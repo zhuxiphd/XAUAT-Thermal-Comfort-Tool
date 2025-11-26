@@ -6,3 +6,4 @@ pandas
 flask
 flask-cors
 gunicorn
+numba
