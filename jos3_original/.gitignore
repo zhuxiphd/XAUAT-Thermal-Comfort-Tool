@@ -1,0 +1,8 @@
+*.pyc
+*.pypirc
+dist/
+build/
+jos3.egg-info/
+.eggs/
+*.csv
+test.py

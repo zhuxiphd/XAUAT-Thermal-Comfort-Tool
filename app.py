@@ -1,8 +1,13 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
+import math
+
+import numpy as np
+
 import PMV
 import SET
+from two_node_excel import calculate_comfort_parameters
 
 # 尝试导入 JOS3，如果缺包也不影响运行，会自动退回示例数据
 try:
@@ -92,7 +97,7 @@ def api_pmv():
     clo = float(data.get("clo", 0.5))
     wme = float(data.get("wme", 0.0))
 
-    pmv, ppd = PMV.pmv_ppd(
+    res = PMV.pmv_with_components(
         tdb=tdb,
         tr=tr,
         vr=vr,
@@ -103,7 +108,29 @@ def api_pmv():
     )
 
     # 前端判断条件：pmvData && pmvData.ok && typeof pmvData.pmv === "number"
-    return jsonify({"ok": True, "pmv": float(pmv), "ppd": float(ppd)})
+    return jsonify(
+        {
+            "ok": True,
+            "pmv": float(res["pmv"]),
+            "ppd": float(res["ppd"]),
+            "hl1": float(res["hl1"]),
+            "hl2": float(res["hl2"]),
+            "hl3": float(res["hl3"]),
+            "hl4": float(res["hl4"]),
+            "hl5": float(res["hl5"]),
+            "hl6": float(res["hl6"]),
+            "mw": float(res.get("mw", 0.0)),
+            "q_total": float(res.get("q_total", 0.0)),
+            "q_sens": float(res.get("q_sens", 0.0)),
+            "q_sensible": float(res.get("q_sensible", 0.0)),
+            "c_res": float(res.get("c_res", 0.0)),
+            "q_lat": float(res.get("q_lat", 0.0)),
+            "e_skin": float(res.get("e_skin", 0.0)),
+            "e_res": float(res.get("e_res", 0.0)),
+            "e_rsw": float(res.get("e_rsw", 0.0)),
+            "e_diff": float(res.get("e_diff", 0.0)),
+        }
+    )
 
 
 # ---------------- 3. SET 接口：/api/set ----------------
@@ -138,6 +165,111 @@ def api_set():
 
     # 前端判断条件：lastSetData && lastSetData.ok && typeof lastSetData.set === "number"
     return jsonify({"ok": True, "set": float(set_value)})
+
+
+# ---------------- 4. 两节点 (Gagge) 模型批量接口：/api/two_node ----------------
+@app.route("/api/two_node", methods=["POST"])
+def api_two_node():
+    payload = request.get_json(silent=True) or {}
+    rows = payload.get("rows")
+    if not isinstance(rows, list) or not rows:
+        return (
+            jsonify(
+                {
+                    "ok": False,
+                    "error": "rows 必须是包含至少一行数据的列表。",
+                }
+            ),
+            400,
+        )
+
+    # 这些字段在 two_node_excel 输出中一定存在，用于构造“计算错误”占位
+    error_fields = [
+        "n_simulation",
+        "Q_sens",
+        "q_sensible",
+        "c_res",
+        "Q_lat",
+        "e_skin",
+        "e_res",
+        "e_rsw",
+        "e_diff",
+        "Q_skin",
+        "Q_resp",
+        "e_max",
+        "m_bl",
+        "m_rsw",
+        "w",
+        "w_max",
+        "t_skin",
+        "t_core",
+        "_set",
+        "et",
+        "t_sens",
+        "disc",
+        "pmv_gagge",
+        "pmv_set",
+        "ps",
+        "r_clo_s",
+        "h_c_s",
+    ]
+
+    def _clean_value(val):
+        """将 numpy / 非有限数字转换为基础 Python 类型，避免 JSON 序列化失败。"""
+        if isinstance(val, np.generic):
+            val = val.item()
+        if isinstance(val, (float, int)):
+            try:
+                parsed = float(val)
+            except Exception:
+                return None
+            return parsed if math.isfinite(parsed) else None
+        return val
+
+    def _prepare_row(raw_row):
+        """把字符串数字转成 float，去掉空值。"""
+        prepared = {}
+        for key, value in (raw_row or {}).items():
+            if value is None:
+                continue
+            if isinstance(value, (int, float)):
+                prepared[key] = float(value)
+                continue
+            if isinstance(value, str):
+                stripped = value.strip()
+                if not stripped:
+                    continue
+                try:
+                    prepared[key] = float(stripped)
+                    continue
+                except ValueError:
+                    prepared[key] = stripped
+                    continue
+            prepared[key] = value
+        return prepared
+
+    def _error_result(row_dict, message):
+        result = {key: "计算错误" for key in error_fields}
+        result.update({key: _clean_value(val) for key, val in row_dict.items()})
+        result["error"] = message
+        return result
+
+    results = []
+    for idx, row in enumerate(rows, start=1):
+        if not isinstance(row, dict):
+            results.append(_error_result({}, f"第 {idx} 行输入不是有效对象"))
+            continue
+
+        prepared_row = _prepare_row(row)
+        try:
+            output = calculate_comfort_parameters(prepared_row)
+            merged = {**prepared_row, **output}
+            merged = {key: _clean_value(val) for key, val in merged.items()}
+            results.append(merged)
+        except Exception as exc:
+            results.append(_error_result(prepared_row, str(exc)))
+
+    return jsonify({"ok": True, "results": results})
 
 
 if __name__ == "__main__":
