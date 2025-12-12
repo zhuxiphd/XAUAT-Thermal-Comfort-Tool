@@ -1004,7 +1004,7 @@
 
     .body-field-selector-buttons {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(107px, 1fr));
       grid-auto-rows: 24px;
       gap: 4px;
       max-height: none;
@@ -1013,13 +1013,13 @@
 
     @media (max-width: 1600px) {
       .body-field-selector-buttons {
-        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
       }
     }
 
     @media (max-width: 1280px) {
       .body-field-selector-buttons {
-        grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(91px, 1fr));
         grid-auto-rows: 26px;
       }
     }
@@ -1033,6 +1033,10 @@
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.15s ease;
+    }
+
+    .body-field-btn[data-value="-1"] {
+      font-size: 0.62rem;
     }
 
     .body-field-btn.active {
@@ -7434,7 +7438,7 @@
         return datasets;
       }
 
-      function drawBodyFieldSeries(baseKey) {
+      function drawBodyFieldSeries(baseKey, forceRebuild) {
         if (!currentRun || !baseKey) return false;
         bodyFieldCurrentBaseKey = baseKey;
         const time = lastRawTime.length ? lastRawTime : currentRun.time || [];
@@ -7494,7 +7498,10 @@
         if (!canvas) return false;
         const ctx = canvas.getContext("2d");
         const shouldRebuildChart =
-          !rawChart || rawChartContext !== "body-field" || rawChartBaseKey !== baseKey;
+          !!forceRebuild ||
+          !rawChart ||
+          rawChartContext !== "body-field" ||
+          rawChartBaseKey !== baseKey;
         if (shouldRebuildChart && rawChart) {
           rawChart.destroy();
           rawChart = null;
@@ -12436,6 +12443,25 @@
         }
       }
 
+      // 语言切换时需要根据当前上下文重新绘制图表，以刷新轴标题等文案
+      function refreshCurrentOutputChart() {
+        if (!rawChartContext) return;
+        if (rawChartContext === "raw-series" && rawChartBaseKey) {
+          drawRawSeries(rawChartBaseKey);
+          return;
+        }
+        if (rawChartContext === "body-field") {
+          const key = rawChartBaseKey || bodyFieldCurrentBaseKey;
+          if (key) {
+            drawBodyFieldSeries(key, true);
+          }
+          return;
+        }
+        if (rawChartContext === "derived" && rawChartBaseKey) {
+          drawMergedDerivedSeries(rawChartBaseKey);
+        }
+      }
+
       function updateHeatTotalChart(time) {
         // 旧版：在独立卡片中画图；现在改由 drawMergedDerivedSeries("derived_heat_total") 绘制。
         return;
@@ -14830,6 +14856,7 @@
           }
           set3DFieldAvailability(body3DFieldAvailable);
           updateChartsFromRuns();
+          refreshCurrentOutputChart();
           if (currentRun) {
             updateSummaryFromRun();
           } else {
