@@ -1,4 +1,4 @@
-# Advanced-XAUAT-Comfort-Tool
+# Advanced-XAUAT-Comfort-Tool 高级西建大热舒适工具
 
 一个基于 Python 的热舒适性评估工具，提供 PMV、SET、JOS-3 等热舒适指数的计算与可视化服务。适用于室内环境评估、建筑热舒适分析、HVAC 调试与教学研究。
 
