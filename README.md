@@ -1,9 +1,3 @@
-我看到了你仓库的文件结构（虽然 GitHub 页面加载有点问题，不过能看到主要文件名）。你的项目叫 **Advanced-XAUAT-Comfort-Tool**，里面有 `PMV.py`、`SET.py`、`JOS3.py`、`app.py` 和静态资源等。推测这是一个 **用于热舒适性（thermal comfort）计算与可视化的小工具**，可能实现了 PMV（Predicted Mean Vote）、SET（Standard Effective Temperature）、JOS-3 等舒适指标计算，并通过一个简单的界面（`app.py`）对外提供服务。类似于 pythermalcomfort 的功能（一个热舒适度计算 Python 包）([GitHub][1])。
-
-下面是我为你的项目写的 **README 模板**。这个 README 已经涵盖了项目介绍、功能、安装、使用示例、文件说明、贡献和许可证等常见部分，你可以根据真实代码再补充细节（比如界面截图、参数说明、公式出处等）。
-
----
-
 # Advanced-XAUAT-Comfort-Tool
 
 一个基于 Python 的热舒适性评估工具，提供 PMV、SET、JOS-3 等热舒适指数的计算与可视化服务。适用于室内环境评估、建筑热舒适分析、HVAC 调试与教学研究。
@@ -115,9 +109,3 @@ Advanced-XAUAT-Comfort-Tool/
 ## 授权许可
 
 本项目采用 **MIT License**（或你想要的其他许可证），详细内容见 LICENSE 文件。
-
----
-
-如果你愿意，我也可以基于**代码内部具体实现**（比如函数签名、公式出处、返回结构）写得更详细。只需要把其中某个 `.py` 文件的代码粘给我，我就能自动把 README 中的示例代码、参数说明、返回格式写得一针见血。
-
-[1]: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort?utm_source=chatgpt.com "CenterForTheBuiltEnvironment/pythermalcomfort"
