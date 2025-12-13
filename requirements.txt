@@ -1,6 +1,5 @@
 fastapi
 uvicorn[standard]
-jos3
 numpy
 pandas
 flask

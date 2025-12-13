@@ -2,8 +2,20 @@ from typing import List, Literal, Optional, Union, Dict, Tuple
 import pathlib
 import traceback
 import math
+import sys
 
-import jos3
+BASE_DIR = pathlib.Path(__file__).resolve().parent
+JOS3_LOCAL_SRC = BASE_DIR / "jos3_original" / "src"
+if JOS3_LOCAL_SRC.exists():
+    # Ensure the vendored jos3 package is imported instead of an arbitrary pip release.
+    sys.path.insert(0, str(JOS3_LOCAL_SRC))
+
+try:
+    import jos3  # noqa: E402  # pylint: disable=wrong-import-position
+except ImportError as err:
+    raise ImportError(
+        f"无法从 {JOS3_LOCAL_SRC} 导入本地 jos3 源码，请确认仓库包含原始 JOS3 代码。"
+    ) from err
 from PMV import pmv_ppd, pmv_with_components
 from SET import set_tmp  # SET 计算函数
 from two_node_excel import calculate_comfort_parameters
@@ -35,7 +47,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BASE_DIR = pathlib.Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 
 # 静态文件（前端资源）
