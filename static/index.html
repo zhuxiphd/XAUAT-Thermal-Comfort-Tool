@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>Advanced XAUAT Comfort Tool</title>
+  <title>XAUAT Thermal Comfort Tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -83,10 +83,10 @@
     }
 
     .header-logo {
-      width: 55px;
-      height: 55px;
+      width: 44px;
+      height: 44px;
       object-fit: contain;
-      transform: scale(1.5);
+      transform: scale(1.25);
     }
 
     .header-actions {
@@ -3219,7 +3219,7 @@
 
       const I18N = {
         zh: {
-          "header.title": "Advanced XAUAT Comfort Tool",
+          "header.title": "XAUAT Thermal Comfort Tool",
           "section.settings": "工况设置",
           "section.settings.tip": "选中 Condition 1 进行设置参数模拟或增加多阶段工况",
           "field.exposure.label": "暴露时间",
@@ -3400,7 +3400,7 @@
             "本前端仅用于教学与研究示例。"
         },
         en: {
-          "header.title": "Advanced XAUAT Comfort Tool",
+          "header.title": "XAUAT Thermal Comfort Tool",
           "section.settings": "Condition Settings",
           "section.settings.tip": "Select Condition 1 to edit parameters or add multi-stage scenarios",
           "field.exposure.label": "Exposure time",
@@ -3565,7 +3565,7 @@
           "chart.heat.sensible.subtitle": "Total sensible + skin sensible + respiratory sensible",
           "chart.heat.latent.title": "Total latent heat",
           "chart.heat.latent.subtitle": "Total latent + skin/resp latent + sweat evaporation + diffusion",
-          "chart.heat.total.title": "Metabolic vs total heat",
+          "chart.heat.total.title": "Heat gain/loss",
           "chart.heat.total.subtitle": "Metabolic heat, total loss, and total sensible/latent components",
           "export.csv": "Export data (CSV)",
           "button.heatlossDownload": "Download heat loss data",
@@ -7633,7 +7633,7 @@
         const derivedOptions = [
           { value: "derived_heat_sensible", zh: "总显热", en: "Total sensible heat" },
           { value: "derived_heat_latent", zh: "总潜热", en: "Total latent heat" },
-          { value: "derived_heat_total", zh: "总产热量与总散热量", en: "Metabolic vs total heat" }
+          { value: "derived_heat_total", zh: "总产热量与总散热量", en: "Heat gain/loss" }
         ];
 
         const categoryOptions = new Map();
@@ -12207,7 +12207,7 @@
           if (!summary) return;
           data = convertSeries(summary.sensibleTotal || [], summary.area);
           label = makeLabel("总显热", "Total sensible heat", heatSymbols.sensible);
-          yLabel = currentLang === "zh" ? `功率 [${unitLabel}]` : `Power [${unitLabel}]`;
+          yLabel = currentLang === "zh" ? `热流 [${unitLabel}]` : `Heat flux [${unitLabel}]`;
           unit = unitLabel;
           extraDatasets = [
             createHeatDataset(
@@ -12237,7 +12237,7 @@
           if (!summary) return;
           data = convertSeries(summary.latentTotal || [], summary.area);
           label = makeLabel("总潜热", "Total latent heat", heatSymbols.latent);
-          yLabel = currentLang === "zh" ? `功率 [${unitLabel}]` : `Power [${unitLabel}]`;
+          yLabel = currentLang === "zh" ? `热流 [${unitLabel}]` : `Heat flux [${unitLabel}]`;
           unit = unitLabel;
           extraDatasets = [
             createHeatDataset(
@@ -12293,7 +12293,7 @@
           data = metabolicSeries;
           const symbol = labelZh === "总散热量" ? heatSymbols.total : heatSymbols.metabolic;
           label = makeLabel(labelZh, labelEn, symbol);
-          yLabel = currentLang === "zh" ? `功率 [${unitLabel}]` : `Power [${unitLabel}]`;
+          yLabel = currentLang === "zh" ? `热流 [${unitLabel}]` : `Heat flux [${unitLabel}]`;
           unit = unitLabel;
           extraDatasets = [
             createHeatDataset(

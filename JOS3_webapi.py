@@ -16,6 +16,7 @@ except ImportError as err:
     raise ImportError(
         f"无法从 {JOS3_LOCAL_SRC} 导入本地 jos3 源码，请确认仓库包含原始 JOS3 代码。"
     ) from err
+
 from PMV import pmv_ppd, pmv_with_components
 from SET import set_tmp  # SET 计算函数
 from two_node_excel import calculate_comfort_parameters
@@ -57,6 +58,18 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 def serve_index():
     """返回前端主页面 index.html"""
     return FileResponse(str(STATIC_DIR / "index.html"))
+
+
+# ========= Debug 接口：确认 Render 上导入的是哪个 jos3 =========
+@app.get("/api/debug/jos3")
+def debug_jos3():
+    return {
+        "jos3_file": getattr(jos3, "__file__", None),
+        "jos3_version": getattr(jos3, "__version__", None),
+        "vendored_src_exists": bool(JOS3_LOCAL_SRC.exists()),
+        "vendored_src_path": str(JOS3_LOCAL_SRC),
+        "sys_path_head": sys.path[:5],
+    }
 
 
 # ========= 一些通用类型 =========
@@ -250,19 +263,17 @@ def api_two_node(payload: TwoNodeBatchInput):
         return val
 
     for row in payload.rows:
-        # exclude_none=True：只把用户真正填写的高级调参项传下去，其余使用默认
         row_dict = row.dict(exclude_none=True)
         try:
             series = pd.Series(row_dict)
             out = calculate_comfort_parameters(series)
 
             merged: Dict[str, RawValue] = {}
-            merged.update(row_dict)   # 原始输入
-            merged.update(out)        # 计算结果
+            merged.update(row_dict)
+            merged.update(out)
             merged = {k: _clean(v) for k, v in merged.items()}
             results.append(merged)
         except Exception as e:
-            # 出错时，保证结构一致，填“计算错误”
             error_result: Dict[str, RawValue] = {
                 k: "计算错误"
                 for k in [
@@ -287,44 +298,24 @@ class EnvStep(BaseModel):
     """单个阶段 / 工况。可以是非均匀 + 非稳态环境。"""
 
     duration_minutes: float = Field(..., gt=0, description="本阶段持续时间 [min]")
-    Ta: Optional[ScalarOrArray] = Field(
-        None, description="空气温度 Ta [°C]，可为标量或 17 段列表"
-    )
-    Tr: Optional[ScalarOrArray] = Field(
-        None, description="平均辐射温度 Tr [°C]，可为标量或 17 段列表"
-    )
+    Ta: Optional[ScalarOrArray] = Field(None, description="空气温度 Ta [°C]，可为标量或 17 段列表")
+    Tr: Optional[ScalarOrArray] = Field(None, description="平均辐射温度 Tr [°C]，可为标量或 17 段列表")
     To: Optional[ScalarOrArray] = Field(
         None,
         description="作用温度 To [°C]（仅在 Ta == Tr 时使用），可为标量或 17 段列表",
     )
-    Va: Optional[ScalarOrArray] = Field(
-        None, description="风速 Va [m/s]，可为标量或 17 段列表"
-    )
-    RH: Optional[ScalarOrArray] = Field(
-        None, description="相对湿度 RH [%]，可为标量或 17 段列表"
-    )
-    Icl: Optional[ScalarOrArray] = Field(
-        None, description="服装热阻 Icl [clo]，可为标量或 17 段列表"
-    )
+    Va: Optional[ScalarOrArray] = Field(None, description="风速 Va [m/s]，可为标量或 17 段列表")
+    RH: Optional[ScalarOrArray] = Field(None, description="相对湿度 RH [%]，可为标量或 17 段列表")
+    Icl: Optional[ScalarOrArray] = Field(None, description="服装热阻 Icl [clo]，可为标量或 17 段列表")
 
-    met: Optional[float] = Field(
-        None, description="本阶段代谢率 [met]，若 par 未给定，则用于计算 PAR"
-    )
-    par: Optional[float] = Field(
-        None,
-        description="本阶段物理活动系数 PAR [-]，若给定则优先于 met",
-    )
-    posture: Optional[Literal["sitting", "standing", "lying"]] = Field(
-        None, description="本阶段姿态"
-    )
+    met: Optional[float] = Field(None, description="本阶段代谢率 [met]，若 par 未给定，则用于计算 PAR")
+    par: Optional[float] = Field(None, description="本阶段物理活动系数 PAR [-]，若给定则优先于 met")
+    posture: Optional[Literal["sitting", "standing", "lying"]] = Field(None, description="本阶段姿态")
 
-    time_step: Optional[float] = Field(
-        None, gt=0, description="本阶段时间步长 [s]，缺省则使用全局 time_step"
-    )
+    time_step: Optional[float] = Field(None, gt=0, description="本阶段时间步长 [s]，缺省则使用全局 time_step")
 
 
 class SimInput(BaseModel):
-    # ========= 个体参数（全部透传给 JOS-3 构造器） =========
     height: float = Field(1.7, description="Body height [m]")
     weight: float = Field(70.0, description="Body weight [kg]")
     age: int = Field(30, description="Age [years]")
@@ -339,7 +330,6 @@ class SimInput(BaseModel):
         "dubois", description="Body surface area equation"
     )
 
-    # ex_output 原样透传给 JOS-3：None / 'all' / ['BFsk', ...]
     ex_output: Optional[Union[str, List[str]]] = Field(
         "all",
         description=(
@@ -349,44 +339,24 @@ class SimInput(BaseModel):
         ),
     )
 
-    # ========= 活动 & 姿态 =========
     met: float = Field(1.0, description="Metabolic rate [met]")
-    par: Optional[float] = Field(
-        None, description="Physical activity ratio PAR [-]，若给定则优先于 met"
-    )
-    posture: Literal["sitting", "standing", "lying"] = Field(
-        "sitting", description="Initial posture"
-    )
+    par: Optional[float] = Field(None, description="Physical activity ratio PAR [-]，若给定则优先于 met")
+    posture: Literal["sitting", "standing", "lying"] = Field("sitting", description="Initial posture")
 
-    # ========= 全局 / 初始环境条件（作为所有工况的起点） =========
-    air_temperature: ScalarOrArray = Field(
-        25.0, description="Initial / uniform air temperature Ta [°C]"
-    )
-    mean_radiant_temperature: ScalarOrArray = Field(
-        25.0, description="Initial / uniform mean radiant temperature Tr [°C]"
-    )
+    air_temperature: ScalarOrArray = Field(25.0, description="Initial / uniform air temperature Ta [°C]")
+    mean_radiant_temperature: ScalarOrArray = Field(25.0, description="Initial / uniform mean radiant temperature Tr [°C]")
     operative_temperature: Optional[ScalarOrArray] = Field(
         None,
         description="Operative temperature To [°C]（仅在 Ta==Tr 时使用），标量或 17 段列表",
     )
-    air_speed: ScalarOrArray = Field(
-        0.1, description="Initial / uniform air velocity Va [m/s]"
-    )
-    relative_humidity: ScalarOrArray = Field(
-        50.0, description="Initial / uniform relative humidity RH [%]"
-    )
-    clo: ScalarOrArray = Field(
-        0.5, description="Initial / uniform clothing insulation Icl [clo]"
-    )
+    air_speed: ScalarOrArray = Field(0.1, description="Initial / uniform air velocity Va [m/s]")
+    relative_humidity: ScalarOrArray = Field(50.0, description="Initial / uniform relative humidity RH [%]")
+    clo: ScalarOrArray = Field(0.5, description="Initial / uniform clothing insulation Icl [clo]")
 
-    # ========= 单阶段工况参数（scenario='uniform' 时使用） =========
     exposure_minutes: float = Field(30.0, description="Exposure time [min]")
     time_step: float = Field(60.0, description="Global simulation time step [s]")
 
-    # ========= 工况模式 =========
-    scenario: Literal["uniform", "jos3_example", "custom_steps"] = Field(
-        "uniform", description="Scenario type"
-    )
+    scenario: Literal["uniform", "jos3_example", "custom_steps"] = Field("uniform", description="Scenario type")
     steps: Optional[List[EnvStep]] = Field(
         None,
         description="自定义多阶段 / 非均匀环境（仅在 scenario='custom_steps' 时使用）",
@@ -394,26 +364,22 @@ class SimInput(BaseModel):
 
 
 class SimOutput(BaseModel):
-    # 兼容以前接口 + 暴露全部原始结果
     time_min: List[float]
-    body_parts: List[str]  # 17 个身体分段名称（从列名 TskXXX 解析）
+    body_parts: List[str]
     TskMean: List[float]
     Tcb: List[float]
     Met: List[float]
-    tsk_local: List[List[float]]  # [n_parts][n_time]
+    tsk_local: List[List[float]]
 
-    # Fiala 风格热感觉 / 热舒适输出
-    DTS: List[float]  # Dynamic Thermal Sensation
-    PPD: List[float]  # Predicted Percentage of Dissatisfied
+    DTS: List[float]
+    PPD: List[float]
 
-    # 完整输出：dict_results() 的每一列原样给出（不丢任何 JOS-3 功能）
     raw: Dict[str, List[RawValue]]
 
 
 def _build_model(sim_input: SimInput):
     """根据 SimInput 构建并配置 JOS-3 模型实例。"""
 
-    # ex_output 解析：'none'/'None' -> None
     ex_output = sim_input.ex_output
     if isinstance(ex_output, str) and ex_output.lower() == "none":
         ex_output_param = None
@@ -432,28 +398,24 @@ def _build_model(sim_input: SimInput):
         ex_output=ex_output_param,
     )
 
-    # 获取 BMR，用于 met -> PAR 的转换
     bmr = getattr(model, "BMR", None)
     if bmr is None:
         bmr = getattr(model, "bmr", None)
 
     def met_to_par(met_val: Optional[float]) -> float:
         if met_val is None:
-            return 1.2  # fallback：安静坐姿
+            return 1.2
         if bmr is None or bmr == 0:
             return 1.2
         return (met_val * 58.2) / float(bmr)
 
-    # 设置初始 PAR
     if sim_input.par is not None:
         model.PAR = sim_input.par
     else:
         model.PAR = met_to_par(sim_input.met)
 
-    # 初始姿势
     model.posture = sim_input.posture
 
-    # 通用环境设置函数（支持标量 / 17 段列表）
     def set_env(value: Optional[ScalarOrArray], attr: str):
         if value is None:
             return
@@ -462,7 +424,6 @@ def _build_model(sim_input: SimInput):
         else:
             setattr(model, attr, float(value))
 
-    # 初始化环境（所有 scenario 共用的“初始状态”）
     set_env(sim_input.air_temperature, "Ta")
     set_env(sim_input.mean_radiant_temperature, "Tr")
     if sim_input.operative_temperature is not None:
@@ -473,8 +434,6 @@ def _build_model(sim_input: SimInput):
 
     return model, met_to_par
 
-
-# ========= Fiala 风格 DTS / PPD 计算（基于 JOS-3 输出） =========
 
 def _compute_dts_ppd(
     time_min: List[float],
@@ -487,7 +446,7 @@ def _compute_dts_ppd(
     if not time_min or not TskMean or not Tcb:
         return [], []
 
-    t = np.asarray(time_min, dtype=float) * 60.0  # [s]
+    t = np.asarray(time_min, dtype=float) * 60.0
     tsk = np.asarray(TskMean, dtype=float)
     tcb_arr = np.asarray(Tcb, dtype=float)
 
@@ -501,7 +460,6 @@ def _compute_dts_ppd(
         tcb_arr = tcb_arr[:n_min]
         n = n_min
 
-    # 时间步长 [s]
     if n < 2:
         dt_sec = np.array([60.0], dtype=float)
     else:
@@ -511,22 +469,20 @@ def _compute_dts_ppd(
             fallback = float(np.median(positive)) if positive.size > 0 else 60.0
             dt_sec[dt_sec <= 0] = fallback
 
-    # ---------- 静态部分：皮肤 + 核心温度偏差 ----------
     delta_tsk = tsk - float(tsk_neutral)
     delta_tcb = tcb_arr - float(tcb_neutral)
 
-    k_skin = 0.35  # 皮肤权重
-    k_core = 0.50  # 核心权重
+    k_skin = 0.35
+    k_core = 0.50
 
     ts_static = k_skin * delta_tsk + k_core * delta_tcb
 
-    # ---------- 动态部分：基于 dTsk/dt 的指数记忆 ----------
     dTdt = np.zeros_like(tsk)
     if n > 1:
         dTdt[1:] = np.diff(tsk) / dt_sec
 
-    tau_pos = 300.0  # [s] 升温记忆时间常数 ~5 min
-    tau_neg = 600.0  # [s] 降温记忆时间常数 ~10 min
+    tau_pos = 300.0
+    tau_neg = 600.0
 
     ts_dyn = np.zeros_like(tsk)
     pos_state = 0.0
@@ -550,30 +506,21 @@ def _compute_dts_ppd(
     DTS = ts_static + ts_dyn
     DTS = np.clip(DTS, -3.0, 3.0)
 
-    # ---------- PPD：Fanger 型公式 ----------
     PPD = 100.0 - 95.0 * np.exp(-0.03353 * DTS**4 - 0.2179 * DTS**2)
 
     return DTS.astype(float).tolist(), PPD.astype(float).tolist()
 
 
-# ========= 核心接口：调用 JOS-3（完整功能 + Fiala 输出） =========
-
 @app.post("/api/simulate", response_model=SimOutput)
 def simulate(sim_input: SimInput):
     try:
-        # ---- 1. 构建模型 ----
         model, met_to_par = _build_model(sim_input)
 
-        # ---- 2. 按 scenario 执行模拟 ----
         if sim_input.scenario == "uniform":
-            loops = max(
-                1,
-                int(round(sim_input.exposure_minutes * 60.0 / sim_input.time_step)),
-            )
+            loops = max(1, int(round(sim_input.exposure_minutes * 60.0 / sim_input.time_step)))
             model.simulate(times=loops, dtime=sim_input.time_step)
 
         elif sim_input.scenario == "jos3_example":
-            # 示例工况（保持不动）
             model.Ta = 28
             model.Tr = 30
             model.RH = 40
@@ -609,10 +556,7 @@ def simulate(sim_input: SimInput):
 
         elif sim_input.scenario == "custom_steps":
             if not sim_input.steps:
-                raise HTTPException(
-                    status_code=400,
-                    detail="scenario='custom_steps' 时必须提供 steps 列表。",
-                )
+                raise HTTPException(status_code=400, detail="scenario='custom_steps' 时必须提供 steps 列表。")
 
             def set_env(value: Optional[ScalarOrArray], attr: str):
                 if value is None:
@@ -623,7 +567,6 @@ def simulate(sim_input: SimInput):
                     setattr(model, attr, float(value))
 
             for step in sim_input.steps:
-                # 活动强度 / 姿态
                 if step.par is not None:
                     model.PAR = step.par
                 elif step.met is not None:
@@ -632,7 +575,6 @@ def simulate(sim_input: SimInput):
                 if step.posture is not None:
                     model.posture = step.posture
 
-                # 环境条件
                 set_env(step.Ta, "Ta")
                 set_env(step.Tr, "Tr")
                 set_env(step.To, "To")
@@ -647,11 +589,12 @@ def simulate(sim_input: SimInput):
         else:
             raise HTTPException(status_code=400, detail=f"未知 scenario: {sim_input.scenario}")
 
-        # ---- 3. 取结果 ----
         results = model.dict_results()
         df = pd.DataFrame(results)
 
-        # 时间列
+        # ✅ 正确位置：打印列名到 Render Logs（或本地控制台）
+        print("JOS3 columns:", list(df.columns))
+
         if "ModTime" in df.columns:
             time_col = df["ModTime"]
         elif "Time" in df.columns:
@@ -664,32 +607,27 @@ def simulate(sim_input: SimInput):
         else:
             time_min = (pd.to_numeric(time_col, errors="coerce") / 60.0).astype(float).tolist()
 
-        # 全身平均皮肤温度
         if "TskMean" not in df.columns:
             raise RuntimeError("JOS-3 结果中没有 TskMean 列")
         TskMean = pd.to_numeric(df["TskMean"], errors="coerce").astype(float).tolist()
 
-        # 核心温度
         if "Tcb" in df.columns:
             Tcb = pd.to_numeric(df["Tcb"], errors="coerce").astype(float).tolist()
         else:
             last_val = float(TskMean[-1]) if TskMean else 37.0
             Tcb = [last_val] * len(time_min)
 
-        # 代谢率
         if "Met" in df.columns:
             Met = pd.to_numeric(df["Met"], errors="coerce").astype(float).tolist()
         else:
             Met = [sim_input.met * 58.2] * len(time_min)
 
-        # 计算 DTS / PPD
         DTS, PPD = _compute_dts_ppd(time_min, TskMean, Tcb)
 
         if len(DTS) == len(df):
             df["DTS"] = DTS
             df["PPD"] = PPD
 
-        # 局部皮肤温度列
         tsk_local_cols = [c for c in df.columns if c.startswith("Tsk") and c != "TskMean"]
         body_parts = [c[3:] for c in tsk_local_cols]
 
@@ -702,7 +640,6 @@ def simulate(sim_input: SimInput):
             body_parts = ["WholeBody"]
             tsk_local = [TskMean]
 
-        # raw 输出：用 None 代替 NaN / NaT / numpy 类型等
         raw_df = df.where(pd.notnull(df), None)
 
         raw: Dict[str, List[RawValue]] = {}
@@ -740,7 +677,6 @@ def simulate(sim_input: SimInput):
         )
 
     except HTTPException:
-        # FastAPI 会自动处理 HTTPException
         raise
     except Exception as e:
         traceback.print_exc()
@@ -751,5 +687,4 @@ def simulate(sim_input: SimInput):
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)
