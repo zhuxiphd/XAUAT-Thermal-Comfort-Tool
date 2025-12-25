@@ -3784,7 +3784,6 @@
       const jos3AdvancedSection = document.getElementById("jos3-advanced-section");
       const jos3AdvancedBody = document.getElementById("jos3-advanced-body");
       const jos3AdvancedFieldIds = [
-        "field-wme",
         "field-posture",
         "field-height",
         "field-weight",
@@ -4766,9 +4765,7 @@
               clo: Number.isFinite(row.clo) ? row.clo : getCloValue(),
               wme: Number.isFinite(row.wme)
                 ? row.wme
-                : Number.isFinite(parseFloat(wmeInput.value))
-                ? parseFloat(wmeInput.value)
-                : 0.0
+                : getWmeValue()
             };
 
             try {
@@ -5618,7 +5615,11 @@
         if (!row || typeof row !== "object") return row;
         const tdb = toFiniteNumber(row.tdb);
         const rh = toFiniteNumber(row.rh);
-        const met = toFiniteNumber(row.met);
+        const metInput = toFiniteNumber(row.met);
+        const wmeInput = toFiniteNumber(row.wme);
+        const netMet =
+          metInput !== null ? metInput - (Number.isFinite(wmeInput) ? wmeInput : 0) : null;
+        const met = netMet !== null ? Math.max(netMet, 0) : null;
         const weight = toFiniteNumber(row.weight);
         const height = toFiniteNumber(row.height);
         const qSens = toFiniteNumber(row.q_sensible);
@@ -6621,14 +6622,21 @@
           }
 
           // 如果还没有建立对比列，则退回到原始按时间步导出的形式
-        if (!lastTwoNodeResults || !Array.isArray(lastTwoNodeResults) || !lastTwoNodeResults.length) {
+        const exportRows =
+          (Array.isArray(lastTwoNodeResults) && lastTwoNodeResults.length
+            ? lastTwoNodeResults
+            : null) ||
+          (Array.isArray(lastTwoNodeBatchResults) && lastTwoNodeBatchResults.length
+            ? lastTwoNodeBatchResults
+            : null);
+        if (!exportRows) {
           alert("还没有可导出的两节点结果，请先运行一次计算。");
           return;
-          }
+        }
 
           setTwoNodeStatus("正在生成 Excel 文件…");
 
-          const ws = XLSX.utils.json_to_sheet(lastTwoNodeResults);
+          const ws = XLSX.utils.json_to_sheet(exportRows);
           const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, "two_node_result");
 
@@ -9391,6 +9399,11 @@
           return Number.isFinite(v) ? v : parseFloat(cloSelect.value);
         }
         return parseFloat(cloSelect.value);
+      }
+
+      function getWmeValue() {
+        const v = parseFloat(wmeInput.value);
+        return Number.isFinite(v) ? v : 0.0;
       }
 
       function formatNumber(n, digits) {
@@ -13812,6 +13825,15 @@
                 advancedTwoNodeSection.style.display = "none";
               }
             }
+            const wmeField = document.getElementById("field-wme");
+            if (wmeField) {
+              if (isPMV || isTwoNode) {
+                wmeField.style.display = "";
+              } else {
+                wmeField.style.display = "none";
+                wmeInput.value = "0.0";
+              }
+            }
           }
         }
 
@@ -14420,6 +14442,11 @@
         if (Number.isFinite(payload.clo)) {
           setCloFromValue(payload.clo);
         }
+        if (Number.isFinite(payload.wme)) {
+          wmeInput.value = String(payload.wme);
+        } else {
+          wmeInput.value = "0.0";
+        }
         if (payload.posture) {
           postureSelect.value = payload.posture;
         } else {
@@ -14543,7 +14570,7 @@
           rh: parseFloat(rhInput.value),
           met: getMetValue(),
           clo: getCloValue(),
-          wme: Number.isFinite(parseFloat(wmeInput.value)) ? parseFloat(wmeInput.value) : 0.0
+          wme: getWmeValue()
         };
 
         lastPayload = payload;
@@ -14742,7 +14769,7 @@
           rh: parseFloat(rhInput.value),
           met: getMetValue(),
           clo: getCloValue(),
-          wme: Number.isFinite(parseFloat(wmeInput.value)) ? parseFloat(wmeInput.value) : 0.0,
+          wme: getWmeValue(),
           weight: parseFloat(weightInput.value),
           height: parseFloat(heightInput.value)
         };
