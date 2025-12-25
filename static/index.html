@@ -3309,7 +3309,15 @@
         </div>
       </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="/static/vendor/xlsx.full.min.js"></script>
+  <script>
+    if (typeof XLSX === "undefined") {
+      const fallbackXlsx = document.createElement("script");
+      fallbackXlsx.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+      fallbackXlsx.referrerPolicy = "no-referrer";
+      document.head.appendChild(fallbackXlsx);
+    }
+  </script>
   <script>
     (function () {
       const $ = (id) => document.getElementById(id);
@@ -3347,6 +3355,27 @@
       // === 语言与模型切换相关 ===
       let currentLang = "zh";
       let currentModel = "jos3"; // 默认 JOS-3
+
+      function ensureXlsxAvailable(actionZh, actionEn, onError) {
+        if (typeof XLSX !== "undefined") return true;
+        const zhAction = actionZh || "完成该操作";
+        const enAction = actionEn || "complete this action";
+        const message =
+          currentLang === "zh"
+            ? `Excel 库未能加载，暂时无法${zhAction}。请刷新页面或联系管理员。`
+            : `The Excel library failed to load, so we cannot ${enAction} yet. Please refresh the page or contact the administrator.`;
+        if (typeof onError === "function") {
+          try {
+            onError(message);
+          } catch (err) {
+            console.error("ensureXlsxAvailable onError 回调失败：", err);
+          }
+        } else {
+          alert(message);
+        }
+        console.error(message);
+        return false;
+      }
 
       const STORAGE_KEY_LAST_MODEL = "jos3_ui_last_model";
 
@@ -4387,6 +4416,19 @@
         reader.onload = (e) => {
           try {
             if (isExcel) {
+              if (
+                !ensureXlsxAvailable(
+                  "解析 Excel 批量文件",
+                  "parse Excel batch files",
+                  (message) => {
+                    alert(message);
+                    setTwoNodeBatchStatus(message, true);
+                  }
+                )
+              ) {
+                twoNodeBatchRows = [];
+                return;
+              }
               const data = new Uint8Array(e.target.result);
               const workbook = XLSX.read(data, { type: "array" });
               const firstSheet = workbook.SheetNames[0];
@@ -4909,6 +4951,19 @@
         reader.onload = (e) => {
           try {
             if (isExcel) {
+              if (
+                !ensureXlsxAvailable(
+                  "读取 Excel 批量文件",
+                  "read Excel batch files",
+                  (message) => {
+                    alert(message);
+                    setBatchStatus(message, true);
+                  }
+                )
+              ) {
+                batchRows = [];
+                return;
+              }
               const data = new Uint8Array(e.target.result);
               const workbook = XLSX.read(data, { type: "array" });
               const firstSheet = workbook.SheetNames[0];
@@ -6872,6 +6927,18 @@
       // 生成并下载 Excel（使用 lastTwoNodeResults）
       function handleTwoNodeDownload() {
         try {
+          if (
+            !ensureXlsxAvailable(
+              "导出两节点结果",
+              "export the two-node results",
+              (message) => {
+                alert(message);
+                setTwoNodeStatus(message);
+              }
+            )
+          ) {
+            return;
+          }
           // 优先导出当前对比表（多列“数值X”）
           if (twoNodeColumns && twoNodeColumns.length) {
             setTwoNodeStatus("正在生成 Excel（对比表）…");
@@ -9580,6 +9647,17 @@
       }
 
       function exportRawToXlsx(rawDict, timeMin, filename) {
+        if (
+          !ensureXlsxAvailable(
+            "导出 JOS-3 原始数据",
+            "export the JOS-3 raw data",
+            (message) => {
+              alert(message);
+            }
+          )
+        ) {
+          return;
+        }
         const blob = buildRawWorkbookBlob(rawDict, timeMin);
         const finalName =
           filename ||
@@ -13449,6 +13527,17 @@
       function exportPmvToExcel() {
         if (!pmvColumns.length) {
           alert(currentLang === "zh" ? "暂无 PMV 结果可导出" : "No PMV results to export.");
+          return;
+        }
+        if (
+          !ensureXlsxAvailable(
+            "导出 PMV 结果",
+            "export PMV results",
+            (message) => {
+              alert(message);
+            }
+          )
+        ) {
           return;
         }
         const fields = PMV_FIELD_CONFIG;
