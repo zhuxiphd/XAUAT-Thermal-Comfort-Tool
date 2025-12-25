@@ -356,7 +356,9 @@ class SimInput(BaseModel):
     exposure_minutes: float = Field(30.0, description="Exposure time [min]")
     time_step: float = Field(60.0, description="Global simulation time step [s]")
 
-    scenario: Literal["uniform", "jos3_example", "custom_steps"] = Field("uniform", description="Scenario type")
+    scenario: Literal["uniform", "jos3_example", "jos3_example_1", "custom_steps"] = Field(
+        "uniform", description="Scenario type"
+    )
     steps: Optional[List[EnvStep]] = Field(
         None,
         description="自定义多阶段 / 非均匀环境（仅在 scenario='custom_steps' 时使用）",
@@ -553,6 +555,21 @@ def simulate(sim_input: SimInput):
             model.Ta = 30
             model.Tr = 35
             model.simulate(times=30, dtime=60)
+
+        elif sim_input.scenario == "jos3_example_1":
+            # Official example.py: first 60 minutes at To = 28°C, then lower To to 20°C
+            model.Ta = 28
+            model.Tr = 28
+            model.To = 28
+            model.RH = 40
+            model.Va = 0.2
+            model.PAR = 1.2
+            model.posture = "sitting"
+            model.simulate(times=60, dtime=60)
+
+            # Only change operative temperature to 20°C while keeping other conditions
+            model.To = 20
+            model.simulate(times=60, dtime=60)
 
         elif sim_input.scenario == "custom_steps":
             if not sim_input.steps:

@@ -1363,7 +1363,7 @@
       align-items: flex-start;
       gap: 2px;
       margin-bottom: 12px;
-      cursor: default;
+      cursor: pointer;
       white-space: normal;
       overflow-wrap: break-word;
       word-break: break-word;
@@ -1829,11 +1829,134 @@
     .quick-example-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       margin: 0 0 6px;
       flex-wrap: wrap;
       justify-content: flex-end;
       flex: 0 0 auto;
+    }
+    .quick-example-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+    .example-info-tooltip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .example-info-icon {
+      width: 22px;
+      height: 22px;
+      border: 1px solid var(--text-muted);
+      border-radius: 50%;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: default;
+      background: #fff;
+    }
+    .example-info-tooltip .tooltip-bubble {
+      position: absolute;
+      top: 30px;
+      min-width: 280px;
+      max-width: 320px;
+      background: rgba(248, 250, 252, 0.65);
+      color: #111827;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 12px;
+      line-height: 1.55;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 30;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .example-info-tooltip.tooltip-visible .tooltip-bubble {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .example-info-tooltip .tooltip-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 12.5px;
+    }
+    .example-info-tooltip .tooltip-subtext {
+      margin-top: 6px;
+      font-size: 11px;
+      color: rgba(15, 23, 42, 0.65);
+    }
+    .example-info-tooltip .tooltip-list {
+      margin: 6px 0;
+      padding-left: 18px;
+    }
+    .example-info-tooltip .tooltip-list li {
+      margin-bottom: 4px;
+    }
+    .example-info-tooltip .tooltip-list li:last-child {
+      margin-bottom: 0;
+    }
+    .example-info-tooltip .tooltip-subsection {
+      margin-top: 8px;
+      font-size: 11px;
+      color: rgba(15, 23, 42, 0.75);
+    }
+    .example-info-tooltip .tooltip-subsection strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #0f172a;
+    }
+    .example-info-tooltip .tooltip-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .example-info-tooltip .tooltip-tag {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(148, 163, 184, 0.25);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 11px;
+      color: #0f172a;
+    }
+    .example-info-tooltip .tooltip-bubble::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: var(--tooltip-arrow-left, 50%);
+      transform: translateX(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: transparent transparent rgba(248, 250, 252, 0.65) transparent;
+    }
+    .example-info-tooltip.tooltip-align-left .tooltip-bubble {
+      left: 0;
+      right: auto;
+      transform: translateX(0);
+    }
+    .example-info-tooltip.tooltip-align-right .tooltip-bubble {
+      right: 0;
+      left: auto;
+      transform: translateX(0);
+    }
+    .example-info-tooltip.tooltip-align-left .tooltip-bubble::after {
+      left: 18px;
+      transform: none;
+    }
+    .example-info-tooltip.tooltip-align-right .tooltip-bubble::after {
+      right: 18px;
+      left: auto;
+      transform: none;
     }
     .quick-example-btn-label {
       display: block;
@@ -2342,9 +2465,38 @@
               </div>
             </div>
             <div class="quick-example-row">
-              <button id="jos3-example-btn" type="button" class="btn-secondary xsmall quick-example-btn">
-                <span class="quick-example-btn-label" data-i18n-key="button.quickExample">示例工况<br/>（暖→风扇→更暖）</span>
-              </button>
+              <div class="quick-example-group">
+                <button id="jos3-example1-btn" type="button" class="btn-secondary xsmall quick-example-btn">
+                  <span class="quick-example-btn-label" data-i18n-key="button.quickExample1">示例工况 1<br/>（To 28→20 °C）</span>
+                </button>
+                <div class="example-info-tooltip tooltip-align-center" data-scenario="jos3_example_1" tabindex="0" aria-label="示例工况1说明" role="button" aria-expanded="false">
+                  <div class="example-info-icon">?</div>
+                  <div class="tooltip-bubble">
+                    <div class="tooltip-title">JOS-3 示例工况 1（操作温度 28→20 °C）</div>
+                    <ul class="tooltip-list">
+                      <li><strong>阶段 1（0–60 min）</strong>：设置操作温度 To = 28 °C（Ta = Tr = 28 °C），RH 40%，Va 0.2 m/s，PAR 1.2，坐姿，使用默认服装参数，模拟温暖办公室。</li>
+                      <li><strong>阶段 2（60–120 min）</strong>：保持其它条件不变，仅将操作温度调整为 To = 20 °C（等效为桌面风扇冷却），继续计算 60 分钟，观测降温后的动态响应。</li>
+                      <li>此示例对应官方 example.py：仅修改 To 以查看操作温度下降对平均皮肤温度的影响。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="quick-example-group">
+                <button id="jos3-example2-btn" type="button" class="btn-secondary xsmall quick-example-btn">
+                  <span class="quick-example-btn-label" data-i18n-key="button.quickExample2">示例工况 2<br/>（暖→风扇→更暖）</span>
+                </button>
+                <div class="example-info-tooltip tooltip-align-center" data-scenario="jos3_example" tabindex="0" aria-label="示例工况2说明" role="button" aria-expanded="false">
+                  <div class="example-info-icon">?</div>
+                  <div class="tooltip-bubble">
+                    <div class="tooltip-title">JOS-3 示例工况 2（暖 → 风扇 → 更暖）</div>
+                    <ul class="tooltip-list">
+                      <li><strong>阶段 1（0–30 min）</strong>：Ta 28 °C，Tr 30 °C，RH 40%，Va 0.2 m/s，PAR 1.2，坐姿。局部服装热阻 Icl （头部 0、颈部 0、胸部 1.14、背部 0.84、骨盆 1.04、左肩 0.84、左臂 0.42、左手 0、右肩 0.84、右臂 0.42、右手 0、左大腿 0.58、左小腿 0.62、左脚 0.82、右大腿 0.58、右小腿 0.62、右脚 0.82 clo）。</li>
+                      <li><strong>阶段 2（30–90 min）</strong>：保持 Ta/Tr，设置 To = 20 °C，并启用 17 段 Va 列表模拟桌面风扇（头部 0.2、颈部 0.4、胸部 0.4、背部 0.1、骨盆 0.1、左肩 0.4、左臂 0.4、左手 0.4、右肩 0.4、右臂 0.4、右手 0.4、左大腿 0.1、左小腿 0.1、左脚 0.1、右大腿 0.1、右小腿 0.1、右脚 0.1 m/s），持续 60 分钟。</li>
+                      <li><strong>阶段 3（90–120 min）</strong>：环境升温至 Ta 30 °C、Tr 35 °C，继续计算 30 分钟以观测再升温后的反应。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2359,10 +2511,11 @@
           <div class="form-grid">
           <!-- 工况模式 -->
           <div class="field hidden-field" id="field-scenario">
-            <label for="scenario" data-i18n-key="field.scenario.label">JOS3示例工况（暖→风扇→更暖）</label>
+            <label for="scenario" data-i18n-key="field.scenario.label">JOS3示例工况</label>
             <select id="scenario">
               <option value="uniform" selected data-i18n-key="scenario.uniform">自定义均匀工况（单阶段）</option>
-              <option value="jos3_example" data-i18n-key="scenario.example">JOS-3 示例工况（暖 → 风扇 → 更暖）</option>
+              <option value="jos3_example_1" data-i18n-key="scenario.example1">JOS-3 示例工况 1（操作温度 28 → 20 °C）</option>
+              <option value="jos3_example" data-i18n-key="scenario.example2">JOS-3 示例工况 2（暖 → 风扇 → 更暖）</option>
               <option value="custom_steps" data-i18n-key="scenario.custom_steps">多阶段 / 局部工况（custom_steps）</option>
             </select>
           </div>
@@ -3233,9 +3386,10 @@
           "field.met.suffix": "1.0 met ≈ 58.15 W/m²",
           "field.clo.label": "服装热阻 (clo)",
           "field.posture.label": "初始姿势",
-          "field.scenario.label": "JOS3示例工况（暖→风扇→更暖）",
+          "field.scenario.label": "JOS3 示例工况",
           "scenario.uniform": "自定义均匀工况（单阶段）",
-          "scenario.example": "JOS-3 示例工况（暖 → 风扇 → 更暖）",
+          "scenario.example1": "JOS-3 示例工况 1（操作温度 28 → 20 °C）",
+          "scenario.example2": "JOS-3 示例工况 2（暖 → 风扇 → 更暖）",
           "scenario.custom_steps": "多阶段 / 局部工况（custom_steps）",
           "field.height.label": "身高 (m)",
           "field.weight.label": "体重 (kg)",
@@ -3282,7 +3436,8 @@
           "field.model.hint": "先选择模型，再填写左侧参数并点击「模拟」。",
           "meta.dt.label": "时间步长（全局）：",
           "button.simulate": "模拟",
-          "button.quickExample": "示例工况<br/>（暖→风扇→更暖）",
+          "button.quickExample1": "示例工况 1<br/>（To 28→20 °C）",
+          "button.quickExample2": "示例工况 2<br/>（暖→风扇→更暖）",
           "local.open": "展开局部设置",
           "local.modal.title": "局部设置",
           "local.modal.close": "保存并关闭",
@@ -3414,9 +3569,10 @@
           "field.met.suffix": "1.0 met ≈ 58.2 W/m²",
           "field.clo.label": "Clothing insulation (clo)",
           "field.posture.label": "Initial posture",
-          "field.scenario.label": "JOS-3 demo scenario (warm → fan → warmer)",
+          "field.scenario.label": "JOS-3 demo scenarios",
           "scenario.uniform": "Uniform scenario (single stage, custom)",
-          "scenario.example": "JOS-3 demo scenario (warm → fan → warmer)",
+          "scenario.example1": "JOS-3 Demo 1 (Operative temp 28→20 °C)",
+          "scenario.example2": "JOS-3 Demo 2 (Warm → Fan → Warmer)",
           "scenario.custom_steps": "Multi-stage / local scenario (custom_steps)",
           "field.height.label": "Height (m)",
           "field.weight.label": "Weight (kg)",
@@ -3463,7 +3619,8 @@
           "field.model.hint": "Select a model first, then fill the inputs and click \"Simulate\".",
           "meta.dt.label": "Global time step:",
           "button.simulate": "Simulate",
-          "button.quickExample": "Demo scenario<br/>(Warm → Fan → Warmer)",
+          "button.quickExample1": "Demo 1<br/>(To 28→20 °C)",
+          "button.quickExample2": "Demo 2<br/>(Warm → Fan → Warmer)",
           "local.open": "Open local settings",
           "local.modal.title": "Local settings",
           "local.modal.close": "Save & Close",
@@ -3712,16 +3869,141 @@
       const metCustomInput = $("met-custom");
       const cloCustomInput = $("clo-custom");
       const modelSelect = $("model-select");
-      const jos3ExampleBtn = $("jos3-example-btn");
+      const jos3Example1Btn = $("jos3-example1-btn");
+      const jos3Example2Btn = $("jos3-example2-btn");
+      const quickExampleButtons = [
+        { btn: jos3Example1Btn, scenario: "jos3_example_1" },
+        { btn: jos3Example2Btn, scenario: "jos3_example" }
+      ];
       const quickExampleRow = document.querySelector(".quick-example-row");
       const settingsTip = document.querySelector(".section-tip");
       const conditionInlineLabel = $("condition-inline-label");
       const conditionRemoveBtn = $("condition-remove-btn");
       const conditionAddInlineBtn = $("condition-add-inline-btn") || $("condition-add-btn");
+      const exampleInfoTooltips = document.querySelectorAll(".example-info-tooltip");
+      const hideOtherExampleTooltips = (current) => {
+        if (!exampleInfoTooltips || !exampleInfoTooltips.length) return;
+        exampleInfoTooltips.forEach((el) => {
+          if (el === current) return;
+          const setter = el && el.__tooltipVisibilitySetter;
+          if (typeof setter === "function") {
+            setter(false, false);
+          } else {
+            el.classList.remove("tooltip-visible");
+            el.setAttribute("aria-expanded", "false");
+          }
+        });
+      };
+      const PRESET_SCENARIOS = ["jos3_example", "jos3_example_1"];
+      const isPresetScenario = (value) => PRESET_SCENARIOS.includes(value);
+      const JOS3_EXAMPLE1_PRESET_STEPS = Object.freeze([
+        {
+          duration_minutes: 60,
+          Ta: 28,
+          Tr: 28,
+          To: 28,
+          RH: 40,
+          Va: 0.2,
+          met: 1.2,
+          posture: "sitting"
+        },
+        {
+          duration_minutes: 60,
+          Ta: 28,
+          Tr: 28,
+          To: 20,
+          RH: 40,
+          Va: 0.2,
+          met: 1.2,
+          posture: "sitting"
+        }
+      ]);
+
+      function buildExample1CustomSteps() {
+        return JOS3_EXAMPLE1_PRESET_STEPS.map((step) => Object.assign({}, step));
+      }
 
       let inlineConditions = [];
       let activeConditionId = null;
       let nextConditionId = 1;
+
+      if (exampleInfoTooltips && exampleInfoTooltips.length) {
+        exampleInfoTooltips.forEach((tooltipEl) => {
+          const bubble = tooltipEl.querySelector(".tooltip-bubble");
+          if (!bubble) return;
+          const alignTooltip = () => {
+            if (!bubble) return;
+            window.requestAnimationFrame(() => {
+              const rect = tooltipEl.getBoundingClientRect();
+              if (!rect || !rect.width) return;
+              const viewportWidth =
+                window.innerWidth || document.documentElement.clientWidth || 0;
+              const margin = 16;
+              const baseMin = 280;
+              const baseMax = 320;
+              const maxWidth = Math.max(220, Math.min(baseMax, viewportWidth - margin * 2));
+              const minWidth = Math.min(baseMin, maxWidth);
+              bubble.style.maxWidth = `${maxWidth}px`;
+              bubble.style.minWidth = `${minWidth}px`;
+              const bubbleWidth = Math.min(
+                maxWidth,
+                Math.max(minWidth, bubble.offsetWidth || maxWidth)
+              );
+              const centerX = rect.left + rect.width / 2;
+              const maxLeft = Math.max(margin, viewportWidth - bubbleWidth - margin);
+              let leftPx = centerX - bubbleWidth / 2;
+              if (leftPx < margin) leftPx = margin;
+              if (leftPx > maxLeft) leftPx = maxLeft;
+              const relativeLeft = leftPx - rect.left;
+              bubble.style.left = `${relativeLeft}px`;
+              bubble.style.right = "auto";
+              bubble.style.transform = "translateX(0)";
+              const arrowCenter = centerX - leftPx;
+              const arrowPx = Math.max(14, Math.min(arrowCenter, bubbleWidth - 14));
+              bubble.style.setProperty("--tooltip-arrow-left", `${arrowPx}px`);
+            });
+          };
+          let tooltipVisible = false;
+          const setTooltipVisibility = (visible, align = true) => {
+            tooltipVisible = visible;
+            if (visible) {
+              hideOtherExampleTooltips(tooltipEl);
+              tooltipEl.classList.add("tooltip-visible");
+              tooltipEl.setAttribute("aria-expanded", "true");
+              if (align) alignTooltip();
+            } else {
+              tooltipEl.classList.remove("tooltip-visible");
+              tooltipEl.setAttribute("aria-expanded", "false");
+            }
+          };
+          tooltipEl.__tooltipVisibilitySetter = setTooltipVisibility;
+          const toggleTooltip = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setTooltipVisibility(!tooltipVisible, true);
+          };
+          const iconBtn = tooltipEl.querySelector(".example-info-icon");
+          if (iconBtn) {
+            iconBtn.addEventListener("click", toggleTooltip);
+          }
+          tooltipEl.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              toggleTooltip(event);
+            }
+          });
+          document.addEventListener("click", (event) => {
+            if (!tooltipEl.contains(event.target)) {
+              setTooltipVisibility(false, false);
+            }
+          });
+          window.addEventListener("resize", () => {
+            alignTooltip();
+            if (tooltipVisible) alignTooltip();
+          });
+          alignTooltip();
+        });
+      }
 
       // 3D 模型整体缩放（参考 index 10 设置，避免穿模）
       const BODY_MODEL_SCALE = 1.0;
@@ -4679,8 +4961,25 @@
         const normalizeScenario = (val) => {
           const s = val != null ? String(val).toLowerCase().trim() : "";
           if (!s) return scenarioSelect ? scenarioSelect.value : "uniform";
+          const compact = s.replace(/\s+/g, "");
           if (s.includes("custom")) return "custom_steps";
-          if (s.includes("example")) return "jos3_example";
+          if (
+            compact.includes("example1") ||
+            compact.includes("example_1") ||
+            compact.includes("示例工况1") ||
+            compact.includes("示例1")
+          ) {
+            return "jos3_example_1";
+          }
+          if (
+            compact.includes("example2") ||
+            compact.includes("example_2") ||
+            compact.includes("示例工况2") ||
+            compact.includes("示例2")
+          ) {
+            return "jos3_example";
+          }
+          if (compact.includes("example")) return "jos3_example";
           if (s.includes("uniform")) return "uniform";
           return scenarioSelect ? scenarioSelect.value : "uniform";
         };
@@ -10288,7 +10587,7 @@
           chip.type = "button";
           const isActive = cond.id === activeConditionId;
           const forceInactive =
-            scenarioSelect && scenarioSelect.value === "jos3_example";
+            scenarioSelect && isPresetScenario(scenarioSelect.value);
           chip.className =
             "condition-chip" + (isActive && !forceInactive ? " active" : "");
           const label = document.createElement("span");
@@ -10476,7 +10775,7 @@
         if (
           !scenarioSelect ||
           currentModel !== "jos3" ||
-          scenarioSelect.value !== "jos3_example"
+          !isPresetScenario(scenarioSelect.value)
         ) {
           return;
         }
@@ -10688,13 +10987,15 @@
         if (settingsTip) {
           settingsTip.style.display = showJos3Only ? "" : "none";
         }
-        if (!jos3ExampleBtn) return;
-        const active =
-          showJos3Only &&
-          scenarioSelect &&
-          scenarioSelect.value === "jos3_example";
-        jos3ExampleBtn.classList.toggle("active", !!active);
-        jos3ExampleBtn.disabled = !showJos3Only;
+        const activeScenario = scenarioSelect ? scenarioSelect.value : "";
+        quickExampleButtons.forEach(({ btn, scenario }) => {
+          if (!btn) return;
+          const isActive =
+            showJos3Only &&
+            activeScenario === scenario;
+          btn.classList.toggle("active", !!isActive);
+          btn.disabled = !showJos3Only;
+        });
       }
 
       // === 布局 & 场景 UI ===
@@ -13966,7 +14267,7 @@
           updateSummaryFromRun();
           return;
         }
-        if (scenarioSelect) {
+        if (scenarioSelect && !isPresetScenario(scenarioSelect.value)) {
           scenarioSelect.value = "jos3_example";
           updateScenarioUI();
         }
@@ -14065,6 +14366,11 @@
             currentLang === "zh"
               ? "本模式使用 JOS-3 原始示例工况中预设的温度、风速与服装参数（暖环境 → 桌面风扇降温 → 再升温）。"
               : "This mode uses the original JOS-3 demo scenario with preset Ta / Va / clothing (warm → desk fan → warmer).";
+        } else if (lastScenario === "jos3_example_1") {
+          extraDesc =
+            currentLang === "zh"
+              ? "示例工况 1：先在操作温度 To = 28 °C（Ta/Tr = 28 °C）、RH 40%、Va 0.2 m/s、PAR 1.2 的环境下坐 60 分钟，随后保持其它条件不变，仅将 To 降至 20 °C 再计算 60 分钟，对应官方 example.py 的 To 降温示例。"
+              : "Example scenario 1: sit for 60 min at operative temperature To = 28 °C (Ta/Tr = 28 °C, RH 40%, Va 0.2 m/s, PAR 1.2), then keep all other inputs and lower To to 20 °C for another 60 min, matching the official example.py."
         } else if (lastScenario === "custom_steps") {
           const totalSteps = lastStepsForSummary.length;
           extraDesc =
@@ -14644,7 +14950,7 @@
 
         let scenario = scenarioSelect.value;
         let stepsInline = [];
-        const manageInline = scenario !== "jos3_example";
+        const manageInline = !isPresetScenario(scenario);
         if (manageInline) {
           stepsInline = buildStepsFromConditions();
           if (stepsInline.length > 1) {
@@ -14654,6 +14960,13 @@
             scenarioSelect.value = "uniform";
             scenario = "uniform";
           }
+        }
+
+        let requestScenario = scenario;
+        let presetSteps = null;
+        if (scenario === "jos3_example_1") {
+          requestScenario = "custom_steps";
+          presetSteps = buildExample1CustomSteps();
         }
 
         const payload = {
@@ -14675,23 +14988,32 @@
           bsa_equation: bsaEqSelect.value,
           ex_output: exOutputInput ? parseExOutput(exOutputInput.value) : "all",
           time_step: Number.isFinite(parseFloat(dtInput.value)) ? parseFloat(dtInput.value) : 60.0,
-          scenario: scenario
+          scenario: requestScenario
         };
 
         let stepsForSummary = [];
 
-        if (scenario === "custom_steps") {
-          const steps = stepsInline.length ? stepsInline : buildStepsFromUI();
-          if (!steps.length) {
-            alert(
-              currentLang === "zh"
-                ? "custom_steps 模式下，请至少添加一个阶段，并确保持续时间 > 0。"
-                : "In custom_steps mode, please define at least one stage with duration > 0."
-            );
-            return;
+        if (requestScenario === "custom_steps") {
+          let stepsToSend = null;
+          if (presetSteps && presetSteps.length) {
+            stepsToSend = presetSteps;
+            stepsForSummary = presetSteps;
+          } else {
+            const steps = stepsInline.length ? stepsInline : buildStepsFromUI();
+            if (!steps.length) {
+              alert(
+                currentLang === "zh"
+                  ? "custom_steps 模式下，请至少添加一个阶段，并确保持续时间 > 0。"
+                  : "In custom_steps mode, please define at least one stage with duration > 0."
+              );
+              return;
+            }
+            stepsToSend = steps;
+            stepsForSummary = steps;
           }
-          payload.steps = steps;
-          stepsForSummary = steps;
+          payload.steps = stepsToSend;
+        } else {
+          delete payload.steps;
         }
 
         lastPayload = payload;
@@ -15020,30 +15342,36 @@
       }
       scenarioSelect.addEventListener("change", updateScenarioUI);
 
-      if (jos3ExampleBtn) {
-        jos3ExampleBtn.addEventListener("click", async () => {
-          if (modelSelect) {
-            modelSelect.value = "jos3";
-            modelSelect.dispatchEvent(new Event("change"));
-          } else {
-            currentModel = "jos3";
-            applyModelLayout();
-          }
+      async function activatePresetScenario(scenarioValue) {
+        if (!scenarioValue) return;
+        if (modelSelect) {
+          modelSelect.value = "jos3";
+          modelSelect.dispatchEvent(new Event("change"));
+        } else {
+          currentModel = "jos3";
+          applyModelLayout();
+        }
 
-          if (scenarioSelect) {
-            scenarioSelect.value = "jos3_example";
-            updateScenarioUI();
-          }
+        if (scenarioSelect) {
+          scenarioSelect.value = scenarioValue;
+          updateScenarioUI();
+        }
 
-          try {
-            await runSimulation();
-          } catch (err) {
-            console.error("示例工况运行失败：", err);
-          }
-          refreshExampleButtonState();
-          updateConditionInlineStatus();
-        });
+        try {
+          await runSimulation();
+        } catch (err) {
+          console.error("示例工况运行失败：", scenarioValue, err);
+        }
+        refreshExampleButtonState();
+        updateConditionInlineStatus();
       }
+
+      quickExampleButtons.forEach(({ btn, scenario }) => {
+        if (!btn || !scenario) return;
+        btn.addEventListener("click", () => {
+          activatePresetScenario(scenario);
+        });
+      });
 
       if (conditionAddInlineBtn && conditionAddInlineBtn !== conditionAddBtn) {
         conditionAddInlineBtn.addEventListener("click", () => {
@@ -15461,7 +15789,9 @@
         }
 
         if (scenarioSelect) {
-          scenarioSelect.value = "jos3_example";
+          if (!isPresetScenario(scenarioSelect.value)) {
+            scenarioSelect.value = "jos3_example";
+          }
           updateScenarioUI();
         }
 
