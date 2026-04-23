@@ -1,8 +1,10 @@
-from typing import List, Literal, Optional, Union, Dict, Tuple
 import pathlib
+from typing import List, Literal, Optional, Union, Dict, Tuple
 import traceback
 import math
 import sys
+import mimetypes
+import importlib.util
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
 JOS3_LOCAL_SRC = BASE_DIR / "jos3_original" / "src"
@@ -18,6 +20,13 @@ except ImportError as err:
     ) from err
 
 from PMV import pmv_ppd, pmv_with_components
+
+PMV_C_PATH = BASE_DIR / "PMV-C.py"
+_pmv_c_spec = importlib.util.spec_from_file_location("pmv_c", str(PMV_C_PATH))
+pmv_c = None
+if _pmv_c_spec and _pmv_c_spec.loader:
+    pmv_c = importlib.util.module_from_spec(_pmv_c_spec)
+    _pmv_c_spec.loader.exec_module(pmv_c)
 from SET import set_tmp  # SET 计算函数
 from two_node_excel import calculate_comfort_parameters
 import numpy as np
@@ -50,8 +59,23 @@ app.add_middleware(
 
 STATIC_DIR = BASE_DIR / "static"
 
+# Ensure SVGs are served with the correct MIME type (avoid forced downloads).
+mimetypes.add_type("image/svg+xml", ".svg")
+
 # 静态文件（前端资源）
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/static/{svg_name}.svg")
+def serve_svg(svg_name: str):
+    path = STATIC_DIR / f"{svg_name}.svg"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="SVG not found")
+    return FileResponse(
+        str(path),
+        media_type="image/svg+xml",
+        headers={"Content-Disposition": "inline"},
+    )
 
 
 @app.get("/")
@@ -88,6 +112,10 @@ class PMVInput(BaseModel):
     met: float              # 代谢率
     clo: float              # 服装
     wme: float = 0.0        # 外部功（met），默认 0
+    age: Optional[float] = None
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    variant: Literal["adult", "child"] = "adult"
 
 
 class PMVOutput(BaseModel):
@@ -112,23 +140,7 @@ class PMVOutput(BaseModel):
     e_diff: Optional[float] = None
 
 
-@app.post("/api/pmv", response_model=PMVOutput)
-def api_pmv(payload: PMVInput):
-    """调用 PMV.py 里的 pmv_with_components，返回 PMV / PPD + HL1~HL6。"""
-
-    # 如果没给 tr，就用 ta
-    tr = payload.tr if payload.tr is not None else payload.ta
-
-    res = pmv_with_components(
-        payload.ta,   # tdb
-        tr,           # tr
-        payload.vel,  # vr
-        payload.rh,   # rh
-        payload.met,  # met
-        payload.clo,  # clo
-        payload.wme,  # wme
-    )
-
+def _build_pmv_output(res: Dict[str, float]) -> PMVOutput:
     return PMVOutput(
         ok=res["ok"],
         pmv=res["pmv"],
@@ -150,6 +162,53 @@ def api_pmv(payload: PMVInput):
         e_rsw=res.get("e_rsw"),
         e_diff=res.get("e_diff"),
     )
+
+
+@app.post("/api/pmv_adult", response_model=PMVOutput)
+def api_pmv_adult(payload: PMVInput):
+    """严格调用 PMV.py 进行成人 PMV 计算。"""
+    tr = payload.tr if payload.tr is not None else payload.ta
+    res = pmv_with_components(
+        payload.ta,   # tdb
+        tr,           # tr
+        payload.vel,  # vr
+        payload.rh,   # rh
+        payload.met,  # met
+        payload.clo,  # clo
+        payload.wme,  # wme
+    )
+    return _build_pmv_output(res)
+
+
+@app.post("/api/pmv_child", response_model=PMVOutput)
+def api_pmv_child(payload: PMVInput):
+    """严格调用 PMV-C.py 进行儿童 PMV 计算。"""
+    if pmv_c is None:
+        raise HTTPException(status_code=500, detail="PMV-C 模块未加载，无法计算儿童模式")
+    if payload.height is None or payload.weight is None:
+        raise HTTPException(status_code=400, detail="儿童 PMV 需要提供身高与体重")
+    tr = payload.tr if payload.tr is not None else payload.ta
+    res = pmv_c.pmv_with_components_auto(
+        payload.ta,   # tdb
+        tr,           # tr
+        payload.vel,  # vr
+        payload.rh,   # rh
+        payload.met,  # met
+        payload.clo,  # clo
+        payload.wme,  # wme
+        age=payload.age,
+        height=payload.height,
+        weight=payload.weight,
+    )
+    return _build_pmv_output(res)
+
+
+@app.post("/api/pmv", response_model=PMVOutput)
+def api_pmv(payload: PMVInput):
+    """兼容旧接口：根据 variant 路由到成人/儿童计算。"""
+    if payload.variant == "child":
+        return api_pmv_child(payload)
+    return api_pmv_adult(payload)
 
 
 # ========= SET 计算接口 =========
@@ -704,4 +763,5 @@ def simulate(sim_input: SimInput):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Use a browser-friendly address; 0.0.0.0 is only for binding.
+    uvicorn.run(app, host="127.0.0.1", port=8000)
