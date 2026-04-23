@@ -57,6 +57,10 @@
       padding: 16px 16px 32px;
     }
 
+body.pmv-mode-active .app {
+      padding: 12px 16px 8px;
+    }
+
     header {
       display: flex;
       align-items: center;
@@ -69,10 +73,19 @@
       padding: 5px 10px 10px 30px;
     }
 
+    body.pmv-mode-active header {
+      margin-bottom: 10px;
+      padding: 4px 10px 6px 24px;
+    }
+
     .title-block {
       display: flex;
       align-items: center;
       gap: 30px;
+    }
+
+    body.pmv-mode-active .title-block {
+      gap: 22px;
     }
 
     .title-block h1 {
@@ -80,6 +93,10 @@
       color: #356bde;
       margin: 0;
       letter-spacing: 0.02em;
+    }
+
+    body.pmv-mode-active .title-block h1 {
+      font-size: 2rem;
     }
 
     .header-logo {
@@ -174,11 +191,23 @@
       box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
     }
 
+    body.pmv-mode-active #panel-settings,
+    body.pmv-mode-active #panel-output {
+      padding: 12px;
+    }
+
   .settings-panel {
     min-width: 320px;
   }
   .settings-panel .settings-content {
     margin-top: 24px;
+  }
+  .settings-panel.pmv-shift .settings-content {
+    margin-top: 8px;
+  }
+
+  body.pmv-mode-active .settings-panel.pmv-shift .settings-content {
+    margin-top: 4px;
   }
 
     .steps-panel {
@@ -190,6 +219,15 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+
+    body.pmv-mode-active .output-panel.output-panel--pmv {
+      gap: 4px;
+    }
+
+    body.pmv-mode-active #panel-output {
+      align-self: start;
+      height: auto;
     }
 
     .output-top-row {
@@ -231,11 +269,21 @@
       margin-bottom: 10px;
     }
 
+    body.pmv-mode-active #panel-settings .section-title,
+    body.pmv-mode-active #batch-input-title {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       row-gap: 8px;   /* 上下间距保持原来的感觉 */
       column-gap: 4px; /* 左右两列间距缩小（原来相当于 12px） */
+    }
+
+    body.pmv-mode-active #panel-settings .form-grid {
+      row-gap: 6px;
     }
 
     .sr-only {
@@ -256,10 +304,19 @@
       font-size: 0.8rem;
     }
 
+    body.pmv-mode-active #panel-settings .field {
+      gap: 2px;
+      font-size: 0.76rem;
+    }
+
     .field label {
       color: var(--text-muted);
       font-size: 0.88rem;   /* 比默认正文略大一号，作为次级标题 */
       font-weight: 500;
+    }
+
+    body.pmv-mode-active #panel-settings .field label {
+      font-size: 0.82rem;
     }
 
     .field input,
@@ -272,6 +329,12 @@
       font-size: 0.8rem;
       outline: none;
       width: 100%;
+    }
+
+    body.pmv-mode-active #panel-settings .field input,
+    body.pmv-mode-active #panel-settings .field select {
+      padding: 5px 8px;
+      font-size: 0.76rem;
     }
     /* 让左侧工况与个体设置里的所有输入框 + 下拉框宽度缩短为原来的 3/4 */
     .settings-panel .field input,
@@ -294,9 +357,28 @@
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
     }
 
+    .settings-panel .field input:disabled,
+    .settings-panel .field select:disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      border-color: #e5e7eb;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .settings-panel.pmv-elder-disabled .field label,
+    .settings-panel.pmv-elder-disabled .field-suffix {
+      color: #9ca3af;
+    }
+
     .field-suffix {
       font-size: 0.75rem;
       color: var(--text-muted);
+    }
+
+    body.pmv-mode-active #panel-settings .field-suffix,
+    body.pmv-mode-active #panel-settings .two-node-field-note {
+      font-size: 0.7rem;
     }
 
     .meta-row {
@@ -308,6 +390,10 @@
       color: var(--text-muted);
       gap: 8px;
       flex-wrap: wrap;
+    }
+
+    body.pmv-mode-active #panel-settings .meta-row {
+      margin-top: 8px;
     }
 
     .meta-row-left {
@@ -341,6 +427,14 @@
     .btn-primary:active {
       transform: translateY(1px);
       box-shadow: 0 6px 18px rgba(56, 189, 248, 0.5);
+    }
+
+    .btn-primary:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+      box-shadow: none;
+      background: linear-gradient(145deg, #d1d5db, #e5e7eb);
+      color: #6b7280;
     }
 
     .btn-secondary {
@@ -622,10 +716,21 @@
       }
     }
 
+    body.pmv-mode-active .output-panel.output-panel--pmv .charts-grid {
+      grid-auto-rows: auto;
+      align-items: start;
+    }
+
 .chart-card--pmv-table {
   width: 100%;
   grid-column: 1 / -1;
   margin-top: -28px;
+}
+
+body.pmv-mode-active .chart-card--pmv-table {
+  margin-top: -22px;
+  min-height: auto;
+  align-self: start;
 }
 .chart-card--two-node {
   margin-top: -18px;
@@ -671,13 +776,6 @@
       height: calc(100vh - 24px);
       overflow: auto;
     }
-
-    .chart-card.dragging {
-      opacity: 0.8;
-      cursor: grabbing;
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.6);
-    }
-
 
     .chart-title {
       font-size: 0.8rem;
@@ -855,13 +953,6 @@
     .summary-highlight {
       color: var(--accent);
       font-weight: 600;
-    }
-
-    .footer-note {
-      margin-top: 8px;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-align: right;
     }
 
     /* 多阶段阶段切换 tabs */
@@ -1628,8 +1719,9 @@
     .table-scroll-hint {
       font-size: 0.75rem;
       color: var(--text-muted);
-      text-align: right;
+      text-align: center;
       margin-top: 4px;
+      padding: 4px 0 0;
       user-select: text;
     }
 
@@ -1834,6 +1926,169 @@
       flex-wrap: wrap;
       justify-content: flex-end;
       flex: 0 0 auto;
+    }
+
+    #pmv-example-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 10px;
+      align-items: start;
+      justify-content: start;
+      margin: 4px 0 6px;
+      width: 75%;
+    }
+
+    body.pmv-mode-active #pmv-example-row {
+      column-gap: 8px;
+      margin: 2px 0 4px;
+    }
+
+    #pmv-example-row .quick-example-group {
+      display: block;
+    }
+
+    #pmv-example-row .pmv-example-card {
+      width: 100%;
+      min-height: 138px;
+      padding: 0;
+      gap: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      overflow: hidden;
+      white-space: normal;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+      transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    body.pmv-mode-active #pmv-example-row .pmv-example-card {
+      min-height: 124px;
+    }
+
+    #pmv-example-row .pmv-example-card-media {
+      width: 100%;
+      height: 90px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      transition: background-color 0.18s ease;
+    }
+
+    body.pmv-mode-active #pmv-example-row .pmv-example-card-media {
+      height: 78px;
+      padding: 8px 10px;
+    }
+
+    #pmv-example-row .pmv-example-card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+    }
+
+    #pmv-example-row .pmv-example-card-label {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.15;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-top: 1px solid rgba(148, 163, 184, 0.18);
+      background: transparent;
+      color: inherit;
+      transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        border-color 0.18s ease;
+    }
+
+    body.pmv-mode-active #pmv-example-row .pmv-example-card-label {
+      min-height: 40px;
+      padding: 8px 6px;
+      font-size: 0.78rem;
+    }
+
+    #pmv-example-row .pmv-example-card:hover,
+    #pmv-example-row .pmv-example-card:focus-visible {
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.08), rgba(37, 99, 235, 0.16));
+      color: #1e3a8a;
+      border-color: rgba(37, 99, 235, 0.42);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.12);
+      transform: translateY(-1px);
+    }
+
+    #pmv-example-row .pmv-example-card:hover .pmv-example-card-media,
+    #pmv-example-row .pmv-example-card:focus-visible .pmv-example-card-media,
+    #pmv-example-row .pmv-example-card:hover .pmv-example-card-label,
+    #pmv-example-row .pmv-example-card:focus-visible .pmv-example-card-label {
+      background: transparent;
+      color: #1e3a8a;
+      border-color: rgba(37, 99, 235, 0.18);
+    }
+
+    #pmv-example-row .pmv-example-card:focus-visible {
+      outline: 2px solid rgba(37, 99, 235, 0.35);
+      outline-offset: 2px;
+    }
+
+    #pmv-example-row .pmv-example-card.active {
+      background: linear-gradient(180deg, rgba(59, 130, 246, 0.18), rgba(37, 99, 235, 0.3));
+      color: #1d4ed8;
+      border: 2px solid #2563eb;
+      box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.14),
+        0 16px 30px rgba(37, 99, 235, 0.16);
+      transform: none;
+    }
+
+    #pmv-example-row .pmv-example-card.active .pmv-example-card-media,
+    #pmv-example-row .pmv-example-card.active .pmv-example-card-label {
+      background: transparent;
+      color: #1d4ed8;
+      border-color: rgba(37, 99, 235, 0.16);
+    }
+
+    #pmv-example-row .pmv-example-card.active::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36);
+      pointer-events: none;
+    }
+
+    #pmv-example-row .pmv-coming-soon {
+      display: block;
+      width: 100%;
+      margin-top: 0;
+      font-size: 0.68rem;
+      font-weight: 600;
+      opacity: 0.82;
+      line-height: 1.15;
+    }
+
+    #pmv-example-row .pmv-label-main {
+      display: block;
+      width: 100%;
     }
     .quick-example-group {
       display: inline-flex;
@@ -2152,6 +2407,36 @@
       color: var(--text-muted);
       margin-left: 12px;
     }
+
+    body.pmv-mode-active .pmv-chart-title {
+      display: grid;
+      grid-template-columns: minmax(0, 49%) minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 12px;
+      row-gap: 4px;
+    }
+
+    body.pmv-mode-active .pmv-title-cluster {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    body.pmv-mode-active .pmv-title-cluster > span {
+      flex: 0 0 auto;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    body.pmv-mode-active .pmv-title-cluster .table-scroll-hint {
+      flex: 1 1 auto;
+      margin: 0;
+      padding: 0;
+      text-align: right;
+      white-space: nowrap;
+    }
+
     .pmv-panel-actions {
       display: flex;
       align-items: center;
@@ -2159,14 +2444,907 @@
       flex-wrap: wrap;
     }
 
+    body.pmv-mode-active .pmv-status-text {
+      font-size: 0.7rem;
+      margin-left: 0;
+      justify-self: center;
+      text-align: center;
+    }
+
+    body.pmv-mode-active .pmv-panel-actions {
+      gap: 4px;
+      justify-self: end;
+    }
+
+    .pmv-split {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+      height: 100%;
+    }
+
+    body.pmv-mode-active .pmv-split {
+      gap: 8px;
+      align-items: stretch;
+      height: auto;
+    }
+
+    .pmv-split-left {
+      flex: 0 0 50%;
+      max-width: 50%;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    body.pmv-mode-active .pmv-split-left {
+      flex: 0 0 49%;
+      max-width: 49%;
+      overflow-y: visible;
+      padding-right: 0;
+      align-self: flex-start;
+    }
+
+    .pmv-split-right-column {
+      flex: 1 1 50%;
+      max-width: 50%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    body.pmv-mode-active .pmv-split-right-column {
+      flex: 1 1 51%;
+      max-width: 51%;
+      gap: 8px;
+    }
+
+    .pmv-split-left table.two-node-table {
+      width: max-content;
+    }
+
+    .pmv-split-right {
+      flex: 0 0 auto;
+      border: 1px dashed var(--border-subtle);
+      border-radius: 12px;
+      background: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    body.pmv-mode-active .pmv-split-right {
+      min-height: 208px;
+      width: 100%;
+      align-self: stretch;
+    }
+
+    .pmv-psych-card {
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: 300px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.92) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        0 8px 20px rgba(15, 23, 42, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: var(--text-main);
+    }
+
+    body.pmv-mode-active .pmv-psych-card {
+      min-height: 298px;
+      padding: 10px 12px;
+      gap: 8px;
+    }
+
+    .pmv-psych-card.is-disabled {
+      opacity: 0.78;
+      filter: saturate(0.6);
+    }
+
+    .pmv-psych-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pmv-psych-heading {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .pmv-psych-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pmv-psych-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    body.pmv-mode-active .pmv-psych-title {
+      font-size: 0.82rem;
+    }
+
+    .pmv-psych-subtitle {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    body.pmv-mode-active .pmv-psych-subtitle {
+      font-size: 0.7rem;
+    }
+
+    .pmv-psych-meta {
+      display: none;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .pmv-psych-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pmv-psych-chip strong {
+      color: var(--text-main);
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    body.pmv-mode-active .pmv-psych-chip {
+      min-height: 22px;
+      padding: 3px 8px;
+      font-size: 0.66rem;
+    }
+
+    body.pmv-mode-active .pmv-psych-chip strong {
+      font-size: 0.7rem;
+    }
+
+    .pmv-psych-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pmv-psych-result-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      margin-left: 4px;
+    }
+
+    .pmv-psych-result-switch-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .pmv-psych-result-switch select {
+      min-width: 110px;
+      max-width: 180px;
+      padding: 5px 28px 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.26);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.96) 100%);
+      color: var(--text-main);
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.1;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #64748b 50%),
+        linear-gradient(135deg, #64748b 50%, transparent 50%);
+      background-position:
+        calc(100% - 16px) 50%,
+        calc(100% - 11px) 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    .pmv-psych-result-switch select:focus {
+      border-color: rgba(37, 99, 235, 0.4);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .pmv-psych-result-switch select:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+      color: #94a3b8;
+    }
+
+    body.pmv-mode-active .pmv-psych-result-switch-label {
+      font-size: 0.66rem;
+    }
+
+    body.pmv-mode-active .pmv-psych-result-switch select {
+      min-width: 100px;
+      padding: 4px 26px 4px 9px;
+      font-size: 0.68rem;
+    }
+
+    .pmv-psych-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      align-items: stretch;
+    }
+
+    body.pmv-mode-active .pmv-psych-body {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .pmv-psych-stats {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 2;
+      pointer-events: none;
+      min-width: 142px;
+      padding: 10px 10px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 7px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    body.pmv-mode-active .pmv-psych-stats {
+      top: 10px;
+      left: 10px;
+      min-width: 132px;
+      padding: 8px 9px 7px;
+      gap: 6px;
+    }
+
+    .pmv-psych-stat-row {
+      display: grid;
+      grid-template-columns: minmax(0, auto) 1fr;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .pmv-psych-stat-key {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0;
+    }
+
+    .pmv-psych-stat-value {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-main);
+      justify-self: end;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    body.pmv-mode-active .pmv-psych-stat-key {
+      font-size: 0.72rem;
+    }
+
+    body.pmv-mode-active .pmv-psych-stat-value {
+      font-size: 0.76rem;
+    }
+
+    .pmv-psych-chart-wrap {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(255, 255, 255, 0.84);
+      padding: 8px;
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+
+    body.pmv-mode-active .pmv-psych-chart-wrap {
+      padding: 4px;
+    }
+
+    #pmvPsychChartSvg {
+      width: 100%;
+      height: 100%;
+      min-height: 390px;
+      display: block;
+    }
+
+    .pmv-psych-empty {
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      border-radius: 10px;
+      border: 1px dashed rgba(148, 163, 184, 0.32);
+      background: rgba(248, 250, 252, 0.88);
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      line-height: 1.6;
+    }
+
+    body.pmv-mode-active .pmv-psych-empty {
+      min-height: 208px;
+      font-size: 0.76rem;
+      padding: 12px;
+    }
+
+    .pmv-psych-note {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      white-space: pre-line;
+    }
+
+    body.pmv-mode-active .pmv-psych-note {
+      font-size: 0.68rem;
+    }
+
+    .pmv-compare-placeholder {
+      text-align: center;
+      padding: 12px;
+    }
+
+    #pmvVizCard.pmv-viz-card {
+      width: 100%;
+      height: 100%;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      background: transparent;
+      color: var(--text-main);
+    }
+
+    body.pmv-mode-active #pmvVizCard.pmv-viz-card {
+      height: auto;
+      padding: 10px 12px;
+      gap: 10px;
+    }
+
+    .pmv-viz-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
+    }
+
+    .pmv-viz-top {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: start;
+      justify-items: center;
+      padding-top: 8px;
+    }
+
+    body.pmv-mode-active .pmv-viz-top {
+      gap: 8px;
+      padding-top: 2px;
+    }
+
+    .pmv-viz-person {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    body.pmv-mode-active .pmv-viz-person {
+      gap: 6px;
+    }
+
+    .pmv-viz-person-title {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: center;
+      flex-wrap: wrap;
+    }
+
+    body.pmv-mode-active .pmv-viz-person-title {
+      font-size: 0.76rem;
+    }
+
+    .pmv-viz-person-result-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 18px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.24);
+      background: rgba(59, 130, 246, 0.1);
+      color: #1d4ed8;
+      font-size: 0.68rem;
+      font-weight: 600;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pmv-viz-person-result-tag:empty {
+      display: none;
+    }
+
+    body.pmv-mode-active .pmv-viz-person-result-tag {
+      min-height: 16px;
+      padding: 1px 6px;
+      font-size: 0.62rem;
+    }
+
+    .pmv-viz-metrics {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    body.pmv-mode-active .pmv-viz-metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .pmv-viz-metric {
+      min-width: 0;
+      padding: 10px 8px 9px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
+    }
+
+    body.pmv-mode-active .pmv-viz-metric {
+      padding: 6px 5px 5px;
+      border-radius: 8px;
+    }
+
+    .pmv-viz-metric .pmv-viz-value {
+      font-size: 1.45rem;
+    }
+
+    body.pmv-mode-active .pmv-viz-metric .pmv-viz-value {
+      font-size: 1.08rem;
+    }
+
+    .pmv-viz-title {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    body.pmv-mode-active .pmv-viz-title {
+      font-size: 0.72rem;
+    }
+
+    .pmv-viz-value {
+      font-size: 2.1rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    body.pmv-mode-active .pmv-viz-value {
+      font-size: 1.54rem;
+    }
+
+    .pmv-viz-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    body.pmv-mode-active .pmv-viz-label {
+      font-size: 0.71rem;
+    }
+
+    .pmv-viz-divider {
+      width: 86%;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    body.pmv-mode-active .pmv-viz-divider {
+      width: 92%;
+    }
+
+    .pmv-viz-bar-wrap {
+      width: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.pmv-mode-active .pmv-viz-bar-wrap {
+      gap: 16px;
+    }
+
+    #pmvBar.pmv-viz-bar {
+      position: relative;
+      width: min(100%, 560px);
+      height: 70px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #3b82f6 0%, #22c55e 45%, #facc15 70%, #ef4444 100%);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08), 0 6px 14px rgba(15, 23, 42, 0.08);
+    }
+
+    body.pmv-mode-active #pmvBar.pmv-viz-bar {
+      width: min(100%, 500px);
+      height: 104px;
+    }
+
+    .pmv-viz-points {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .pmv-viz-dot {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #0b1120 center/cover no-repeat;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    body.pmv-mode-active .pmv-viz-dot {
+      width: 40px;
+      height: 40px;
+      border-width: 3px;
+    }
+
+    .pmv-viz-dot.is-active {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.42),
+        0 8px 18px rgba(15, 23, 42, 0.32);
+    }
+
+    .pmv-viz-dot.is-selected {
+      box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.96),
+        0 0 0 6px rgba(255, 255, 255, 0.34),
+        0 8px 18px rgba(15, 23, 42, 0.3);
+    }
+
+    .pmv-viz-dot--child {
+      top: 20%;
+      border-color: #3b82f6;
+      background-image: url("/static/children-head.svg");
+    }
+
+    .pmv-viz-dot--adult {
+      top: 50%;
+      border-color: #111827;
+      background-image: url("/static/adult-head.svg");
+    }
+
+    .pmv-viz-dot--elder {
+      top: 80%;
+      border-color: #374151;
+      background-image: url("/static/elder-head.svg?v=2");
+    }
+
+    .pmv-viz-pointer {
+      position: absolute;
+      left: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #0b1120;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
+      transform: translate(-50%, -50%);
+    }
+
+    .pmv-viz-pointer.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .pmv-viz-pointer--child {
+      top: -6px;
+    }
+
+    .pmv-viz-pointer--adult {
+      top: calc(100% + 6px);
+    }
+
+    .pmv-viz-scale {
+      width: min(100%, 560px);
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    body.pmv-mode-active .pmv-viz-scale {
+      width: min(100%, 500px);
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    .pmv-viz-scale span {
+      text-align: center;
+    }
+
+    .floating-glass-tooltip {
+      background: rgba(148, 163, 184, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+      color: #111827;
+      position: fixed;
+      transform: none;
+      padding: 8px 12px;
+      pointer-events: none;
+      font-size: 12px;
+      line-height: 1.4;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      max-height: 70vh;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .floating-glass-tooltip--locked {
+      pointer-events: auto;
+    }
+
+    .floating-glass-tooltip__inner {
+      margin: 0;
+    }
+
+    .floating-glass-tooltip__title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .floating-glass-tooltip__line + .floating-glass-tooltip__line {
+      margin-top: 1px;
+    }
+
+    .floating-glass-tooltip__hint {
+      margin-top: 8px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(239, 68, 68, 0.12);
+      color: #b91c1c;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    @media (max-width: 1280px) {
+      body.pmv-mode-active .pmv-split {
+        flex-direction: column;
+      }
+
+      body.pmv-mode-active .pmv-split-left,
+      body.pmv-mode-active .pmv-split-right-column {
+        flex: 1 1 auto;
+        max-width: none;
+        width: 100%;
+      }
+
+      body.pmv-mode-active .pmv-split-right-column {
+        gap: 10px;
+      }
+
+      .pmv-psych-body {
+        grid-template-columns: 1fr;
+      }
+
+      .pmv-psych-stats {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 900px) {
+      #pmvVizCard.pmv-viz-card {
+        padding: 12px 10px;
+      }
+      .pmv-viz-top {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .pmv-viz-value {
+        font-size: 1.7rem;
+      }
+      .pmv-viz-metric .pmv-viz-value {
+        font-size: 1.2rem;
+      }
+      .pmv-viz-label {
+        font-size: 0.78rem;
+      }
+      .pmv-viz-scale {
+        font-size: 0.66rem;
+      }
+      .pmv-psych-header {
+        gap: 8px;
+      }
+      .pmv-psych-meta {
+        justify-content: flex-start;
+      }
+      .pmv-psych-result-switch {
+        width: auto;
+        margin-left: 0;
+      }
+      .pmv-psych-result-switch select {
+        width: 100%;
+        max-width: none;
+      }
+      .pmv-psych-stats {
+        min-width: 124px;
+      }
+      #pmvPsychChartSvg {
+        min-height: 340px;
+      }
+    }
+
     .pmv-table-condensed table.two-node-table {
       width: auto;
       margin: 0;
+      --pmv-sticky-col1: 140px;
+      --pmv-sticky-col2: 72px;
     }
+
+    body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+      font-size: 0.71rem;
+      --pmv-sticky-col1: 124px;
+      --pmv-sticky-col2: 60px;
+    }
+
     .pmv-table-condensed thead th,
     .pmv-table-condensed tbody td {
       padding: 5px 7px;
       white-space: nowrap;
+    }
+
+    body.pmv-mode-active .pmv-table-condensed thead th,
+    body.pmv-mode-active .pmv-table-condensed tbody td {
+      padding: 3px 5px;
+    }
+
+    /* PMV 表格冻结首列与符号列（类似 Excel 冻结首列/前两列） */
+    .pmv-table-condensed table.two-node-table th:first-child,
+    .pmv-table-condensed table.two-node-table td:first-child {
+      position: sticky;
+      left: 0;
+      background: #ffffff;
+      z-index: 2;
+      min-width: var(--pmv-sticky-col1);
+      max-width: var(--pmv-sticky-col1);
+      width: var(--pmv-sticky-col1);
+    }
+
+    .pmv-table-condensed table.two-node-table th:nth-child(2),
+    .pmv-table-condensed table.two-node-table td:nth-child(2) {
+      position: sticky;
+      left: var(--pmv-sticky-col1);
+      background: #ffffff;
+      z-index: 2;
+      min-width: var(--pmv-sticky-col2);
+      max-width: var(--pmv-sticky-col2);
+      width: var(--pmv-sticky-col2);
+    }
+
+    .pmv-table-condensed table.two-node-table thead th:first-child,
+    .pmv-table-condensed table.two-node-table thead th:nth-child(2) {
+      z-index: 3;
+      background: #f2f4f7;
+    }
+
+    .pmv-table-condensed .pmv-group-cell {
+      font-weight: 600;
+      color: var(--accent);
+      text-align: left;
+      background: #f8fafc;
+    }
+
+    body.pmv-mode-active #pmv-panel .table-scroll-hint {
+      margin: 0;
+      font-size: 0.74rem;
+      text-align: right;
+    }
+
+    body.pmv-mode-active #pmv-panel .chart-container {
+      flex: 0 0 auto;
+      min-height: auto;
+      overflow: visible;
+    }
+
+    body.pmv-mode-active .pmv-col-header-label {
+      font-size: 0.72rem;
+      line-height: 1.05;
+    }
+
+    body.pmv-mode-active .pmv-col-header-actions {
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    body.pmv-mode-active .pmv-col-btn {
+      width: 20px;
+      height: 20px;
+      font-size: 0.72rem;
+    }
+
+    body.pmv-mode-active .pmv-group-cell {
+      font-size: 0.72rem;
+      padding-top: 1px;
+      padding-bottom: 1px;
     }
     .pmv-table-condensed--single table.two-node-table {
       margin-left: 0;
@@ -2231,6 +3409,726 @@
     .batch-upload-status {
       font-size: 0.85rem;
       color: var(--text-muted);
+    }
+
+    body.pmv-mode-active #batch-input-section.batch-input {
+      margin-top: 8px;
+      padding: 10px;
+    }
+
+    body.pmv-mode-active #batch-input-section .batch-input-header {
+      margin-bottom: 4px;
+    }
+
+    body.pmv-mode-active #batch-input-section .batch-upload-drop {
+      padding: 8px 10px;
+      font-size: 0.82rem;
+    }
+
+    body.pmv-mode-active #batch-input-section .upload-inline-row,
+    body.pmv-mode-active #batch-input-section .upload-inline-row .upload-inline-prefix,
+    body.pmv-mode-active #batch-input-section .upload-inline-row .upload-inline-suffix,
+    body.pmv-mode-active #batch-input-section .batch-upload-status {
+      font-size: 0.78rem;
+    }
+
+    @media (min-width: 1920px) and (min-height: 1080px) {
+      body.pmv-mode-active .app {
+        padding: 16px 20px 24px;
+      }
+
+      body.pmv-mode-active header {
+        margin-bottom: 14px;
+        padding: 6px 16px 10px 28px;
+      }
+
+      body.pmv-mode-active .title-block {
+        gap: 28px;
+      }
+
+      body.pmv-mode-active .title-block h1 {
+        font-size: 2.35rem;
+      }
+
+      body.pmv-mode-active main.layout-2row-simple {
+        grid-template-columns: minmax(420px, 0.92fr) minmax(1120px, 2.45fr);
+        gap: 24px;
+      }
+
+      body.pmv-mode-active #panel-settings,
+      body.pmv-mode-active #panel-output {
+        padding: 16px;
+      }
+
+      body.pmv-mode-active #panel-settings .section-title,
+      body.pmv-mode-active #batch-input-title {
+        font-size: 1.08rem;
+        margin-bottom: 8px;
+      }
+
+      body.pmv-mode-active #panel-settings .form-grid {
+        row-gap: 8px;
+      }
+
+      body.pmv-mode-active #panel-settings .field {
+        gap: 4px;
+        font-size: 0.82rem;
+      }
+
+      body.pmv-mode-active #panel-settings .field label {
+        font-size: 0.88rem;
+      }
+
+      body.pmv-mode-active #panel-settings .field input,
+      body.pmv-mode-active #panel-settings .field select {
+        width: 80%;
+        padding: 7px 10px;
+        font-size: 0.84rem;
+      }
+
+      body.pmv-mode-active #panel-settings .field-suffix,
+      body.pmv-mode-active #panel-settings .two-node-field-note {
+        font-size: 0.76rem;
+      }
+
+      body.pmv-mode-active #pmv-example-row {
+        width: 82%;
+        column-gap: 12px;
+        margin: 4px 0 6px;
+      }
+
+      body.pmv-mode-active #pmv-example-row .pmv-example-card {
+        min-height: 144px;
+      }
+
+      body.pmv-mode-active #pmv-example-row .pmv-example-card-media {
+        height: 92px;
+        padding: 10px 12px;
+      }
+
+      body.pmv-mode-active #pmv-example-row .pmv-example-card-label {
+        min-height: 44px;
+        padding: 9px 8px;
+        font-size: 0.84rem;
+      }
+
+      body.pmv-mode-active .output-panel.output-panel--pmv {
+        gap: 8px;
+      }
+
+      body.pmv-mode-active .chart-card--pmv-table {
+        margin-top: -18px;
+      }
+
+      body.pmv-mode-active .pmv-status-text {
+        font-size: 0.78rem;
+        margin-left: 10px;
+      }
+
+      body.pmv-mode-active .pmv-panel-actions {
+        gap: 6px;
+      }
+
+      body.pmv-mode-active .pmv-split {
+        gap: 14px;
+      }
+
+      body.pmv-mode-active .pmv-split-left {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+
+      body.pmv-mode-active .pmv-split-right-column {
+        flex: 1 1 50%;
+        max-width: 50%;
+        gap: 12px;
+      }
+
+      body.pmv-mode-active .pmv-split-right {
+        min-height: 244px;
+      }
+
+      body.pmv-mode-active .pmv-psych-card {
+        min-height: 372px;
+        padding: 12px 14px;
+      }
+
+      body.pmv-mode-active .pmv-psych-body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+      }
+
+      body.pmv-mode-active #pmvPsychChartSvg {
+        min-height: 420px;
+      }
+
+      body.pmv-mode-active #pmvVizCard.pmv-viz-card {
+        padding: 14px 16px;
+        gap: 14px;
+      }
+
+      body.pmv-mode-active .pmv-viz-top {
+        gap: 12px;
+        padding-top: 6px;
+      }
+
+      body.pmv-mode-active .pmv-viz-person {
+        gap: 9px;
+      }
+
+      body.pmv-mode-active .pmv-viz-person-title {
+        font-size: 0.84rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-person-result-tag {
+        min-height: 18px;
+        padding: 2px 8px;
+        font-size: 0.68rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-metrics {
+        gap: 8px;
+      }
+
+      body.pmv-mode-active .pmv-viz-metric {
+        padding: 8px 7px 7px;
+        border-radius: 9px;
+      }
+
+      body.pmv-mode-active .pmv-viz-metric .pmv-viz-value {
+        font-size: 1.18rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-title {
+        font-size: 0.76rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-value {
+        font-size: 1.72rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-label {
+        font-size: 0.76rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-bar-wrap {
+        gap: 18px;
+      }
+
+      body.pmv-mode-active #pmvBar.pmv-viz-bar {
+        width: min(100%, 620px);
+        height: 120px;
+      }
+
+      body.pmv-mode-active .pmv-viz-dot {
+        width: 44px;
+        height: 44px;
+        border-width: 3px;
+      }
+
+      body.pmv-mode-active .pmv-viz-scale {
+        width: min(100%, 620px);
+        font-size: 1rem;
+        margin-top: 10px;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: 0.77rem;
+        --pmv-sticky-col1: 138px;
+        --pmv-sticky-col2: 68px;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed thead th,
+      body.pmv-mode-active .pmv-table-condensed tbody td {
+        padding: 4px 6px;
+      }
+
+      body.pmv-mode-active .pmv-col-header-label {
+        font-size: 0.78rem;
+      }
+
+      body.pmv-mode-active .pmv-col-header-actions {
+        gap: 5px;
+        margin-top: 3px;
+      }
+
+      body.pmv-mode-active .pmv-col-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 0.76rem;
+      }
+
+      body.pmv-mode-active .pmv-group-cell {
+        font-size: 0.76rem;
+      }
+
+      body.pmv-mode-active #batch-input-section.batch-input {
+        margin-top: 10px;
+        padding: 12px;
+      }
+
+      body.pmv-mode-active #batch-input-section .batch-upload-drop {
+        padding: 10px 12px;
+        font-size: 0.86rem;
+      }
+
+      body.pmv-mode-active #batch-input-section .upload-inline-row,
+      body.pmv-mode-active #batch-input-section .upload-inline-row .upload-inline-prefix,
+      body.pmv-mode-active #batch-input-section .upload-inline-row .upload-inline-suffix,
+      body.pmv-mode-active #batch-input-section .batch-upload-status {
+        font-size: 0.82rem;
+      }
+    }
+
+    /* Desktop PMV layout: fill the viewport height and let the output table breathe. */
+    @media (min-width: 1280px) and (min-height: 760px) {
+      body.pmv-mode-active .app {
+        min-height: 100vh;
+      }
+
+      body.pmv-mode-active main.layout-2row-simple {
+        align-items: stretch;
+        min-height: calc(100vh - 122px);
+      }
+
+      body.pmv-mode-active #panel-settings,
+      body.pmv-mode-active #panel-output {
+        min-height: calc(100vh - 134px);
+        align-self: stretch;
+      }
+
+      body.pmv-mode-active #panel-output {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+      }
+
+      body.pmv-mode-active .output-panel.output-panel--pmv .charts-grid {
+        flex: 1 1 auto;
+        align-items: stretch;
+        grid-auto-rows: minmax(0, 1fr);
+        min-height: 0;
+      }
+
+      body.pmv-mode-active .chart-card--pmv-table {
+        display: flex;
+        flex-direction: column;
+        align-self: stretch;
+        min-height: calc(100vh - 178px);
+      }
+
+      body.pmv-mode-active #pmv-panel .chart-container.pmv-split {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      body.pmv-mode-active .pmv-split {
+        align-items: stretch;
+        height: 100%;
+      }
+
+      body.pmv-mode-active .pmv-split-left {
+        align-self: stretch;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      body.pmv-mode-active .pmv-split-left table.two-node-table {
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: clamp(0.72rem, 0.58rem + 0.16vh, 0.84rem);
+        --pmv-sticky-col1: clamp(132px, 8.6vw, 160px);
+        --pmv-sticky-col2: clamp(66px, 4.3vw, 82px);
+      }
+
+      body.pmv-mode-active .pmv-table-condensed thead th,
+      body.pmv-mode-active .pmv-table-condensed tbody td {
+        padding: clamp(2px, 0.24vh, 4px) clamp(5px, 0.38vw, 8px);
+        line-height: 1.08;
+      }
+
+      body.pmv-mode-active .pmv-col-header-label,
+      body.pmv-mode-active .pmv-group-cell {
+        font-size: clamp(0.7rem, 0.56rem + 0.14vh, 0.82rem);
+      }
+
+      body.pmv-mode-active .table-scroll-hint {
+        flex: 0 0 auto;
+        margin-top: 6px;
+        padding-top: 4px;
+      }
+    }
+
+    @media (min-width: 1280px) and (max-width: 2199px) and (min-height: 760px) {
+      body.pmv-mode-active main.layout-2row-simple {
+        min-height: 0;
+      }
+
+      body.pmv-mode-active #panel-settings,
+      body.pmv-mode-active #panel-output,
+      body.pmv-mode-active .chart-card--pmv-table {
+        min-height: 0;
+      }
+
+      body.pmv-mode-active #pmv-panel .chart-container.pmv-split {
+        overflow: visible;
+      }
+
+      body.pmv-mode-active .pmv-split-left {
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: visible;
+      }
+
+      body.pmv-mode-active .pmv-psych-card {
+        min-height: 0;
+      }
+
+      body.pmv-mode-active #pmvPsychChartSvg {
+        min-height: clamp(360px, 40vh, 430px);
+      }
+    }
+
+    @media (min-width: 1280px) and (max-width: 1599px), (min-width: 1280px) and (max-height: 900px) {
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: 0.66rem;
+        --pmv-sticky-col1: 118px;
+        --pmv-sticky-col2: 56px;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed thead th,
+      body.pmv-mode-active .pmv-table-condensed tbody td {
+        padding: 1px 4px;
+        line-height: 1.04;
+      }
+
+      body.pmv-mode-active .pmv-col-header-label,
+      body.pmv-mode-active .pmv-group-cell {
+        font-size: 0.65rem;
+      }
+
+      body.pmv-mode-active .pmv-col-header-actions {
+        margin-top: 1px;
+      }
+
+      body.pmv-mode-active .pmv-col-btn {
+        width: 18px;
+        height: 18px;
+        font-size: 0.66rem;
+      }
+    }
+
+    @media (max-width: 1279px) {
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: 0.64rem;
+        --pmv-sticky-col1: 112px;
+        --pmv-sticky-col2: 54px;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed thead th,
+      body.pmv-mode-active .pmv-table-condensed tbody td {
+        padding: 1px 4px;
+        line-height: 1.04;
+      }
+
+      body.pmv-mode-active .pmv-col-header-label,
+      body.pmv-mode-active .pmv-group-cell {
+        font-size: 0.64rem;
+      }
+    }
+
+    @media (min-width: 2800px) and (min-height: 1400px) {
+      body.pmv-mode-active main.layout-2row-simple {
+        grid-template-columns: minmax(500px, 0.95fr) minmax(1500px, 2.6fr);
+      }
+
+      body.pmv-mode-active .title-block h1 {
+        font-size: 2.6rem;
+      }
+
+      body.pmv-mode-active #panel-settings,
+      body.pmv-mode-active #panel-output {
+        padding: 18px;
+      }
+
+      body.pmv-mode-active #pmv-example-row {
+        width: 86%;
+      }
+
+      body.pmv-mode-active .pmv-split-right-column {
+        gap: 14px;
+      }
+
+      body.pmv-mode-active #pmvBar.pmv-viz-bar {
+        width: min(100%, 700px);
+        height: 136px;
+      }
+
+      body.pmv-mode-active .pmv-viz-scale {
+        width: min(100%, 700px);
+        font-size: 1.06rem;
+        margin-top: 12px;
+      }
+
+      body.pmv-mode-active .pmv-viz-value {
+        font-size: 1.92rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-metric .pmv-viz-value {
+        font-size: 1.3rem;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: 0.82rem;
+        --pmv-sticky-col1: 150px;
+        --pmv-sticky-col2: 76px;
+      }
+
+      body.pmv-mode-active .pmv-psych-card {
+        min-height: 430px;
+        padding: 14px 16px;
+      }
+
+      body.pmv-mode-active .pmv-psych-body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+      }
+
+      body.pmv-mode-active #pmvPsychChartSvg {
+        min-height: 470px;
+      }
+    }
+
+    /* Large-display PMV layout: use the extra width/height instead of leaving empty canvas. */
+    @media (min-width: 2200px) and (min-height: 1050px) {
+      body.pmv-mode-active .app {
+        width: min(96vw, 3400px);
+        max-width: none;
+        padding: 18px 24px 24px;
+      }
+
+      body.pmv-mode-active header {
+        margin-bottom: 14px;
+      }
+
+      body.pmv-mode-active main.layout-2row-simple {
+        grid-template-columns: minmax(440px, 0.62fr) minmax(0, 2.75fr);
+        gap: clamp(22px, 1.4vw, 34px);
+      }
+
+      body.pmv-mode-active #panel-settings {
+        align-self: stretch;
+      }
+
+      body.pmv-mode-active #panel-output {
+        min-height: calc(100vh - 132px);
+        align-self: stretch;
+      }
+
+      body.pmv-mode-active .chart-card--pmv-table {
+        min-height: calc(100vh - 176px);
+        margin-top: -14px;
+      }
+
+      body.pmv-mode-active .pmv-split {
+        display: grid;
+        grid-template-columns: minmax(560px, 0.95fr) minmax(760px, 1.35fr);
+        align-items: stretch;
+        gap: clamp(16px, 1vw, 28px);
+        min-height: calc(100vh - 238px);
+      }
+
+      body.pmv-mode-active .pmv-split-left,
+      body.pmv-mode-active .pmv-split-right-column {
+        flex: none;
+        max-width: none;
+        width: auto;
+      }
+
+      body.pmv-mode-active .pmv-split-right-column {
+        min-width: 0;
+        gap: clamp(12px, 0.8vw, 20px);
+      }
+
+      body.pmv-mode-active .pmv-split-right {
+        min-height: clamp(260px, 25vh, 380px);
+      }
+
+      body.pmv-mode-active #pmvVizCard.pmv-viz-card {
+        gap: clamp(16px, 1vw, 26px);
+      }
+
+      body.pmv-mode-active .pmv-viz-top {
+        width: min(92%, 1280px);
+        gap: clamp(18px, 1.3vw, 34px);
+        padding-top: clamp(8px, 0.6vh, 16px);
+      }
+
+      body.pmv-mode-active .pmv-viz-person-title {
+        font-size: clamp(0.98rem, 0.72rem + 0.34vw, 1.28rem);
+        gap: 8px;
+      }
+
+      body.pmv-mode-active .pmv-viz-person-result-tag {
+        min-height: 22px;
+        padding: 3px 10px;
+        font-size: clamp(0.76rem, 0.58rem + 0.22vw, 0.98rem);
+      }
+
+      body.pmv-mode-active .pmv-viz-scale {
+        gap: clamp(8px, 0.55vw, 16px);
+        font-size: clamp(1.02rem, 0.72rem + 0.3vw, 1.24rem);
+        margin-top: clamp(12px, 0.8vh, 18px);
+      }
+
+      body.pmv-mode-active #pmv-panel .table-scroll-hint {
+        font-size: clamp(0.86rem, 0.62rem + 0.22vw, 1.04rem);
+      }
+
+      body.pmv-mode-active .pmv-psych-header {
+        gap: clamp(12px, 0.8vw, 20px);
+      }
+
+      body.pmv-mode-active .pmv-psych-title-row {
+        gap: clamp(10px, 0.7vw, 18px);
+      }
+
+      body.pmv-mode-active .pmv-psych-title {
+        font-size: clamp(1rem, 0.74rem + 0.3vw, 1.28rem);
+      }
+
+      body.pmv-mode-active .pmv-psych-subtitle,
+      body.pmv-mode-active .pmv-psych-result-switch-label {
+        font-size: clamp(0.84rem, 0.62rem + 0.22vw, 1.02rem);
+      }
+
+      body.pmv-mode-active .pmv-psych-result-switch select {
+        min-width: clamp(160px, 10vw, 240px);
+        padding: 7px 34px 7px 14px;
+        font-size: clamp(0.84rem, 0.62rem + 0.22vw, 1.02rem);
+      }
+
+      body.pmv-mode-active .pmv-psych-card {
+        flex: 1 1 auto;
+        min-height: clamp(430px, 45vh, 660px);
+      }
+
+      body.pmv-mode-active #pmvPsychChartSvg {
+        min-height: clamp(460px, 45vh, 680px);
+      }
+
+      body.pmv-mode-active #pmvBar.pmv-viz-bar,
+      body.pmv-mode-active .pmv-viz-scale {
+        width: min(100%, 860px);
+      }
+
+      body.pmv-mode-active #pmvBar.pmv-viz-bar {
+        height: clamp(128px, 8vh, 156px);
+      }
+
+      body.pmv-mode-active .pmv-viz-dot {
+        width: clamp(48px, 2.8vw, 58px);
+        height: clamp(48px, 2.8vw, 58px);
+        border-width: 4px;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: clamp(0.9rem, 0.72rem + 0.24vh, 1.08rem);
+        --pmv-sticky-col1: clamp(158px, 7vw, 190px);
+        --pmv-sticky-col2: clamp(78px, 3.6vw, 96px);
+      }
+
+      body.pmv-mode-active .pmv-table-condensed thead th,
+      body.pmv-mode-active .pmv-table-condensed tbody td {
+        padding: clamp(6px, 0.55vh, 10px) clamp(8px, 0.34vw, 12px);
+      }
+
+      body.pmv-mode-active .pmv-col-header-label,
+      body.pmv-mode-active .pmv-group-cell {
+        font-size: clamp(0.86rem, 0.68rem + 0.2vh, 1rem);
+      }
+    }
+
+    @media (min-width: 3000px) and (min-height: 1300px) {
+      body.pmv-mode-active .app {
+        width: min(94vw, 3800px);
+        padding-left: 32px;
+        padding-right: 32px;
+      }
+
+      body.pmv-mode-active main.layout-2row-simple {
+        grid-template-columns: minmax(520px, 0.58fr) minmax(0, 3fr);
+      }
+
+      body.pmv-mode-active .pmv-split {
+        grid-template-columns: minmax(720px, 1fr) minmax(980px, 1.42fr);
+      }
+
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: clamp(1rem, 0.78rem + 0.22vh, 1.18rem);
+        --pmv-sticky-col1: 196px;
+        --pmv-sticky-col2: 104px;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed thead th,
+      body.pmv-mode-active .pmv-table-condensed tbody td {
+        padding: 8px 11px;
+      }
+
+      body.pmv-mode-active .pmv-col-header-label,
+      body.pmv-mode-active .pmv-group-cell {
+        font-size: 1rem;
+      }
+
+      body.pmv-mode-active #pmvBar.pmv-viz-bar {
+        width: min(100%, 980px);
+        height: 152px;
+      }
+
+      body.pmv-mode-active .pmv-viz-scale {
+        width: min(100%, 980px);
+        font-size: 1.28rem;
+        margin-top: 16px;
+      }
+
+      body.pmv-mode-active .pmv-viz-dot {
+        width: 64px;
+        height: 64px;
+        border-width: 4px;
+      }
+
+      body.pmv-mode-active .pmv-viz-person-title {
+        font-size: 1.32rem;
+      }
+
+      body.pmv-mode-active .pmv-viz-person-result-tag {
+        min-height: 24px;
+        padding: 4px 12px;
+        font-size: 1rem;
+      }
+
+      body.pmv-mode-active .pmv-psych-title {
+        font-size: 1.34rem;
+      }
+
+      body.pmv-mode-active .pmv-psych-subtitle,
+      body.pmv-mode-active .pmv-psych-result-switch-label,
+      body.pmv-mode-active .pmv-psych-result-switch select {
+        font-size: 1.04rem;
+      }
+
+      body.pmv-mode-active .pmv-psych-card {
+        min-height: clamp(520px, 48vh, 760px);
+      }
+
+      body.pmv-mode-active #pmvPsychChartSvg {
+        min-height: clamp(560px, 48vh, 780px);
+      }
     }
     .batch-preview {
       margin-top: 10px;
@@ -2423,7 +4321,7 @@
   <div class="app">
     <header>
     <div class="title-block">
-        <img class="header-logo" src="/static/logo2.svg" alt="logo" />
+        <img class="header-logo" src="/static/logo2.svg?v=1" alt="logo" />
         <h1 data-i18n-key="header.title">JOS-3 热舒适·体温调节可视化</h1>
       </div>
       <div class="header-actions">
@@ -2459,48 +4357,52 @@
         <div class="settings-content">
           <div class="settings-header">
             <div class="settings-header-main">
-              <div class="section-title" data-i18n-key="section.settings">工况设置</div>
+              <div class="section-title" data-i18n-key="section.settings">????</div>
               <div class="section-tip" data-i18n-key="section.settings.tip">
-                选中 Condition 1 进行设置参数模拟或增加多阶段工况
+                ?? Condition 1 ????????????????
               </div>
             </div>
-            <div class="quick-example-row">
+            <div class="quick-example-row" id="jos3-example-row">
               <div class="quick-example-group">
                 <button id="jos3-example1-btn" type="button" class="btn-secondary xsmall quick-example-btn">
-                  <span class="quick-example-btn-label" data-i18n-key="button.quickExample1">示例工况 1<br/>（To 28→20 °C）</span>
+                  <span class="quick-example-btn-label" data-i18n-key="button.quickExample1">???? 1<br/>?To 28?20??C?</span>
                 </button>
-                <div class="example-info-tooltip tooltip-align-center" data-scenario="jos3_example_1" tabindex="0" aria-label="示例工况1说明" role="button" aria-expanded="false">
-                  <div class="example-info-icon">?</div>
-                  <div class="tooltip-bubble">
-                    <div class="tooltip-title">JOS-3 示例工况 1（操作温度 28→20 °C）</div>
-                    <ul class="tooltip-list">
-                      <li><strong>阶段 1（0–60 min）</strong>：设置操作温度 To = 28 °C（Ta = Tr = 28 °C），RH 40%，Va 0.2 m/s，PAR 1.2，坐姿，使用默认服装参数，模拟温暖办公室。</li>
-                      <li><strong>阶段 2（60–120 min）</strong>：保持其它条件不变，仅将操作温度调整为 To = 20 °C（等效为桌面风扇冷却），继续计算 60 分钟，观测降温后的动态响应。</li>
-                      <li>此示例对应官方 example.py：仅修改 To 以查看操作温度下降对平均皮肤温度的影响。</li>
-                    </ul>
-                  </div>
-                </div>
               </div>
               <div class="quick-example-group">
                 <button id="jos3-example2-btn" type="button" class="btn-secondary xsmall quick-example-btn">
-                  <span class="quick-example-btn-label" data-i18n-key="button.quickExample2">示例工况 2<br/>（暖→风扇→更暖）</span>
+                  <span class="quick-example-btn-label" data-i18n-key="button.quickExample2">???? 2<br/>?????????</span>
                 </button>
-                <div class="example-info-tooltip tooltip-align-center" data-scenario="jos3_example" tabindex="0" aria-label="示例工况2说明" role="button" aria-expanded="false">
-                  <div class="example-info-icon">?</div>
-                  <div class="tooltip-bubble">
-                    <div class="tooltip-title">JOS-3 示例工况 2（暖 → 风扇 → 更暖）</div>
-                    <ul class="tooltip-list">
-                      <li><strong>阶段 1（0–30 min）</strong>：Ta 28 °C，Tr 30 °C，RH 40%，Va 0.2 m/s，PAR 1.2，坐姿。局部服装热阻 Icl （头部 0、颈部 0、胸部 1.14、背部 0.84、骨盆 1.04、左肩 0.84、左臂 0.42、左手 0、右肩 0.84、右臂 0.42、右手 0、左大腿 0.58、左小腿 0.62、左脚 0.82、右大腿 0.58、右小腿 0.62、右脚 0.82 clo）。</li>
-                      <li><strong>阶段 2（30–90 min）</strong>：保持 Ta/Tr，设置 To = 20 °C，并启用 17 段 Va 列表模拟桌面风扇（头部 0.2、颈部 0.4、胸部 0.4、背部 0.1、骨盆 0.1、左肩 0.4、左臂 0.4、左手 0.4、右肩 0.4、右臂 0.4、右手 0.4、左大腿 0.1、左小腿 0.1、左脚 0.1、右大腿 0.1、右小腿 0.1、右脚 0.1 m/s），持续 60 分钟。</li>
-                      <li><strong>阶段 3（90–120 min）</strong>：环境升温至 Ta 30 °C、Tr 35 °C，继续计算 30 分钟以观测再升温后的反应。</li>
-                    </ul>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
-          <div class="conditions-inline" id="conditions-inline">
+          <div class="quick-example-row" id="pmv-example-row" style="display:none;">
+            <div class="quick-example-group">
+              <button id="pmv-child-btn" type="button" class="quick-example-btn pmv-example-card">
+                <span class="pmv-example-card-media">
+                  <img src="/static/children-svg.svg?v=1" alt="children" />
+                </span>
+                <span class="quick-example-btn-label pmv-example-card-label" data-i18n-key="button.pmvChild">PMV 小孩</span>
+              </button>
+            </div>
+            <div class="quick-example-group">
+              <button id="pmv-adult-btn" type="button" class="quick-example-btn pmv-example-card">
+                <span class="pmv-example-card-media">
+                  <img src="/static/adult-svg.svg?v=1" alt="adult" />
+                </span>
+                <span class="quick-example-btn-label pmv-example-card-label" data-i18n-key="button.pmvAdult">PMV 成人</span>
+              </button>
+            </div>
+            <div class="quick-example-group">
+              <button id="pmv-elder-btn" type="button" class="quick-example-btn pmv-example-card">
+                <span class="pmv-example-card-media">
+                  <img src="/static/elder-svg.svg?v=2" alt="elder" />
+                </span>
+                <span class="quick-example-btn-label pmv-example-card-label" data-i18n-key="button.pmvElder"><span class="pmv-label-main">PMV 老人</span><small class="pmv-coming-soon">（即将上线）</small></span>
+              </button>
+            </div>
+          </div>
+<div class="conditions-inline" id="conditions-inline">
             <div class="conditions-bar">
               <div class="condition-chip-list" id="condition-chip-list"></div>
               <button type="button" class="condition-add-btn" id="condition-add-btn">➕</button>
@@ -2639,6 +4541,34 @@
             </select>
           </div>
 
+          <!-- 年龄 -->
+          <div class="field" id="field-age">
+            <label for="age" data-i18n-key="field.age.label">年龄 (岁)</label>
+            <div>
+              <input
+                id="age"
+                type="text"
+                inputmode="decimal"
+                value="30"
+              />
+              <select id="pmv-child-age" style="display:none; margin-top:4px;">
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10" selected>10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+              </select>
+            </div>
+          </div>
+
           <!-- 身高 -->
           <div class="field" id="field-height">
             <label for="height" data-i18n-key="field.height.label">身高 (m)</label>
@@ -2661,19 +4591,6 @@
                 type="text"
                 inputmode="decimal"
                 value="60"
-              />
-            </div>
-          </div>
-
-          <!-- 年龄 -->
-          <div class="field" id="field-age">
-            <label for="age" data-i18n-key="field.age.label">年龄 (岁)</label>
-            <div>
-              <input
-                id="age"
-                type="text"
-                inputmode="decimal"
-                value="30"
               />
             </div>
           </div>
@@ -3135,8 +5052,11 @@
         <div class="charts-grid">
           <!-- PMV 结果表（与两节点交互一致） -->
           <div class="chart-card chart-card--pmv-table" id="pmv-panel">
-            <div class="chart-title">
-              <span data-i18n-key="chart.pmv.title">稳态 PMV / PPD（Fanger）模型结果</span>
+            <div class="chart-title pmv-chart-title">
+              <div class="pmv-title-cluster">
+                <span data-i18n-key="chart.pmv.title">稳态 PMV / PPD（Fanger）模型结果</span>
+                <div class="table-scroll-hint" data-i18n-key="table.scrollHint">← 左右滑动查看未显示列 →</div>
+              </div>
               <div id="pmv-status" class="pmv-status-text">状态：尚未计算</div>
               <div class="pmv-panel-actions">
                 <button
@@ -3158,15 +5078,114 @@
                 </button>
               </div>
             </div>
-            <div class="chart-container two-node-table-container pmv-table-condensed">
-              <table class="two-node-table" id="pmv-table">
-                <thead>
-                  <tr id="pmv-header-row"></tr>
-                </thead>
-                <tbody id="pmv-output-tbody"></tbody>
-              </table>
+            <div class="chart-container pmv-split">
+              <div class="pmv-split-left two-node-table-container pmv-table-condensed">
+                <table class="two-node-table" id="pmv-table">
+                  <thead>
+                    <tr id="pmv-header-row"></tr>
+                  </thead>
+                  <tbody id="pmv-output-tbody"></tbody>
+                </table>
+              </div>
+              <div class="pmv-split-right-column">
+                <div class="pmv-split-right">
+                  <div id="pmvVizCard" class="pmv-viz-card">
+                  <div class="pmv-viz-top">
+                    <div class="pmv-viz-person pmv-viz-section--child">
+                      <div class="pmv-viz-person-title"><span>小孩</span><span class="pmv-viz-person-result-tag" id="childCurrentResult"></span></div>
+                      <div class="pmv-viz-metrics">
+                        <div class="pmv-viz-section pmv-viz-metric">
+                          <div class="pmv-viz-title">PMV</div>
+                          <div class="pmv-viz-value" id="childPMV">--</div>
+                          <div class="pmv-viz-label" id="childLabel">--</div>
+                        </div>
+                        <div class="pmv-viz-section pmv-viz-metric">
+                          <div class="pmv-viz-title">PPD</div>
+                          <div class="pmv-viz-value" id="childPPD">--</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pmv-viz-person pmv-viz-section--adult">
+                      <div class="pmv-viz-person-title"><span>成人</span><span class="pmv-viz-person-result-tag" id="adultCurrentResult"></span></div>
+                      <div class="pmv-viz-metrics">
+                        <div class="pmv-viz-section pmv-viz-metric">
+                          <div class="pmv-viz-title">PMV</div>
+                          <div class="pmv-viz-value" id="adultPMV">--</div>
+                          <div class="pmv-viz-label" id="adultLabel">--</div>
+                        </div>
+                        <div class="pmv-viz-section pmv-viz-metric">
+                          <div class="pmv-viz-title">PPD</div>
+                          <div class="pmv-viz-value" id="adultPPD">--</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pmv-viz-person pmv-viz-section--elder">
+                      <div class="pmv-viz-person-title"><span>老人</span><span class="pmv-viz-person-result-tag" id="elderCurrentResult"></span></div>
+                      <div class="pmv-viz-metrics">
+                        <div class="pmv-viz-section pmv-viz-metric">
+                          <div class="pmv-viz-title">PMV</div>
+                          <div class="pmv-viz-value" id="elderPMV">--</div>
+                          <div class="pmv-viz-label" id="elderLabel">--</div>
+                        </div>
+                        <div class="pmv-viz-section pmv-viz-metric">
+                          <div class="pmv-viz-title">PPD</div>
+                          <div class="pmv-viz-value" id="elderPPD">--</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="pmv-viz-divider" aria-hidden="true"></div>
+                  <div class="pmv-viz-section pmv-viz-section--bar">
+                    <div class="pmv-viz-bar-wrap">
+                      <div id="pmvBar" class="pmv-viz-bar">
+                        <div id="pmvPointsLayer" class="pmv-viz-points" aria-hidden="true"></div>
+                        <span id="ptrChild" class="pmv-viz-pointer pmv-viz-pointer--child" aria-hidden="true"></span>
+                        <span id="ptrAdult" class="pmv-viz-pointer pmv-viz-pointer--adult" aria-hidden="true"></span>
+                      </div>
+                      <div class="pmv-viz-scale" aria-hidden="true">
+                        <span>很冷(-3)</span>
+                        <span>(-2)</span>
+                        <span>(-1)</span>
+                        <span>舒适(0)</span>
+                        <span>(+1)</span>
+                        <span>(+2)</span>
+                        <span>很热(+3)</span>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                <div id="pmvPsychCard" class="pmv-psych-card">
+                  <div class="pmv-psych-header">
+                    <div class="pmv-psych-heading">
+                      <div class="pmv-psych-title-row">
+                        <span class="pmv-psych-title" id="pmvPsychTitle">焓湿图</span>
+                        <span class="pmv-psych-subtitle" id="pmvPsychSubtitle">当前输入预览</span>
+                        <div class="pmv-psych-result-switch">
+                          <span class="pmv-psych-result-switch-label" id="pmvPsychResultSwitchLabel">切换结果</span>
+                          <select id="pmvPsychResultSelect" aria-label="PMV psychrometric result selector"></select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pmv-psych-toolbar">
+                      <div class="pmv-psych-meta" id="pmvPsychMeta"></div>
+                    </div>
+                  </div>
+                  <div class="pmv-psych-body" id="pmvPsychBody">
+                    <div class="pmv-psych-chart-wrap">
+                      <div class="pmv-psych-stats" id="pmvPsychStats"></div>
+                      <svg
+                        id="pmvPsychChartSvg"
+                        viewBox="0 0 640 470"
+                        role="img"
+                        aria-label="PMV psychrometric chart"
+                      ></svg>
+                    </div>
+                  </div>
+                  <div class="pmv-psych-note" id="pmvPsychNote"></div>
+                </div>
+              </div>
             </div>
-            <div class="table-scroll-hint" data-i18n-key="table.scrollHint">← 左右滑动查看未显示列 →</div>
           </div>
 
           <!-- === 两节点 (Gagge) 模型输出表 === -->
@@ -3293,9 +5312,6 @@
           用于辅助热舒适与热安全分析。
         </div>
 
-        <div class="footer-note" data-i18n-key="footer.note">
-          本前端仅用于教学与研究示例。
-        </div>
       </section>
 
       <div class="local-modal-backdrop" id="local-modal-backdrop">
@@ -3355,6 +5371,23 @@
       // === 语言与模型切换相关 ===
       let currentLang = "zh";
       let currentModel = "jos3"; // 默认 JOS-3
+      let currentPmvVariant = "adult"; // PMV adult | child | elder
+      const PMV_ELDER_COMING_SOON = true;
+      let lastChildPMV = null;
+      let lastAdultPMV = null;
+      let lastElderPMV = null;
+      let lastChildPPD = null;
+      let lastAdultPPD = null;
+      let lastElderPPD = null;
+      let lastChildPmvPayload = null;
+      let lastAdultPmvPayload = null;
+      let lastChildPmvLabelName = null;
+      let lastAdultPmvLabelName = null;
+      let pmvPsychInputPreviewBound = false;
+      let pmvPsychChartInteractionBound = false;
+      let pmvPsychChartState = null;
+      let pmvPsychHoverSample = null;
+      let pmvPsychBaseSubtitle = "";
 
       function ensureXlsxAvailable(actionZh, actionEn, onError) {
         if (typeof XLSX !== "undefined") return true;
@@ -3467,6 +5500,9 @@
           "button.simulate": "模拟",
           "button.quickExample1": "示例工况 1<br/>（To 28→20 °C）",
           "button.quickExample2": "示例工况 2<br/>（暖→风扇→更暖）",
+          "button.pmvAdult": "PMV 成人",
+          "button.pmvChild": "PMV 小孩",
+          "button.pmvElder": "<span class=\"pmv-label-main\">PMV 老人</span><small class=\"pmv-coming-soon\">（即将上线）</small>",
           "local.open": "展开局部设置",
           "local.modal.title": "局部设置",
           "local.modal.close": "保存并关闭",
@@ -3579,9 +5615,7 @@
           "batch.upload.run": "批量模拟",
           "table.scrollHint": "← 左右滑动查看未显示列 →",
           "summary.description":
-            "请在左侧设置工况，然后点击「模拟」。右侧将显示 JOS-3 计算得到的平均皮肤温度、核心温度，以及各部位皮肤温度随时间的变化（并映射到三维人体模型），同时基于 Fiala 模型给出动态热感觉 DTS 与不满意率 PPD，并基于 Fanger 模型给出稳态 PMV / PPD，用于辅助热舒适与热安全分析。",
-          "footer.note":
-            "本前端仅用于教学与研究示例。"
+            "请在左侧设置工况，然后点击「模拟」。右侧将显示 JOS-3 计算得到的平均皮肤温度、核心温度，以及各部位皮肤温度随时间的变化（并映射到三维人体模型），同时基于 Fiala 模型给出动态热感觉 DTS 与不满意率 PPD，并基于 Fanger 模型给出稳态 PMV / PPD，用于辅助热舒适与热安全分析。"
         },
         en: {
           "header.title": "XAUAT Thermal Comfort Tool",
@@ -3650,6 +5684,9 @@
           "button.simulate": "Simulate",
           "button.quickExample1": "Demo 1<br/>(To 28→20 °C)",
           "button.quickExample2": "Demo 2<br/>(Warm → Fan → Warmer)",
+          "button.pmvAdult": "PMV Adult",
+          "button.pmvChild": "PMV Child",
+          "button.pmvElder": "<span class=\"pmv-label-main\">PMV Elder</span><small class=\"pmv-coming-soon\">(Coming soon)</small>",
           "local.open": "Open local settings",
           "local.modal.title": "Local settings",
           "local.modal.close": "Save & Close",
@@ -3763,9 +5800,7 @@
           "batch.upload.run": "Batch simulation",
           "table.scrollHint": "← Drag horizontally to view hidden columns →",
           "summary.description":
-            "Configure the scenario on the left, then click “Simulate”. The right side shows JOS-3 results such as mean skin temperature, core temperature, and segmental skin temperatures over time (also mapped onto the 3D body). It also reports Fiala-style dynamic thermal sensation (DTS) and dissatisfaction (PPD) plus steady-state Fanger PMV/PPD to support comfort and safety analysis.",
-          "footer.note":
-            "This interface is for teaching and research demonstrations only."
+            "Configure the scenario on the left, then click “Simulate”. The right side shows JOS-3 results such as mean skin temperature, core temperature, and segmental skin temperatures over time (also mapped onto the 3D body). It also reports Fiala-style dynamic thermal sensation (DTS) and dissatisfaction (PPD) plus steady-state Fanger PMV/PPD to support comfort and safety analysis."
         }
       };
 
@@ -3812,6 +5847,12 @@
         }
         if (typeof renderPmvOutputTable === "function") {
           renderPmvOutputTable();
+        }
+        if (typeof refreshPmvTooltipContent === "function") {
+          refreshPmvTooltipContent();
+        }
+        if (typeof positionPmvTooltip === "function") {
+          positionPmvTooltip();
         }
         if (typeof renderJos3OutputTable === "function") {
           renderJos3OutputTable();
@@ -3900,11 +5941,23 @@
       const modelSelect = $("model-select");
       const jos3Example1Btn = $("jos3-example1-btn");
       const jos3Example2Btn = $("jos3-example2-btn");
+      const pmvAdultBtn = $("pmv-adult-btn");
+      const pmvChildBtn = $("pmv-child-btn");
+      const pmvElderBtn = $("pmv-elder-btn");
+      const pmvChildAgeSelect = $("pmv-child-age");
+      const ptrChild = $("ptrChild");
+      const ptrAdult = $("ptrAdult");
+      const pmvExampleRow = $("pmv-example-row");
+      const jos3ExampleRow = $("jos3-example-row");
       const quickExampleButtons = [
         { btn: jos3Example1Btn, scenario: "jos3_example_1" },
         { btn: jos3Example2Btn, scenario: "jos3_example" }
       ];
-      const quickExampleRow = document.querySelector(".quick-example-row");
+      const pmvExampleButtons = [
+        { btn: pmvChildBtn, variant: "child" },
+        { btn: pmvAdultBtn, variant: "adult" },
+        { btn: pmvElderBtn, variant: "elder" }
+      ];
       const settingsTip = document.querySelector(".section-tip");
       const conditionInlineLabel = $("condition-inline-label");
       const conditionRemoveBtn = $("condition-remove-btn");
@@ -3955,6 +6008,68 @@
       let inlineConditions = [];
       let activeConditionId = null;
       let nextConditionId = 1;
+
+      function setPmvVariant(variant) {
+        const next = variant === "child" ? "child" : variant === "elder" ? "elder" : "adult";
+        currentPmvVariant = next;
+        const showChild = next === "child";
+        if (pmvChildAgeSelect) {
+          pmvChildAgeSelect.style.display = showChild ? "" : "none";
+          pmvChildAgeSelect.disabled = !showChild;
+        }
+        if (ageInput) {
+          ageInput.style.display = showChild ? "none" : "";
+        }
+        refreshExampleButtonState();
+        applyModelLayout();
+        if (currentModel === "pmv") {
+          updatePMVCard();
+        }
+      }
+
+      function isPmvElderComingSoon() {
+        return PMV_ELDER_COMING_SOON;
+      }
+
+      function getPmvElderComingSoonStatus() {
+        return currentLang === "zh"
+          ? "状态：PMV 老人修正即将上线"
+          : "Status: PMV elder variant coming soon";
+      }
+
+      function setPmvElderDisabledState(disabled) {
+        const settingsPanel = document.getElementById("panel-settings");
+        if (settingsPanel) {
+          settingsPanel.classList.toggle("pmv-elder-disabled", !!disabled);
+        }
+        [
+          taInput,
+          trInput,
+          vaInput,
+          rhInput,
+          metSelect,
+          metCustomInput,
+          cloSelect,
+          cloCustomInput,
+          wmeInput,
+          ageInput,
+          heightInput,
+          weightInput,
+          pmvChildAgeSelect
+        ]
+          .filter(Boolean)
+          .forEach((el) => {
+            el.disabled = !!disabled;
+            if (disabled) {
+              el.setAttribute("aria-disabled", "true");
+            } else {
+              el.removeAttribute("aria-disabled");
+            }
+          });
+        if (simulateBtn) {
+          simulateBtn.disabled = !!disabled;
+        }
+      }
 
       if (exampleInfoTooltips && exampleInfoTooltips.length) {
         exampleInfoTooltips.forEach((tooltipEl) => {
@@ -4604,7 +6719,11 @@
           { key: "rh", aliases: ["rh", "relativehumidity", "relative_humidity"], label: { zh: "相对湿度", en: "Relative humidity" }, type: "number", required: true },
           { key: "met", aliases: ["met"], label: { zh: "代谢率", en: "Metabolic rate" }, type: "number", required: true },
           { key: "clo", aliases: ["clo", "icl"], label: { zh: "服装热阻", en: "Clothing insulation" }, type: "number", required: true },
-          { key: "wme", aliases: ["wme", "work"], label: { zh: "外部功率 wme", en: "External work wme" }, type: "number", required: false }
+          { key: "wme", aliases: ["wme", "work"], label: { zh: "外部功率 wme", en: "External work wme" }, type: "number", required: false },
+          { key: "age", aliases: ["age"], label: { zh: "年龄", en: "Age" }, type: "number", required: false },
+          { key: "height", aliases: ["height"], label: { zh: "身高", en: "Height" }, type: "number", required: false },
+          { key: "weight", aliases: ["weight"], label: { zh: "体重", en: "Weight" }, type: "number", required: false },
+          { key: "variant", aliases: ["variant", "mode"], label: { zh: "PMV 模式", en: "PMV mode" }, type: "string", required: false }
         ],
         jos3: [
           { key: "ta", aliases: ["ta", "tdb", "tair", "airtemperature", "air_temperature"], label: { zh: "空气温度", en: "Air temperature" }, type: "number", required: true },
@@ -5119,11 +7238,22 @@
               clo: Number.isFinite(row.clo) ? row.clo : getCloValue(),
               wme: Number.isFinite(row.wme)
                 ? row.wme
-                : getWmeValue()
+                : getWmeValue(),
+              variant: currentPmvVariant
             };
+            if (currentPmvVariant === "child") {
+              payload.age = Number.isFinite(row.age) ? row.age : parseInt(pmvChildAgeSelect ? pmvChildAgeSelect.value : ageInput.value, 10);
+              payload.height = Number.isFinite(row.height) ? row.height : parseFloat(heightInput.value);
+              payload.weight = Number.isFinite(row.weight) ? row.weight : parseFloat(weightInput.value);
+            }
 
             try {
-              const res = await fetch("/api/pmv", {
+              if (currentPmvVariant === "child" && (!Number.isFinite(payload.height) || !Number.isFinite(payload.weight))) {
+                updatePmvColumns(payload, { placeholder: true, message: currentLang === "zh" ? "缺少身高/体重" : "Height/weight missing" }, { forceNew: true, placeholder: true });
+                continue;
+              }
+              const pmvEndpoint = currentPmvVariant === "child" ? "/api/pmv_child" : "/api/pmv_adult";
+              const res = await fetch(pmvEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -7093,6 +9223,14 @@
       function removePmvColumn(columnId) {
         if (!columnId) return;
         pmvColumns = pmvColumns.filter((col) => col.id !== columnId);
+        if (pmvPsychSelectedColumnId === columnId) {
+          pmvPsychSelectedColumnId = null;
+        }
+        Object.keys(pmvSelectedColumnIds).forEach((variant) => {
+          if (pmvSelectedColumnIds[variant] === columnId) {
+            pmvSelectedColumnIds[variant] = null;
+          }
+        });
         renderPmvOutputTable();
       }
 
@@ -7461,9 +9599,8 @@
       // 图表 / 3D 在容器尺寸变化时的重绘节流标记
       let chartsResizeRaf = null;
 
-       // 右侧输出网格，用于拖动重排各个输出卡片
+      // 右侧输出网格固定显示，不再支持整卡片拖动重排
       const chartsGridEl = document.querySelector("#panel-output .charts-grid");
-      let dragSrcCard = null;
 
       // 3D 联动节流：避免 tooltip 高频触发导致频繁重绘 Three.js
       let pending3DIndex = null;
@@ -7483,6 +9620,18 @@
 
       // Tooltip 锁定状态：用于实现双击锁定/解锁功能
       const chartTooltipStates = new WeakMap();
+      const pmvTooltipState = {
+        activeDot: null,
+        activeColumn: null,
+        activeIndex: null,
+        tooltipEl: null
+      };
+      const pmvSelectedColumnIds = {
+        child: null,
+        adult: null,
+        elder: null
+      };
+      let pmvPsychSelectedColumnId = null;
 
       function getChartTooltipState(chart) {
         if (!chart) return null;
@@ -7497,6 +9646,63 @@
           chartTooltipStates.set(chart, state);
         }
         return state;
+      }
+
+      function ensureFloatingGlassTooltip(id, onDblClick) {
+        let tooltipEl = document.getElementById(id);
+        if (!tooltipEl) {
+          tooltipEl = document.createElement("div");
+          tooltipEl.id = id;
+          document.body.appendChild(tooltipEl);
+        }
+
+        tooltipEl.className = "floating-glass-tooltip";
+        tooltipEl.__onFloatingTooltipDblClick = onDblClick;
+
+        let inner = tooltipEl.firstElementChild;
+        if (!inner) {
+          inner = document.createElement("div");
+          tooltipEl.appendChild(inner);
+        }
+        inner.className = "floating-glass-tooltip__inner";
+
+        if (!tooltipEl.__floatingTooltipDblClickBound) {
+          tooltipEl.addEventListener("dblclick", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const handler = tooltipEl.__onFloatingTooltipDblClick;
+            if (typeof handler === "function") {
+              handler(event);
+            }
+          });
+          tooltipEl.__floatingTooltipDblClickBound = true;
+        }
+
+        return tooltipEl;
+      }
+
+      function positionFloatingTooltip(tooltipEl, rawLeft, rawTop) {
+        if (!tooltipEl) return;
+        const margin = 12;
+        const tooltipWidth = tooltipEl.offsetWidth;
+        const tooltipHeight = tooltipEl.offsetHeight;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        let left = rawLeft + margin;
+        if (left + tooltipWidth > viewportWidth - margin) {
+          left = rawLeft - tooltipWidth - margin;
+        }
+
+        let top = rawTop - tooltipHeight / 2;
+        if (top < margin) {
+          top = margin;
+        } else if (top + tooltipHeight > viewportHeight - margin) {
+          top = Math.max(margin, viewportHeight - tooltipHeight - margin);
+        }
+
+        tooltipEl.style.left = left + "px";
+        tooltipEl.style.top = top + "px";
       }
 
       function updateTooltipLockHint(state) {
@@ -7520,7 +9726,7 @@
           }
           chart.update();
           if (state.tooltipEl) {
-            state.tooltipEl.classList.remove("chart-tooltip--locked");
+            state.tooltipEl.classList.remove("floating-glass-tooltip--locked");
             state.tooltipEl.style.opacity = "0";
           }
           updateTooltipLockHint(state);
@@ -7559,7 +9765,7 @@
         }
         chart.update();
         if (state.tooltipEl) {
-          state.tooltipEl.classList.add("chart-tooltip--locked");
+          state.tooltipEl.classList.add("floating-glass-tooltip--locked");
         }
         updateTooltipLockHint(state);
       }
@@ -9863,67 +12069,12 @@
         return result;
       }
 
-      // === 输出卡片拖动重排（类似桌面小组件） ===
-      function onChartCardDragStart(e) {
-        if (!chartsGridEl) return;
-        dragSrcCard = this;
-        this.classList.add("dragging");
-        e.dataTransfer.effectAllowed = "move";
-        // 某些浏览器要求 setData 才会启动拖动
-        e.dataTransfer.setData("text/plain", "");
-      }
-
-      function onChartCardDragOver(e) {
-        if (!dragSrcCard || !chartsGridEl) return;
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-      }
-
-      function onChartCardDrop(e) {
-        if (!dragSrcCard || !chartsGridEl) return;
-        e.preventDefault();
-        if (this === dragSrcCard) return;
-
-        const cards = Array.from(
-          chartsGridEl.querySelectorAll(".chart-card")
-        );
-        const srcIndex = cards.indexOf(dragSrcCard);
-        const targetIndex = cards.indexOf(this);
-        if (srcIndex === -1 || targetIndex === -1) return;
-
-        if (srcIndex < targetIndex) {
-          chartsGridEl.insertBefore(dragSrcCard, this.nextSibling);
-        } else {
-          chartsGridEl.insertBefore(dragSrcCard, this);
-        }
-      }
-
-      function onChartCardDragEnd() {
-        this.classList.remove("dragging");
-        dragSrcCard = null;
-      }
-
       function initDraggableCharts() {
         if (!chartsGridEl) return;
         const cards = chartsGridEl.querySelectorAll(".chart-card");
         cards.forEach((card) => {
-          // 两节点结果卡片 & 三维人体模型卡片不需要拖拽，直接跳过
-          if (
-            card.classList.contains("chart-card--two-node") ||
-            card.classList.contains("chart-card--body3d")
-          ) {
-            card.removeAttribute("draggable");
-            card.removeEventListener("dragstart", onChartCardDragStart);
-            card.removeEventListener("dragover", onChartCardDragOver);
-            card.removeEventListener("drop", onChartCardDrop);
-            card.removeEventListener("dragend", onChartCardDragEnd);
-            return;
-          }
-          card.setAttribute("draggable", "true");
-          card.addEventListener("dragstart", onChartCardDragStart);
-          card.addEventListener("dragover", onChartCardDragOver);
-          card.addEventListener("drop", onChartCardDrop);
-          card.addEventListener("dragend", onChartCardDragEnd);
+          card.removeAttribute("draggable");
+          card.classList.remove("dragging");
         });
       }
 
@@ -9946,39 +12097,9 @@
       function externalTooltipHandler(context) {
         const { chart, tooltip } = context;
         const tooltipState = getChartTooltipState(chart);
-        let tooltipEl = document.getElementById("chartjs-tooltip");
-
-        if (!tooltipEl) {
-          tooltipEl = document.createElement("div");
-          tooltipEl.id = "chartjs-tooltip";
-          tooltipEl.style.background = "rgba(148,163,184,0.18)"; // 提高透明度让遮挡更少
-          tooltipEl.style.borderRadius = "10px";
-          tooltipEl.style.boxShadow = "0 12px 30px rgba(15,23,42,0.25)";
-          tooltipEl.style.color = "#111827";
-          tooltipEl.style.position = "fixed";
-          tooltipEl.style.transform = "none";
-          tooltipEl.style.padding = "8px 12px";
-          tooltipEl.style.pointerEvents = "none";
-          tooltipEl.style.fontSize = "12px";
-          tooltipEl.style.lineHeight = "1.4";
-          tooltipEl.style.zIndex = "9999";
-          tooltipEl.style.backdropFilter = "blur(5px)";
-          tooltipEl.style.webkitBackdropFilter = "blur(5px)";
-          tooltipEl.style.maxHeight = "70vh";
-          tooltipEl.style.overflowY = "auto";
-
-          const inner = document.createElement("div");
-          inner.style.margin = "0";
-          tooltipEl.appendChild(inner);
-
-          document.body.appendChild(tooltipEl);
-
-          tooltipEl.addEventListener("dblclick", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            toggleChartTooltipLock(tooltipEl.__chartRef || null);
-          });
-        }
+        const tooltipEl = ensureFloatingGlassTooltip("chartjs-tooltip");
+        tooltipEl.__onFloatingTooltipDblClick = () =>
+          toggleChartTooltipLock(tooltipEl.__chartRef || null);
 
         tooltipEl.__chartRef = chart;
         if (tooltipState && tooltipState.tooltipEl !== tooltipEl) {
@@ -10035,7 +12156,7 @@
               ? "Double-click to unlock"
               : "Double-click to lock";
           html +=
-            '<div class="chart-tooltip-lock-hint" data-lock-hint="1" style="margin-top:8px;padding:4px 8px;border-radius:8px;background:rgba(239,68,68,0.12);color:#b91c1c;font-weight:700;text-align:center;">' +
+            '<div class="floating-glass-tooltip__hint" data-lock-hint="1">' +
             lockHint +
             "</div>";
 
@@ -10045,31 +12166,10 @@
         const canvasRect = chart.canvas.getBoundingClientRect();
         const rawLeft = canvasRect.left + tooltip.caretX;
         const rawTop = canvasRect.top + tooltip.caretY;
-
-        const margin = 12;
-        const tooltipWidth = tooltipEl.offsetWidth;
-        const tooltipHeight = tooltipEl.offsetHeight;
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // 默认显示在光标右侧，若右侧放不下再反向放置；同时做视口范围约束
-        let left = rawLeft + margin;
-        if (left + tooltipWidth > viewportWidth - margin) {
-          left = rawLeft - tooltipWidth - margin;
-        }
-
-        let top = rawTop - tooltipHeight / 2;
-        if (top < margin) {
-          top = margin;
-        } else if (top + tooltipHeight > viewportHeight - margin) {
-          top = Math.max(margin, viewportHeight - tooltipHeight - margin);
-        }
-
         tooltipEl.style.opacity = "1";
-        tooltipEl.style.left = left + "px";
-        tooltipEl.style.top = top + "px";
+        positionFloatingTooltip(tooltipEl, rawLeft, rawTop);
         const isLocked = tooltipState && tooltipState.locked;
-        tooltipEl.classList.toggle("chart-tooltip--locked", isLocked);
+        tooltipEl.classList.toggle("floating-glass-tooltip--locked", isLocked);
 
         if (tooltipState) {
           tooltipState.lastCaret = { x: tooltip.caretX, y: tooltip.caretY };
@@ -11059,20 +13159,31 @@
 
       function refreshExampleButtonState() {
         const showJos3Only = currentModel === "jos3";
-        if (quickExampleRow) {
-          quickExampleRow.style.display = showJos3Only ? "" : "none";
+        const showPmvOnly = currentModel === "pmv";
+
+        if (jos3ExampleRow) {
+          jos3ExampleRow.style.display = showJos3Only ? "" : "none";
+        }
+        if (pmvExampleRow) {
+          pmvExampleRow.style.display = showPmvOnly ? "" : "none";
         }
         if (settingsTip) {
           settingsTip.style.display = showJos3Only ? "" : "none";
         }
+
         const activeScenario = scenarioSelect ? scenarioSelect.value : "";
         quickExampleButtons.forEach(({ btn, scenario }) => {
           if (!btn) return;
-          const isActive =
-            showJos3Only &&
-            activeScenario === scenario;
+          const isActive = showJos3Only && activeScenario === scenario;
           btn.classList.toggle("active", !!isActive);
           btn.disabled = !showJos3Only;
+        });
+
+        pmvExampleButtons.forEach(({ btn, variant }) => {
+          if (!btn) return;
+        const isActive = showPmvOnly && currentPmvVariant === variant;
+          btn.classList.toggle("active", !!isActive);
+          btn.disabled = !showPmvOnly;
         });
       }
 
@@ -13321,6 +15432,9 @@
         { key: "met",     label: { zh: "代谢率",             en: "Metabolic rate" },       symbol: "met", unit: "met", group: "inputs" },
         { key: "clo",     label: { zh: "服装热阻",           en: "Clothing" },             symbol: "clo", unit: "clo", group: "inputs" },
         { key: "wme",     label: { zh: "外部功率",           en: "External work" },        symbol: "wme", unit: "met", group: "inputs" },
+        { key: "age",     label: { zh: "年龄",               en: "Age" },                  symbol: "Y",   unit: "y",   group: "inputs" },
+        { key: "height",  label: { zh: "身高",               en: "Height" },               symbol: "H",   unit: "m",   group: "inputs" },
+        { key: "weight",  label: { zh: "体重",               en: "Weight" },               symbol: "W",   unit: "kg",  group: "inputs" },
         // 当前输出
         { key: "mw",      label: { zh: "总产热量",        en: "Metabolic heat" },   symbol: "M",   unit: "W/m²", group: "outputs" },
         { key: "q_total", label: { zh: "总散热量",        en: "Total heat loss" },    symbol: "Q_total", unit: "W/m²", group: "outputs" },
@@ -13440,9 +15554,7 @@
             formatI18n("twoNode.tableHeader.symbol", "符号", "Symbol")
           ];
         pmvColumns.forEach((_, idx) => {
-          const baseValueLabel = formatI18n("twoNode.column.valueLabel", "数值", "Value");
-          const label = idx === 0 ? baseValueLabel : baseValueLabel + (currentLang === "zh" ? idx + 1 : " " + (idx + 1));
-          header.push(label);
+          header.push(getPmvColumnLabel(idx + 1));
         });
         header.push(formatI18n("twoNode.tableHeader.unit", "单位", "Unit"));
         lines.push(header.join("\t"));
@@ -13547,9 +15659,7 @@
           formatI18n("twoNode.tableHeader.symbol", "符号", "Symbol")
         ];
         pmvColumns.forEach((_, idx) => {
-          const baseValueLabel = formatI18n("twoNode.column.valueLabel", "数值", "Value");
-          const label = idx === 0 ? baseValueLabel : baseValueLabel + (currentLang === "zh" ? idx + 1 : " " + (idx + 1));
-          header.push(label);
+          header.push(getPmvColumnLabel(idx + 1));
         });
         header.push(formatI18n("twoNode.tableHeader.unit", "单位", "Unit"));
         aoa.push(header);
@@ -13924,8 +16034,7 @@
 
         (columns || pmvColumns).forEach((col, idx) => {
           const index = idx + 1;
-          const baseValueLabel = formatI18n("twoNode.column.valueLabel", "数值", "Value");
-          const label = index === 1 ? baseValueLabel : baseValueLabel + (currentLang === "zh" ? index : " " + index);
+          const label = getPmvColumnLabel(index);
           const th = document.createElement("th");
           th.className = "two-node-col two-node-value-col";
           th.dataset.columnId = col.id;
@@ -13983,14 +16092,19 @@
 
           if (isNewGroup) {
             const spacer = document.createElement("tr");
-            spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:6px;"></td>`;
+            spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:3px;"></td>`;
             pmvOutputTbody.appendChild(spacer);
 
             const titleTr = document.createElement("tr");
+            let emptyCells = "";
+            renderColumns.forEach((col) => {
+              emptyCells += `<td data-column-id="${col.id}"></td>`;
+            });
             titleTr.innerHTML = `
-              <td colspan="${colSpanCount}" style="padding:4px 6px;font-weight:600;color:var(--accent);text-align:left;">
-                ${getPmvGroupLabel(groupId)}
-              </td>
+              <td class="pmv-group-cell">${getPmvGroupLabel(groupId)}</td>
+              <td class="pmv-group-cell"></td>
+              ${emptyCells}
+              <td class="pmv-group-cell"></td>
             `;
             pmvOutputTbody.appendChild(titleTr);
             lastGroup = groupId;
@@ -14020,18 +16134,23 @@
         });
 
         const spacer = document.createElement("tr");
-        spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:6px;"></td>`;
+        spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:3px;"></td>`;
         pmvOutputTbody.appendChild(spacer);
+
+        renderPmvVizPoints();
+        syncPMVViewFromColumns();
       }
 
       function updatePmvColumns(payload, data, options) {
         const opts = options || {};
         const forceNew = !!opts.forceNew;
-        if (!data || typeof data.pmv !== "number") {
+        const isPlaceholder = !!opts.placeholder || (data && data.placeholder);
+        if (!data || (typeof data.pmv !== "number" && !isPlaceholder)) {
           renderPmvOutputTable();
           return;
         }
 
+        const blank = isPlaceholder ? "/" : undefined;
         const colData = {
           ta: payload.ta,
           tr: payload.tr,
@@ -14040,25 +16159,29 @@
           met: payload.met,
           clo: payload.clo,
           wme: payload.wme,
-          mw: data.mw,
-          q_total: data.q_total,
-          q_sens: data.q_sens,
-          q_sensible: data.q_sensible,
-          c_res: data.c_res,
-          q_lat: data.q_lat,
-          e_skin: data.e_skin,
-          e_res: data.e_res,
-          e_rsw: data.e_rsw,
-          e_diff: data.e_diff,
-          pmv: data.pmv,
-          ppd: data.ppd,
-          hl1: data.hl1,
-          hl2: data.hl2,
-          hl3: data.hl3,
-          hl4: data.hl4,
-          hl5: data.hl5,
-          hl6: data.hl6,
-          feeling: data.pmv
+          age: payload.age,
+          height: payload.height,
+          weight: payload.weight,
+          variant: payload.ui_variant || payload.variant || currentPmvVariant,
+          mw: isPlaceholder ? blank : data.mw,
+          q_total: isPlaceholder ? blank : data.q_total,
+          q_sens: isPlaceholder ? blank : data.q_sens,
+          q_sensible: isPlaceholder ? blank : data.q_sensible,
+          c_res: isPlaceholder ? blank : data.c_res,
+          q_lat: isPlaceholder ? blank : data.q_lat,
+          e_skin: isPlaceholder ? blank : data.e_skin,
+          e_res: isPlaceholder ? blank : data.e_res,
+          e_rsw: isPlaceholder ? blank : data.e_rsw,
+          e_diff: isPlaceholder ? blank : data.e_diff,
+          pmv: isPlaceholder ? blank : data.pmv,
+          ppd: isPlaceholder ? blank : data.ppd,
+          hl1: isPlaceholder ? blank : data.hl1,
+          hl2: isPlaceholder ? blank : data.hl2,
+          hl3: isPlaceholder ? blank : data.hl3,
+          hl4: isPlaceholder ? blank : data.hl4,
+          hl5: isPlaceholder ? blank : data.hl5,
+          hl6: isPlaceholder ? blank : data.hl6,
+          feeling: isPlaceholder ? (data && data.message ? data.message : blank) : data.pmv
         };
 
         const signature = JSON.stringify({
@@ -14068,7 +16191,11 @@
           rh: payload.rh,
           met: payload.met,
           clo: payload.clo,
-          wme: payload.wme
+          wme: payload.wme,
+          age: payload.age,
+          height: payload.height,
+          weight: payload.weight,
+          variant: payload.ui_variant || payload.variant || currentPmvVariant
         });
 
         const createColumn = () => {
@@ -14089,6 +16216,10 @@
           }
         }
 
+        const latestCol = pmvColumns[pmvColumns.length - 1];
+        if (latestCol && hasDisplayablePmvData(latestCol)) {
+          pmvPsychSelectedColumnId = latestCol.id;
+        }
         renderPmvOutputTable();
       }
 
@@ -14121,10 +16252,1108 @@
         renderPmvOutputTable();
       }
 
+      function clamp(x, a, b) {
+        return Math.min(Math.max(x, a), b);
+      }
+
+      function pmvToPercent(pmv) {
+        const clamped = clamp(pmv, -3, 3);
+        return ((clamped + 3) / 6) * 100;
+      }
+
+      function pmvToLabel(pmv) {
+        if (pmv <= -2.5) return "很冷 (-3)";
+        if (pmv <= -1.5) return "冷 (-2)";
+        if (pmv <= -0.5) return "偏冷 (-1)";
+        if (pmv < 0.5) return "舒适 (0)";
+        if (pmv < 1.5) return "偏热 (+1)";
+        if (pmv < 2.5) return "热 (+2)";
+        return "很热 (+3)";
+      }
+
+      function getPmvColumnLabel(index) {
+        const baseValueLabel = formatI18n("twoNode.column.valueLabel", "数值", "Value");
+        const idx = Number.isFinite(index) ? index : 1;
+        return currentLang === "zh" ? `${baseValueLabel}${idx}` : `${baseValueLabel} ${idx}`;
+      }
+
+      function getLatestPmvColumnLabel() {
+        const count = pmvColumns && pmvColumns.length ? pmvColumns.length : 1;
+        return getPmvColumnLabel(count);
+      }
+
+      function getPmvEmptyDisplay() {
+        return "— —";
+      }
+
+      function getPmvColumnVariant(col) {
+        if (!col || !col.data) return "adult";
+        return col.data.variant === "child"
+          ? "child"
+          : col.data.variant === "elder"
+          ? "elder"
+          : "adult";
+      }
+
+      function getPmvColumnById(columnId) {
+        if (!columnId || !Array.isArray(pmvColumns)) return null;
+        return pmvColumns.find((col) => col && col.id === columnId) || null;
+      }
+
+      function getPmvColumnIndexById(columnId) {
+        if (!columnId || !Array.isArray(pmvColumns)) return null;
+        const idx = pmvColumns.findIndex((col) => col && col.id === columnId);
+        return idx >= 0 ? idx + 1 : null;
+      }
+
+      function hasDisplayablePmvData(col) {
+        if (!col || !col.data) return false;
+        const pmvVal = Number(col.data.pmv);
+        const ppdVal = Number(col.data.ppd);
+        return Number.isFinite(pmvVal) || Number.isFinite(ppdVal);
+      }
+
+      function getLatestPmvColumnByVariant(variant) {
+        if (variant === "elder" && isPmvElderComingSoon()) return null;
+        if (!Array.isArray(pmvColumns) || !pmvColumns.length) return null;
+        for (let i = pmvColumns.length - 1; i >= 0; i -= 1) {
+          const col = pmvColumns[i];
+          if (!col || !col.data) continue;
+          if (getPmvColumnVariant(col) !== variant) continue;
+          const pmvVal = Number(col.data.pmv);
+          const ppdVal = Number(col.data.ppd);
+          if (Number.isFinite(pmvVal) || Number.isFinite(ppdVal)) {
+            return col;
+          }
+        }
+        return null;
+      }
+
+      function getDisplayablePmvColumnsByVariant(variant) {
+        if (!Array.isArray(pmvColumns) || !pmvColumns.length) return [];
+        return pmvColumns.filter((col) => {
+          if (!col || !col.data) return false;
+          if (getPmvColumnVariant(col) !== variant) return false;
+          return hasDisplayablePmvData(col);
+        });
+      }
+
+      function getDisplayablePmvColumnsForPsychrometric() {
+        if (!Array.isArray(pmvColumns) || !pmvColumns.length) return [];
+        return pmvColumns.filter((col) => {
+          if (!col || !col.data) return false;
+          const variant = getPmvColumnVariant(col);
+          if (variant === "elder" && isPmvElderComingSoon()) return false;
+          return hasDisplayablePmvData(col);
+        });
+      }
+
+      function getDisplayedPmvPsychrometricColumn() {
+        const columns = getDisplayablePmvColumnsForPsychrometric();
+        if (!columns.length) {
+          pmvPsychSelectedColumnId = null;
+          return null;
+        }
+        if (pmvPsychSelectedColumnId) {
+          const selectedCol = columns.find((col) => col.id === pmvPsychSelectedColumnId);
+          if (selectedCol) return selectedCol;
+        }
+        const latestCol = columns[columns.length - 1];
+        pmvPsychSelectedColumnId = latestCol ? latestCol.id : null;
+        return latestCol || null;
+      }
+
+      function getDisplayedPmvColumnByVariant(variant) {
+        if (variant === "elder" && isPmvElderComingSoon()) {
+          pmvSelectedColumnIds.elder = null;
+          return null;
+        }
+        const selectedId = pmvSelectedColumnIds[variant];
+        if (selectedId) {
+          const selectedCol = getPmvColumnById(selectedId);
+          if (
+            selectedCol &&
+            getPmvColumnVariant(selectedCol) === variant &&
+            hasDisplayablePmvData(selectedCol)
+          ) {
+            return selectedCol;
+          }
+        }
+        const latestCol = getLatestPmvColumnByVariant(variant);
+        pmvSelectedColumnIds[variant] = latestCol ? latestCol.id : null;
+        return latestCol;
+      }
+
+      const PMV_PSYCH_ATMOSPHERIC_PRESSURE_KPA = 101.325;
+
+      function getPmvPsychrometricLiveData() {
+        const variant =
+          currentPmvVariant === "child"
+            ? "child"
+            : currentPmvVariant === "elder"
+            ? "elder"
+            : "adult";
+        const childAgeValue = pmvChildAgeSelect
+          ? parseInt(pmvChildAgeSelect.value, 10)
+          : parseInt(ageInput && ageInput.value, 10);
+        const genericAgeValue = parseInt(ageInput && ageInput.value, 10);
+        return {
+          variant,
+          ta: parseFloat(taInput && taInput.value),
+          tr: parseFloat(trInput && trInput.value),
+          vel: parseFloat(vaInput && vaInput.value),
+          rh: parseFloat(rhInput && rhInput.value),
+          met: getMetValue(),
+          clo: getCloValue(),
+          wme: getWmeValue(),
+          age: variant === "child" ? childAgeValue : genericAgeValue,
+          height: parseFloat(heightInput && heightInput.value),
+          weight: parseFloat(weightInput && weightInput.value)
+        };
+      }
+
+      function isPmvPsychValueClose(a, b, tolerance) {
+        const left = Number(a);
+        const right = Number(b);
+        if (!Number.isFinite(left) || !Number.isFinite(right)) return true;
+        return Math.abs(left - right) <= tolerance;
+      }
+
+      function doPmvPsychInputsMatch(liveData, columnData, variant) {
+        if (!liveData || !columnData) return false;
+        const pairs = [
+          [liveData.ta, columnData.ta, 0.0001],
+          [liveData.tr, columnData.tr, 0.0001],
+          [liveData.vel, columnData.vel, 0.0001],
+          [liveData.rh, columnData.rh, 0.0001],
+          [liveData.met, columnData.met, 0.0001],
+          [liveData.clo, columnData.clo, 0.0001],
+          [liveData.wme, columnData.wme, 0.0001]
+        ];
+        if (variant === "child") {
+          pairs.push([liveData.age, columnData.age, 0.0001]);
+          pairs.push([liveData.height, columnData.height, 0.0001]);
+          pairs.push([liveData.weight, columnData.weight, 0.0001]);
+        }
+        return pairs.every(([left, right, tolerance]) =>
+          isPmvPsychValueClose(left, right, tolerance)
+        );
+      }
+
+      function getPmvPsychrometricSource() {
+        const variant =
+          currentPmvVariant === "child"
+            ? "child"
+            : currentPmvVariant === "elder"
+            ? "elder"
+            : "adult";
+        const liveData = getPmvPsychrometricLiveData();
+
+        const displayedCol = getDisplayedPmvPsychrometricColumn();
+        if (displayedCol && displayedCol.data) {
+          const columnIndex = getPmvColumnIndexById(displayedCol.id);
+          const colVariant = getPmvColumnVariant(displayedCol);
+          return {
+            variant: colVariant,
+            disabled: false,
+            isFromColumn: true,
+            label: columnIndex ? getPmvColumnLabel(columnIndex) : "",
+            column: displayedCol,
+            data: displayedCol.data
+          };
+        }
+
+        if (variant === "elder" && isPmvElderComingSoon()) {
+          return {
+            variant,
+            disabled: true,
+            noResults: false,
+            isFromColumn: false,
+            label: "",
+            column: null,
+            data: liveData
+          };
+        }
+
+        return {
+          variant,
+          disabled: false,
+          noResults: true,
+          isFromColumn: false,
+          label: "",
+          column: null,
+          data: liveData
+        };
+      }
+
+      function refreshPmvPsychResultSelect() {
+        const selectEl = document.getElementById("pmvPsychResultSelect");
+        const labelEl = document.getElementById("pmvPsychResultSwitchLabel");
+        if (!selectEl) return;
+
+        const variant =
+          currentPmvVariant === "child"
+            ? "child"
+            : currentPmvVariant === "elder"
+            ? "elder"
+            : "adult";
+        const columns = getDisplayablePmvColumnsForPsychrometric();
+        const selectedId = pmvPsychSelectedColumnId || "";
+
+        if (labelEl) {
+          labelEl.textContent = currentLang === "zh" ? "切换结果" : "Result";
+        }
+
+        selectEl.innerHTML = "";
+
+        if (!columns.length) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent =
+            variant === "elder" && isPmvElderComingSoon()
+              ? currentLang === "zh"
+                ? "即将上线"
+                : "Coming soon"
+              : currentLang === "zh"
+              ? "当前输入"
+              : "Current input";
+          selectEl.appendChild(option);
+          selectEl.value = "";
+          selectEl.disabled = true;
+          return;
+        }
+
+        columns.forEach((col) => {
+          const option = document.createElement("option");
+          const index = getPmvColumnIndexById(col.id);
+          const colVariant = getPmvColumnVariant(col);
+          const pmvValue = col.data ? Number(col.data.pmv) : NaN;
+          const pmvSuffix = Number.isFinite(pmvValue) ? ` PMV ${formatNumber(pmvValue, 2)}` : "";
+          option.value = col.id;
+          option.textContent = index
+            ? `${getPmvColumnLabel(index)} · ${getPmvVariantTitle(colVariant)}${pmvSuffix}`
+            : currentLang === "zh"
+            ? "结果"
+            : "Result";
+          selectEl.appendChild(option);
+        });
+
+        const fallbackValue = columns[columns.length - 1].id;
+        selectEl.disabled = false;
+        selectEl.value =
+          selectedId && columns.some((col) => col.id === selectedId) ? selectedId : fallbackValue;
+      }
+
+      function getPmvPsychSaturationPressureKpa(tempC) {
+        const t = Number(tempC);
+        if (!Number.isFinite(t)) return NaN;
+        return 0.61078 * Math.exp((17.2694 * t) / (t + 237.29));
+      }
+
+      function getPmvPsychHumidityRatioFromPressure(pwKpa, pressureKpa) {
+        const pressure = Number(pressureKpa);
+        const partial = Number(pwKpa);
+        if (!Number.isFinite(pressure) || !Number.isFinite(partial)) return NaN;
+        const boundedPartial = clamp(partial, 0, pressure * 0.98);
+        return 0.62198 * boundedPartial / Math.max(pressure - boundedPartial, 0.0001);
+      }
+
+      function getPmvPsychHumidityRatio(tempC, rhPct) {
+        const saturation = getPmvPsychSaturationPressureKpa(tempC);
+        const rh = clamp(Number(rhPct), 0, 100) / 100;
+        if (!Number.isFinite(saturation) || !Number.isFinite(rh)) return NaN;
+        return getPmvPsychHumidityRatioFromPressure(
+          saturation * rh,
+          PMV_PSYCH_ATMOSPHERIC_PRESSURE_KPA
+        );
+      }
+
+      function getPmvPsychRelativeHumidity(tempC, humidityRatioKgKg) {
+        const t = Number(tempC);
+        const humidityRatio = Math.max(Number(humidityRatioKgKg), 0);
+        const saturation = getPmvPsychSaturationPressureKpa(t);
+        if (!Number.isFinite(t) || !Number.isFinite(humidityRatio) || !Number.isFinite(saturation) || saturation <= 0) {
+          return NaN;
+        }
+        const vaporPressure =
+          (PMV_PSYCH_ATMOSPHERIC_PRESSURE_KPA * humidityRatio) / (0.62198 + humidityRatio);
+        return clamp((vaporPressure / saturation) * 100, 0, 100);
+      }
+
+      function getPmvPsychDewPoint(tempC, rhPct) {
+        const saturation = getPmvPsychSaturationPressureKpa(tempC);
+        const rh = clamp(Number(rhPct), 0, 100) / 100;
+        const vaporPressure = saturation * rh;
+        if (!Number.isFinite(vaporPressure) || vaporPressure <= 0) return NaN;
+        const gamma = Math.log(vaporPressure / 0.61078);
+        return (237.29 * gamma) / (17.2694 - gamma);
+      }
+
+      function getPmvPsychWetBulb(tempC, rhPct) {
+        const t = Number(tempC);
+        const rh = clamp(Number(rhPct), 1, 100);
+        if (!Number.isFinite(t) || !Number.isFinite(rh)) return NaN;
+        return (
+          t * Math.atan(0.151977 * Math.sqrt(rh + 8.313659)) +
+          Math.atan(t + rh) -
+          Math.atan(rh - 1.676331) +
+          0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh) -
+          4.686035
+        );
+      }
+
+      function getPmvPsychEnthalpy(tempC, humidityRatioKgKg) {
+        const t = Number(tempC);
+        const humidityRatio = Number(humidityRatioKgKg);
+        if (!Number.isFinite(t) || !Number.isFinite(humidityRatio)) return NaN;
+        return 1.006 * t + humidityRatio * (2501 + 1.86 * t);
+      }
+
+      function getPmvPsychPointColor(pmvValue) {
+        const pmv = Number(pmvValue);
+        if (!Number.isFinite(pmv)) return "#2563eb";
+        if (pmv <= -0.5) return "#2563eb";
+        if (pmv < 0.5) return "#16a34a";
+        if (pmv < 1.5) return "#f59e0b";
+        return "#ef4444";
+      }
+
+      function formatPmvPsychDisplay(value, digits, suffix) {
+        const num = Number(value);
+        if (!Number.isFinite(num)) return getPmvEmptyDisplay();
+        return `${formatNumber(num, digits)}${suffix || ""}`;
+      }
+
+      function buildPmvPsychSample(tempC, humidityRatioKgKg) {
+        const tdb = Number(tempC);
+        const humidityRatio = Math.max(Number(humidityRatioKgKg), 0);
+        const rh = getPmvPsychRelativeHumidity(tdb, humidityRatio);
+        return {
+          tdb,
+          rh,
+          humidityRatioKgKg: humidityRatio,
+          humidityRatioGkg: Number.isFinite(humidityRatio) ? humidityRatio * 1000 : NaN,
+          wetBulb: getPmvPsychWetBulb(tdb, rh),
+          dewPoint: getPmvPsychDewPoint(tdb, rh),
+          enthalpy: getPmvPsychEnthalpy(tdb, humidityRatio)
+        };
+      }
+
+      function getPmvPsychSampleFromSvgPoint(svgX, svgY, state) {
+        if (!state) return null;
+        const chartLeft = state.padding.left;
+        const chartRight = state.width - state.padding.right;
+        const chartTop = state.padding.top;
+        const chartBottom = state.height - state.padding.bottom;
+        const x = clamp(Number(svgX), chartLeft, chartRight);
+        const y = clamp(Number(svgY), chartTop, chartBottom);
+        const temp =
+          state.xMin +
+          ((x - chartLeft) / Math.max(chartRight - chartLeft, 1)) *
+            (state.xMax - state.xMin);
+        const humidityGkg =
+          ((chartBottom - y) / Math.max(chartBottom - chartTop, 1)) * state.yMax;
+        const sample = buildPmvPsychSample(temp, humidityGkg / 1000);
+        return { sample, x, y };
+      }
+
+      function renderPmvPsychStats(sample) {
+        const statsEl = document.getElementById("pmvPsychStats");
+        if (!statsEl) return;
+        const view = sample || {};
+        statsEl.innerHTML = [
+          ["t<sub>db</sub>", formatPmvPsychDisplay(view.tdb, 1, " °C")],
+          ["rh", formatPmvPsychDisplay(view.rh, 1, " %")],
+          ["W<sub>a</sub>", formatPmvPsychDisplay(view.humidityRatioGkg, 1, " g/kg")],
+          ["t<sub>wb</sub>", formatPmvPsychDisplay(view.wetBulb, 1, " °C")],
+          ["t<sub>dp</sub>", formatPmvPsychDisplay(view.dewPoint, 1, " °C")],
+          ["h", formatPmvPsychDisplay(view.enthalpy, 1, " kJ/kg")]
+        ]
+          .map(
+            ([key, value]) =>
+              `<div class="pmv-psych-stat-row"><span class="pmv-psych-stat-key">${key}</span><span class="pmv-psych-stat-value">${value}</span></div>`
+          )
+          .join("");
+      }
+
+      function setPmvPsychHoverOverlayVisible(visible) {
+        const hoverLayer = document.getElementById("pmvPsychHoverLayer");
+        if (hoverLayer) {
+          hoverLayer.setAttribute("opacity", visible ? "1" : "0");
+        }
+      }
+
+      function updatePmvPsychHoverOverlay(x, y, state) {
+        const hoverVLine = document.getElementById("pmvPsychHoverVLine");
+        const hoverHLine = document.getElementById("pmvPsychHoverHLine");
+        const hoverOuter = document.getElementById("pmvPsychHoverOuter");
+        const hoverInner = document.getElementById("pmvPsychHoverInner");
+        if (!state || !hoverVLine || !hoverHLine || !hoverOuter || !hoverInner) return;
+        const chartLeft = state.padding.left;
+        const chartRight = state.width - state.padding.right;
+        const chartTop = state.padding.top;
+        const chartBottom = state.height - state.padding.bottom;
+        hoverVLine.setAttribute("x1", x.toFixed(2));
+        hoverVLine.setAttribute("y1", chartTop.toFixed(2));
+        hoverVLine.setAttribute("x2", x.toFixed(2));
+        hoverVLine.setAttribute("y2", chartBottom.toFixed(2));
+        hoverHLine.setAttribute("x1", chartLeft.toFixed(2));
+        hoverHLine.setAttribute("y1", y.toFixed(2));
+        hoverHLine.setAttribute("x2", chartRight.toFixed(2));
+        hoverHLine.setAttribute("y2", y.toFixed(2));
+        hoverOuter.setAttribute("cx", x.toFixed(2));
+        hoverOuter.setAttribute("cy", y.toFixed(2));
+        hoverInner.setAttribute("cx", x.toFixed(2));
+        hoverInner.setAttribute("cy", y.toFixed(2));
+      }
+
+      function applyPmvPsychHoverSample(sample) {
+        const subtitleEl = document.getElementById("pmvPsychSubtitle");
+        pmvPsychHoverSample = sample || null;
+        renderPmvPsychStats(sample);
+        if (subtitleEl && pmvPsychChartState) {
+          subtitleEl.textContent = sample
+            ? currentLang === "zh"
+              ? `${pmvPsychChartState.variantTitle} · 鼠标位置`
+              : `${pmvPsychChartState.variantTitle} · cursor position`
+            : pmvPsychBaseSubtitle;
+        }
+      }
+
+      function resetPmvPsychHoverSample() {
+        const state = pmvPsychChartState;
+        pmvPsychHoverSample = null;
+        setPmvPsychHoverOverlayVisible(false);
+        if (!state) return;
+        renderPmvPsychStats(state.baseSample);
+        const subtitleEl = document.getElementById("pmvPsychSubtitle");
+        if (subtitleEl) {
+          subtitleEl.textContent = pmvPsychBaseSubtitle;
+        }
+      }
+
+      function buildPmvPsychPath(points) {
+        if (!Array.isArray(points) || !points.length) return "";
+        return points
+          .map((point, index) => {
+            const x = Number(point[0]);
+            const y = Number(point[1]);
+            if (!Number.isFinite(x) || !Number.isFinite(y)) return "";
+            return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+          })
+          .filter(Boolean)
+          .join(" ");
+      }
+
+      function renderPmvPsychrometricPlaceholder(message) {
+        const statsEl = document.getElementById("pmvPsychStats");
+        const chartSvg = document.getElementById("pmvPsychChartSvg");
+        pmvPsychChartState = null;
+        pmvPsychHoverSample = null;
+        pmvPsychBaseSubtitle = "";
+        if (statsEl) {
+          renderPmvPsychStats({
+            tdb: NaN,
+            rh: NaN,
+            humidityRatioGkg: NaN,
+            wetBulb: NaN,
+            dewPoint: NaN,
+            enthalpy: NaN
+          });
+        }
+        if (chartSvg) {
+          const msg = message || (currentLang === "zh" ? "暂无焓湿图数据" : "No psychrometric data");
+          chartSvg.innerHTML = [
+            `<rect x="12" y="12" width="616" height="356" rx="12" fill="rgba(248,250,252,0.92)" stroke="rgba(148,163,184,0.36)" stroke-width="1.2" stroke-dasharray="6 6" />`,
+            `<text x="320" y="188" text-anchor="middle" fill="#64748b" font-size="18" font-weight="600">${msg}</text>`
+          ].join("");
+        }
+      }
+
+      function renderPmvPsychrometricCard() {
+        const card = document.getElementById("pmvPsychCard");
+        const titleEl = document.getElementById("pmvPsychTitle");
+        const subtitleEl = document.getElementById("pmvPsychSubtitle");
+        const metaEl = document.getElementById("pmvPsychMeta");
+        const noteEl = document.getElementById("pmvPsychNote");
+        const statsEl = document.getElementById("pmvPsychStats");
+        const chartSvg = document.getElementById("pmvPsychChartSvg");
+        if (!card || !subtitleEl || !metaEl || !noteEl || !statsEl || !chartSvg) {
+          return;
+        }
+
+        if (titleEl) {
+          titleEl.textContent = currentLang === "zh" ? "焓湿图" : "Psychrometric chart";
+        }
+        chartSvg.setAttribute(
+          "aria-label",
+          currentLang === "zh" ? "PMV 焓湿图" : "PMV psychrometric chart"
+        );
+        refreshPmvPsychResultSelect();
+
+        const source = getPmvPsychrometricSource();
+        const variantTitle = getPmvVariantTitle(source.variant);
+        card.classList.toggle("is-disabled", !!source.disabled);
+
+        if (source.disabled) {
+          subtitleEl.textContent =
+            currentLang === "zh"
+              ? `${variantTitle} PMV 修正即将上线`
+              : `${variantTitle} PMV variant coming soon`;
+          metaEl.innerHTML = "";
+          noteEl.textContent =
+            currentLang === "zh"
+              ? "老人 PMV 仍处于禁用状态，因此这里暂不联动显示焓湿点位。"
+              : "The older-adult PMV path is still disabled, so this psychrometric panel is temporarily inactive.";
+          renderPmvPsychrometricPlaceholder(
+            currentLang === "zh"
+              ? "PMV 老人修正即将上线"
+              : "Older-adult PMV variant coming soon"
+          );
+          return;
+        }
+
+        subtitleEl.textContent = source.isFromColumn
+          ? currentLang === "zh"
+            ? `${variantTitle} · 当前选中结果`
+            : `${variantTitle} · selected result`
+          : currentLang === "zh"
+          ? `${variantTitle} · 当前输入预览`
+          : `${variantTitle} · current input preview`;
+
+        const data = source.data || {};
+        const tdb = Number(data.ta);
+        const tr = Number(data.tr);
+        const airSpeed = Number(data.vel);
+        const rh = Number(data.rh);
+        const pmvValue = Number(data.pmv);
+        const ppdValue = Number(data.ppd);
+        const metValue = Number(data.met);
+        const cloValue = Number(data.clo);
+        const humidityRatio = getPmvPsychHumidityRatio(tdb, rh);
+        const humidityRatioGkg = Number.isFinite(humidityRatio) ? humidityRatio * 1000 : NaN;
+        const wetBulb = getPmvPsychWetBulb(tdb, rh);
+        const dewPoint = getPmvPsychDewPoint(tdb, rh);
+        const enthalpy = getPmvPsychEnthalpy(tdb, humidityRatio);
+        const baseSample = {
+          tdb,
+          rh,
+          humidityRatioKgKg: humidityRatio,
+          humidityRatioGkg,
+          wetBulb,
+          dewPoint,
+          enthalpy
+        };
+
+        metaEl.innerHTML = "";
+
+        renderPmvPsychStats(baseSample);
+
+        noteEl.textContent =
+          currentLang === "zh"
+            ? "注：在本焓湿图中，横坐标为操作温度；对于每个点，干球温度等于平均辐射温度（DBT = MRT）。舒适区表示在 DBT 与 MRT 相同的条件组合下，依据标准 PMV 介于 -0.5 至 +0.5 之间的范围。\n\n适用性限制：本标准仅适用于健康个体。本标准不适用于以下人员：a) 服装热阻超过 1.5 clo；b) 服装具有高度不透湿性；c) 正在睡眠、斜躺并接触寝具，或能够调节毯子/寝具的人员。"
+            : "NOTE: In this psychrometric chart the abscissa is the operative temperature and for each point dry-bulb temperature equals mean radiant temperature (DBT = MRT). The comfort zone represents the combination of conditions with the same DBT and MRT for which the PMV is between -0.5 and +0.5, according to the standard.\n\nLimits of Applicability: This standard is only applicable to healthy individuals. This standard does not apply to occupants: a) whose clothing insulation exceed 1.5 clo; b) whose clothing is highly impermeable; or c) who are sleeping, reclining in contact with bedding, or able to adjust blankets or bedding.";
+
+        if (!Number.isFinite(tdb) || !Number.isFinite(rh) || !Number.isFinite(humidityRatioGkg)) {
+          renderPmvPsychrometricPlaceholder(
+            currentLang === "zh" ? "当前输入不足，无法绘制焓湿图" : "Insufficient input to draw the psychrometric chart"
+          );
+          return;
+        }
+
+        const width = 640;
+        const height = 470;
+        const padding = { top: 14, right: 52, bottom: 58, left: 36 };
+        const axisTickFontSize = 14;
+        const axisLabelFontSize = 17;
+        const innerWidth = width - padding.left - padding.right;
+        const innerHeight = height - padding.top - padding.bottom;
+        const xMin = Math.min(10, Math.floor((tdb - 4) / 2) * 2);
+        const xMax = Math.max(36, Math.ceil((tdb + 4) / 2) * 2);
+        const yMax = Math.max(30, Math.ceil((humidityRatioGkg + 4) / 5) * 5);
+        const xTickStep = xMax - xMin > 30 ? 4 : 2;
+
+        const toX = (temp) =>
+          padding.left + ((temp - xMin) / Math.max(xMax - xMin, 1)) * innerWidth;
+        const toY = (humidityGkg) =>
+          height -
+          padding.bottom -
+          (clamp(humidityGkg, 0, yMax) / Math.max(yMax, 1)) * innerHeight;
+
+        const psychCurveStep = 0.2;
+        const ashrae065TopStart = 20.0;
+        const ashrae065TopEnd = 23.8;
+        const ashrae065BottomLeft = 22.1;
+        const ashrae065BottomRight = 26.5;
+        const comfortZoneDataPoints = [[ashrae065BottomLeft, 0]];
+        for (let temp = ashrae065TopStart; temp <= ashrae065TopEnd + 0.001; temp += psychCurveStep) {
+          const saturationHumidity = getPmvPsychHumidityRatio(temp, 100) * 1000;
+          if (Number.isFinite(saturationHumidity)) {
+            comfortZoneDataPoints.push([temp, saturationHumidity]);
+          }
+        }
+        comfortZoneDataPoints.push([ashrae065BottomRight, 0]);
+        const comfortZonePoints = comfortZoneDataPoints.map(([temp, humidity]) => [
+          toX(temp),
+          toY(humidity)
+        ]);
+        const comfortPath = buildPmvPsychPath(comfortZonePoints);
+
+        const horizontalGrid = [];
+        for (let tick = 0; tick <= yMax; tick += 5) {
+          const y = toY(tick);
+          horizontalGrid.push(
+            `<line x1="${padding.left}" y1="${y.toFixed(2)}" x2="${(width - padding.right).toFixed(2)}" y2="${y.toFixed(2)}" stroke="rgba(148,163,184,0.18)" stroke-width="1" />`
+          );
+          horizontalGrid.push(
+            `<text x="${(width - padding.right + 8).toFixed(2)}" y="${(y + 5).toFixed(2)}" fill="#64748b" font-size="${axisTickFontSize}">${tick}</text>`
+          );
+        }
+
+        const verticalGrid = [];
+        for (let tick = xMin; tick <= xMax; tick += xTickStep) {
+          const x = toX(tick);
+          verticalGrid.push(
+            `<line x1="${x.toFixed(2)}" y1="${padding.top}" x2="${x.toFixed(2)}" y2="${(height - padding.bottom).toFixed(2)}" stroke="rgba(148,163,184,0.12)" stroke-width="1" />`
+          );
+          verticalGrid.push(
+            `<text x="${x.toFixed(2)}" y="${(height - padding.bottom + 25).toFixed(2)}" text-anchor="middle" fill="#64748b" font-size="${axisTickFontSize}">${tick}</text>`
+          );
+        }
+
+        const rhCurves = [];
+        for (let ratio = 0.1; ratio <= 1.0001; ratio += 0.1) {
+          const points = [];
+          for (let temp = xMin; temp <= xMax + 0.001; temp += psychCurveStep) {
+            const w = getPmvPsychHumidityRatio(temp, ratio * 100) * 1000;
+            if (!Number.isFinite(w)) continue;
+            points.push([toX(temp), toY(w)]);
+          }
+          const path = buildPmvPsychPath(points);
+          if (!path) continue;
+          const isSaturation = ratio >= 0.999;
+          rhCurves.push(
+            `<path d="${path}" fill="none" stroke="${isSaturation ? "rgba(71,85,105,0.72)" : "rgba(100,116,139,0.52)"}" stroke-width="${isSaturation ? "1.8" : "1.2"}" />`
+          );
+        }
+
+        const pointX = toX(tdb);
+        const pointY = toY(humidityRatioGkg);
+        const pointColor = getPmvPsychPointColor(pmvValue);
+        const axisX = padding.left;
+        const axisY = height - padding.bottom;
+        const chartRight = width - padding.right;
+        const chartTop = padding.top;
+
+        chartSvg.innerHTML = [
+          `<rect x="0" y="0" width="${width}" height="${height}" rx="12" fill="rgba(255,255,255,0.96)" />`,
+          ...horizontalGrid,
+          ...verticalGrid,
+          comfortPath
+            ? `<path d="${comfortPath} Z" fill="rgba(34,197,94,0.48)" stroke="rgba(22,101,52,0.24)" stroke-width="1.2" />`
+            : "",
+          ...rhCurves,
+          `<line x1="${axisX}" y1="${axisY}" x2="${(width - padding.right).toFixed(2)}" y2="${axisY}" stroke="#94a3b8" stroke-width="1.2" />`,
+          `<line x1="${(width - padding.right).toFixed(2)}" y1="${padding.top}" x2="${(width - padding.right).toFixed(2)}" y2="${axisY}" stroke="#94a3b8" stroke-width="1.2" />`,
+          `<line x1="${pointX.toFixed(2)}" y1="${pointY.toFixed(2)}" x2="${pointX.toFixed(2)}" y2="${axisY}" stroke="${pointColor}" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.5" />`,
+          `<line x1="${pointX.toFixed(2)}" y1="${pointY.toFixed(2)}" x2="${(width - padding.right).toFixed(2)}" y2="${pointY.toFixed(2)}" stroke="${pointColor}" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.5" />`,
+          `<circle cx="${pointX.toFixed(2)}" cy="${pointY.toFixed(2)}" r="13" fill="rgba(255,255,255,0.92)" stroke="${pointColor}" stroke-width="3.2" />`,
+          `<circle cx="${pointX.toFixed(2)}" cy="${pointY.toFixed(2)}" r="4.5" fill="${pointColor}" />`,
+          `<g id="pmvPsychHoverLayer" opacity="0" pointer-events="none">`,
+          `<line id="pmvPsychHoverVLine" x1="${pointX.toFixed(2)}" y1="${chartTop}" x2="${pointX.toFixed(2)}" y2="${axisY}" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.65" />`,
+          `<line id="pmvPsychHoverHLine" x1="${axisX}" y1="${pointY.toFixed(2)}" x2="${chartRight.toFixed(2)}" y2="${pointY.toFixed(2)}" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.65" />`,
+          `<circle id="pmvPsychHoverOuter" cx="${pointX.toFixed(2)}" cy="${pointY.toFixed(2)}" r="10" fill="rgba(255,255,255,0.88)" stroke="#2563eb" stroke-width="2.6" />`,
+          `<circle id="pmvPsychHoverInner" cx="${pointX.toFixed(2)}" cy="${pointY.toFixed(2)}" r="3.8" fill="#2563eb" />`,
+          `</g>`,
+          `<text x="${((padding.left + width - padding.right) / 2).toFixed(2)}" y="${(height - 10).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600">${currentLang === "zh" ? "操作温度 [°C]" : "Operative Temperature [°C]"}</text>`,
+          `<text x="${(width - 13).toFixed(2)}" y="${((padding.top + axisY) / 2).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600" transform="rotate(90 ${(width - 13).toFixed(2)} ${((padding.top + axisY) / 2).toFixed(2)})">${currentLang === "zh" ? "含湿比 [g/kg_da]" : "Humidity Ratio [g/kg_da]"}</text>`
+        ].join("");
+        pmvPsychBaseSubtitle = subtitleEl.textContent;
+        pmvPsychHoverSample = null;
+        pmvPsychChartState = {
+          width,
+          height,
+          padding,
+          xMin,
+          xMax,
+          yMax,
+          baseSample,
+          variantTitle
+        };
+      }
+
+      function bindPmvPsychrometricPreviewInputs() {
+        if (pmvPsychInputPreviewBound) return;
+        pmvPsychInputPreviewBound = true;
+        const resultSelect = document.getElementById("pmvPsychResultSelect");
+        const chartSvg = document.getElementById("pmvPsychChartSvg");
+        if (resultSelect) {
+          resultSelect.addEventListener("change", (event) => {
+            const value = event.target && event.target.value ? String(event.target.value) : "";
+            if (!value) return;
+            setSelectedPmvPsychColumn(value);
+          });
+        }
+        if (chartSvg && !pmvPsychChartInteractionBound) {
+          pmvPsychChartInteractionBound = true;
+          chartSvg.addEventListener("mousemove", (event) => {
+            const state = pmvPsychChartState;
+            if (!state) return;
+            const rect = chartSvg.getBoundingClientRect();
+            if (!rect || !rect.width || !rect.height) return;
+            const svgX = ((event.clientX - rect.left) / rect.width) * state.width;
+            const svgY = ((event.clientY - rect.top) / rect.height) * state.height;
+            const next = getPmvPsychSampleFromSvgPoint(svgX, svgY, state);
+            if (!next || !next.sample) return;
+            updatePmvPsychHoverOverlay(next.x, next.y, state);
+            setPmvPsychHoverOverlayVisible(true);
+            applyPmvPsychHoverSample(next.sample);
+          });
+          chartSvg.addEventListener("mouseleave", () => {
+            resetPmvPsychHoverSample();
+          });
+        }
+        [
+          taInput,
+          trInput,
+          vaInput,
+          rhInput,
+          metSelect,
+          metCustomInput,
+          cloSelect,
+          cloCustomInput,
+          wmeInput,
+          ageInput,
+          heightInput,
+          weightInput,
+          pmvChildAgeSelect
+        ]
+          .filter(Boolean)
+          .forEach((el) => {
+            const rerender = () => {
+              if (currentModel === "pmv") {
+                renderPmvPsychrometricCard();
+              }
+            };
+            el.addEventListener("input", rerender);
+            el.addEventListener("change", rerender);
+          });
+      }
+
+      function refreshPmvSelectedDots() {
+        const layer = document.getElementById("pmvPointsLayer");
+        if (!layer) return;
+        const dots = layer.querySelectorAll(".pmv-viz-dot");
+        dots.forEach((dot) => {
+          const variant = dot.dataset.variant || "adult";
+          const columnId = dot.dataset.columnId || "";
+          dot.classList.toggle(
+            "is-selected",
+            !!columnId && pmvSelectedColumnIds[variant] === columnId
+          );
+        });
+      }
+
+      function updatePmvCurrentResultTags(childCol, adultCol, elderCol) {
+        const childTag = document.getElementById("childCurrentResult");
+        const adultTag = document.getElementById("adultCurrentResult");
+        const elderTag = document.getElementById("elderCurrentResult");
+        const childIndex = childCol ? getPmvColumnIndexById(childCol.id) : null;
+        const adultIndex = adultCol ? getPmvColumnIndexById(adultCol.id) : null;
+        const elderIndex = elderCol ? getPmvColumnIndexById(elderCol.id) : null;
+        if (childTag) childTag.textContent = childIndex ? getPmvColumnLabel(childIndex) : "";
+        if (adultTag) adultTag.textContent = adultIndex ? getPmvColumnLabel(adultIndex) : "";
+        if (elderTag) elderTag.textContent = elderIndex ? getPmvColumnLabel(elderIndex) : "";
+      }
+
+      function setSelectedPmvColumn(variant, columnId) {
+        const normalized =
+          variant === "child" ? "child" : variant === "elder" ? "elder" : "adult";
+        pmvSelectedColumnIds[normalized] = columnId || null;
+        syncPMVViewFromColumns();
+        refreshPmvSelectedDots();
+      }
+
+      function setSelectedPmvPsychColumn(columnId) {
+        const col = getPmvColumnById(columnId);
+        if (!col || !hasDisplayablePmvData(col)) return;
+        const variant = getPmvColumnVariant(col);
+        if (variant === "elder" && isPmvElderComingSoon()) return;
+        pmvPsychSelectedColumnId = col.id;
+        renderPmvPsychrometricCard();
+      }
+
+      function syncPMVViewFromColumns() {
+        const childCol = getDisplayedPmvColumnByVariant("child");
+        const adultCol = getDisplayedPmvColumnByVariant("adult");
+        const elderCol = getDisplayedPmvColumnByVariant("elder");
+
+        updatePMVView(
+          childCol && childCol.data ? childCol.data.pmv : NaN,
+          adultCol && adultCol.data ? adultCol.data.pmv : NaN,
+          elderCol && elderCol.data ? elderCol.data.pmv : NaN
+        );
+        updatePPDView(
+          childCol && childCol.data ? childCol.data.ppd : NaN,
+          adultCol && adultCol.data ? adultCol.data.ppd : NaN,
+          elderCol && elderCol.data ? elderCol.data.ppd : NaN
+        );
+        updatePmvCurrentResultTags(childCol, adultCol, elderCol);
+        refreshPmvSelectedDots();
+        renderPmvPsychrometricCard();
+      }
+
+      function updatePMVView(childPMV, adultPMV, elderPMV) {
+        const childEl = document.getElementById("childPMV");
+        const adultEl = document.getElementById("adultPMV");
+        const elderEl = document.getElementById("elderPMV");
+        const childLabelEl = document.getElementById("childLabel");
+        const adultLabelEl = document.getElementById("adultLabel");
+        const elderLabelEl = document.getElementById("elderLabel");
+        const ptrChild = document.getElementById("ptrChild");
+        const ptrAdult = document.getElementById("ptrAdult");
+
+        const childVal = Number(childPMV);
+        const adultVal = Number(adultPMV);
+        const elderVal = Number(elderPMV);
+        const childOk = Number.isFinite(childVal);
+        const adultOk = Number.isFinite(adultVal);
+        const elderOk = Number.isFinite(elderVal);
+
+        if (childEl) childEl.textContent = childOk ? childVal.toFixed(2) : getPmvEmptyDisplay();
+        if (adultEl) adultEl.textContent = adultOk ? adultVal.toFixed(2) : getPmvEmptyDisplay();
+        if (elderEl) elderEl.textContent = elderOk ? elderVal.toFixed(2) : getPmvEmptyDisplay();
+        if (childLabelEl) childLabelEl.textContent = childOk ? pmvToLabel(childVal) : getPmvEmptyDisplay();
+        if (adultLabelEl) adultLabelEl.textContent = adultOk ? pmvToLabel(adultVal) : getPmvEmptyDisplay();
+        if (elderLabelEl) elderLabelEl.textContent = elderOk ? pmvToLabel(elderVal) : getPmvEmptyDisplay();
+
+        const childPercent = childOk ? pmvToPercent(childVal) : 50;
+        const adultPercent = adultOk ? pmvToPercent(adultVal) : 50;
+        if (ptrChild) {
+          ptrChild.style.left = `${childPercent}%`;
+          ptrChild.classList.add("is-hidden");
+        }
+        if (ptrAdult) {
+          ptrAdult.style.left = `${adultPercent}%`;
+          ptrAdult.classList.add("is-hidden");
+        }
+
+        if (!childOk || !adultOk || !elderOk) {
+          hidePmvTooltip();
+        }
+      }
+
+      function updatePPDView(childPPD, adultPPD, elderPPD) {
+        const childEl = document.getElementById("childPPD");
+        const adultEl = document.getElementById("adultPPD");
+        const elderEl = document.getElementById("elderPPD");
+        const childVal = Number(childPPD);
+        const adultVal = Number(adultPPD);
+        const elderVal = Number(elderPPD);
+        if (childEl) childEl.textContent = Number.isFinite(childVal) ? `${childVal.toFixed(2)}%` : getPmvEmptyDisplay();
+        if (adultEl) adultEl.textContent = Number.isFinite(adultVal) ? `${adultVal.toFixed(2)}%` : getPmvEmptyDisplay();
+        if (elderEl) elderEl.textContent = Number.isFinite(elderVal) ? `${elderVal.toFixed(2)}%` : getPmvEmptyDisplay();
+      }
+
+      function pickPMVValue(data, keys) {
+        if (!data || typeof data !== "object") return null;
+        for (const key of keys) {
+          if (data[key] == null) continue;
+          const val = Number(data[key]);
+          if (Number.isFinite(val)) return val;
+        }
+        return null;
+      }
+
+      function syncPMVViewFromData(data, options) {
+        syncPMVViewFromColumns();
+      }
+
+      window.updatePMVView = updatePMVView;
+
+      function getPmvVariantTitle(variant) {
+        const normalized =
+          variant === "child" ? "child" : variant === "elder" ? "elder" : "adult";
+        if (currentLang === "zh") {
+          if (normalized === "child") return "小孩";
+          if (normalized === "elder") return "老人";
+          return "成人";
+        }
+        if (normalized === "child") return "Child";
+        if (normalized === "elder") return "Older adult";
+        return "Adult";
+      }
+
+      function formatPmvTooltipNumber(value, digits) {
+        const num = Number(value);
+        return Number.isFinite(num)
+          ? String(Number.parseFloat(formatNumber(num, digits)))
+          : "--";
+      }
+
+      function buildPmvTooltipHtml(col, index) {
+        if (!col || !col.data || !Number.isFinite(col.data.pmv)) return "";
+        const data = col.data;
+        const variant = data.variant === "child" ? "child" : data.variant === "elder" ? "elder" : "adult";
+        const isChild = variant === "child";
+        const lines = [];
+        const title = `${getPmvColumnLabel(index)} · ${getPmvVariantTitle(variant)} PMV`;
+        lines.push(`<div class="floating-glass-tooltip__title">${title}</div>`);
+        lines.push(
+          `<div class="floating-glass-tooltip__line">PMV: <b>${formatPmvTooltipNumber(data.pmv, 2)}</b> (${pmvToLabel(Number(data.pmv))})</div>`
+        );
+        if (Number.isFinite(Number(data.ppd))) {
+          lines.push(
+            `<div class="floating-glass-tooltip__line">PPD: <b>${formatPmvTooltipNumber(data.ppd, 2)}</b> %</div>`
+          );
+        }
+        lines.push(
+          `<div class="floating-glass-tooltip__line">Ta: <b>${formatPmvTooltipNumber(data.ta, 1)}</b> °C</div>`
+        );
+        lines.push(
+          `<div class="floating-glass-tooltip__line">Tr: <b>${formatPmvTooltipNumber(data.tr, 1)}</b> °C</div>`
+        );
+        lines.push(
+          `<div class="floating-glass-tooltip__line">Va: <b>${formatPmvTooltipNumber(data.vel, 2)}</b> m/s</div>`
+        );
+        lines.push(
+          `<div class="floating-glass-tooltip__line">RH: <b>${formatPmvTooltipNumber(data.rh, 0)}</b> %</div>`
+        );
+        lines.push(
+          `<div class="floating-glass-tooltip__line">met: <b>${formatPmvTooltipNumber(data.met, 2)}</b></div>`
+        );
+        lines.push(
+          `<div class="floating-glass-tooltip__line">clo: <b>${formatPmvTooltipNumber(data.clo, 2)}</b></div>`
+        );
+        lines.push(
+          `<div class="floating-glass-tooltip__line">wme: <b>${formatPmvTooltipNumber(data.wme, 2)}</b> met</div>`
+        );
+        if (isChild) {
+          const ageLabel = currentLang === "zh" ? "年龄" : "Age";
+          const heightLabel = currentLang === "zh" ? "身高" : "Height";
+          const weightLabel = currentLang === "zh" ? "体重" : "Weight";
+          lines.push(
+            `<div class="floating-glass-tooltip__line">${ageLabel}: <b>${formatPmvTooltipNumber(data.age, 0)}</b> y</div>`
+          );
+          lines.push(
+            `<div class="floating-glass-tooltip__line">${heightLabel}: <b>${formatPmvTooltipNumber(data.height, 2)}</b> m</div>`
+          );
+          lines.push(
+            `<div class="floating-glass-tooltip__line">${weightLabel}: <b>${formatPmvTooltipNumber(data.weight, 1)}</b> kg</div>`
+          );
+        }
+        return lines.join("");
+      }
+
+      function setActivePmvDot(dot) {
+        if (pmvTooltipState.activeDot && pmvTooltipState.activeDot !== dot) {
+          pmvTooltipState.activeDot.classList.remove("is-active");
+        }
+        if (dot) {
+          dot.classList.add("is-active");
+        }
+        pmvTooltipState.activeDot = dot || null;
+      }
+
+      function positionPmvTooltip() {
+        const state = pmvTooltipState;
+        if (!state.tooltipEl || !state.activeDot) return;
+        const anchorRect = state.activeDot.getBoundingClientRect();
+        const rawLeft = anchorRect.left + anchorRect.width / 2;
+        const rawTop = anchorRect.top + anchorRect.height / 2;
+        positionFloatingTooltip(state.tooltipEl, rawLeft, rawTop);
+      }
+
+      function refreshPmvTooltipContent() {
+        const state = pmvTooltipState;
+        if (!state.tooltipEl || !state.activeColumn || !state.activeIndex) return;
+        const inner = state.tooltipEl.firstElementChild;
+        if (!inner) return;
+        inner.innerHTML = buildPmvTooltipHtml(state.activeColumn, state.activeIndex);
+      }
+
+      function showPmvTooltip(col, index, anchorEl) {
+        if (!col || !col.data || !anchorEl) return;
+        const state = pmvTooltipState;
+        const tooltipEl = ensureFloatingGlassTooltip("pmv-floating-tooltip");
+        tooltipEl.__onFloatingTooltipDblClick = null;
+        state.tooltipEl = tooltipEl;
+        state.activeColumn = col;
+        state.activeIndex = index;
+        setActivePmvDot(anchorEl);
+        refreshPmvTooltipContent();
+        positionPmvTooltip();
+        tooltipEl.style.opacity = "1";
+        tooltipEl.classList.remove("floating-glass-tooltip--locked");
+      }
+
+      function hidePmvTooltip() {
+        const state = pmvTooltipState;
+        if (state.tooltipEl) {
+          state.tooltipEl.style.opacity = "0";
+          state.tooltipEl.classList.remove("floating-glass-tooltip--locked");
+        }
+        if (state.activeDot) {
+          state.activeDot.classList.remove("is-active");
+        }
+        state.activeDot = null;
+        state.activeColumn = null;
+        state.activeIndex = null;
+      }
+
+      function renderPmvVizPoints() {
+        const layer = document.getElementById("pmvPointsLayer");
+        if (!layer) return;
+        hidePmvTooltip();
+        layer.innerHTML = "";
+        if (currentModel !== "pmv") return;
+        if (!pmvColumns || !pmvColumns.length) return;
+
+        pmvColumns.forEach((col, idx) => {
+          if (!col || !col.data) return;
+          const dot = document.createElement("span");
+          const variant = col.data.variant === "child" ? "child" : col.data.variant === "elder" ? "elder" : "adult";
+          if (variant === "elder" && isPmvElderComingSoon()) return;
+          const pmvVal = col.data.pmv;
+          if (!Number.isFinite(pmvVal)) return;
+          dot.className = `pmv-viz-dot pmv-viz-dot--${variant}`;
+          dot.setAttribute("tabindex", "0");
+          dot.setAttribute("role", "button");
+          dot.setAttribute(
+            "aria-label",
+            currentLang === "zh"
+              ? `${getPmvVariantTitle(variant)} PMV 点`
+              : `${getPmvVariantTitle(variant)} PMV point`
+          );
+          dot.style.left = `${pmvToPercent(pmvVal)}%`;
+          dot.style.transform = "translate(-50%, -50%)";
+          dot.dataset.columnId = col.id || "";
+          dot.dataset.variant = variant;
+          const showHoverTooltip = () => showPmvTooltip(col, idx + 1, dot);
+          dot.addEventListener("mouseenter", showHoverTooltip);
+          dot.addEventListener("focus", showHoverTooltip);
+          dot.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setSelectedPmvColumn(variant, col.id);
+            showHoverTooltip();
+          });
+          dot.addEventListener("mouseleave", () => hidePmvTooltip());
+          dot.addEventListener("blur", () => hidePmvTooltip());
+          layer.appendChild(dot);
+        });
+        refreshPmvSelectedDots();
+      }
+
       function applyModelLayout() {
         const isPMV = currentModel === "pmv";
         const isTwoNode = currentModel === "two-node";
         const isJos3 = currentModel === "jos3";
+        const isPmvElderPending = isPMV && currentPmvVariant === "elder" && isPmvElderComingSoon();
+
+        if (!isPMV) {
+          hidePmvTooltip();
+        }
 
         if (conditionsInline) {
           conditionsInline.style.display = isJos3 ? "flex" : "none";
@@ -14157,11 +17386,13 @@
         }
 
         if (settingsPanel) {
+          settingsPanel.classList.toggle("pmv-shift", isPMV);
+          settingsPanel.classList.toggle("pmv-elder-disabled", isPmvElderPending);
           const formGrid = settingsPanel.querySelector(".form-grid");
           if (formGrid) {
             const fields = formGrid.querySelectorAll(".field");
 
-            // PMV：只保留基本工况 6 项，其余隐藏；不显示两节点高级面板
+            // PMV：保留基础项，儿童模式额外展示年龄/身高/体重
             if (isPMV) {
               const keepIdsPMV = new Set([
                 "field-ta",
@@ -14172,6 +17403,11 @@
                 "field-clo",
                 "field-wme"
               ]);
+              if (currentPmvVariant === "child") {
+                keepIdsPMV.add("field-age");
+                keepIdsPMV.add("field-height");
+                keepIdsPMV.add("field-weight");
+              }
               fields.forEach((field) => {
                 if (keepIdsPMV.has(field.id)) {
                   field.style.display = "";
@@ -14227,6 +17463,8 @@
           }
         }
 
+        setPmvElderDisabledState(isPmvElderPending);
+
         if (jos3AdvancedSection) {
           jos3AdvancedSection.style.display = isJos3 ? "" : "none";
         }
@@ -14237,6 +17475,12 @@
         }
 
         updateBatchSectionVisibility();
+
+        if (isPmvElderPending) {
+          setPmvStatus(getPmvElderComingSoonStatus());
+        } else if (isPMV && (!pmvColumns || !pmvColumns.length)) {
+          setPmvStatus(currentLang === "zh" ? "状态：尚未计算" : "Status: not yet computed");
+        }
 
         // === 右侧输出区：原有逻辑 ===
         const stepsPanel = document.getElementById("panel-steps");
@@ -14337,6 +17581,8 @@
           }
         }
 
+        document.body.classList.toggle("pmv-mode-active", !!isPMV);
+
         if (isPMV || isTwoNode) {
           hideAllChartTooltips();
         } else {
@@ -14387,7 +17633,7 @@
             chart.tooltip.setActiveElements([], { x: 0, y: 0 });
           }
           if (state.tooltipEl) {
-            state.tooltipEl.classList.remove("chart-tooltip--locked");
+            state.tooltipEl.classList.remove("floating-glass-tooltip--locked");
             state.tooltipEl.style.opacity = "0";
           }
           updateTooltipLockHint(state);
@@ -14958,6 +18204,12 @@
 
       // === 模拟主流程 ===
       async function runPmvSimulation() {
+        if (currentPmvVariant === "elder" && isPmvElderComingSoon()) {
+          syncPMVViewFromColumns();
+          setPmvStatus(getPmvElderComingSoonStatus());
+          return;
+        }
+
         const payload = {
           ta: parseFloat(taInput.value),
           tr: parseFloat(trInput.value),
@@ -14965,8 +18217,43 @@
           rh: parseFloat(rhInput.value),
           met: getMetValue(),
           clo: getCloValue(),
-          wme: getWmeValue()
+          wme: getWmeValue(),
+          variant: currentPmvVariant === "child" ? "child" : "adult"
         };
+
+        if (currentPmvVariant === "elder") {
+          payload.ui_variant = "elder";
+        }
+
+        if (currentPmvVariant === "child") {
+          const ageVal = pmvChildAgeSelect
+            ? parseInt(pmvChildAgeSelect.value, 10)
+            : parseInt(ageInput.value, 10);
+          const heightVal = parseFloat(heightInput.value);
+          const weightVal = parseFloat(weightInput.value);
+          payload.age = ageVal;
+          payload.height = heightVal;
+          payload.weight = weightVal;
+
+          const heightOk = Number.isFinite(heightVal) && heightVal > 0;
+          const weightOk = Number.isFinite(weightVal) && weightVal > 0;
+          if (!heightOk || !weightOk) {
+            // 缺少身高/体重：直接生成占位列，值全部为“/”
+            updatePmvColumns(payload, {
+              placeholder: true,
+              message:
+                currentLang === "zh"
+                  ? "缺少身高或体重"
+                  : "Height & weight required"
+            }, { forceNew: true, placeholder: true });
+            setPmvStatus(
+              currentLang === "zh"
+                ? "状态：缺少身高或体重，结果为空"
+                : "Status: height/weight missing; filled with blanks"
+            );
+            return;
+          }
+        }
 
         lastPayload = payload;
         lastScenario = "pmv";
@@ -14977,7 +18264,8 @@
           simulateBtnLabel.textContent = currentLang === "zh" ? "计算中…" : "Running…";
           setPmvStatus("状态：PMV 计算中…");
 
-          const res = await fetch("/api/pmv", {
+          const pmvEndpoint = currentPmvVariant === "child" ? "/api/pmv_child" : "/api/pmv_adult";
+          const res = await fetch(pmvEndpoint, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -14994,6 +18282,12 @@
           lastPmvData = data;
           updatePmvColumns(payload, data);
           updatePMVCard();
+          if (currentPmvVariant === "child") {
+            lastChildPmvPayload = { ...payload };
+          } else {
+            lastAdultPmvPayload = { ...payload };
+          }
+          syncPMVViewFromData(data, { variant: currentPmvVariant });
           setPmvStatus("状态：完成：已更新 PMV 结果");
         } catch (err) {
           const stackInfo =
@@ -15395,6 +18689,9 @@
           if (newModel === "jos3") {
             ensureJos3RunIfEmpty();
           }
+          if (newModel === "pmv") {
+            setPmvVariant(currentPmvVariant);
+          }
           refreshExampleButtonState();
           updateConditionInlineStatus();
         });
@@ -15459,6 +18756,13 @@
         if (!btn || !scenario) return;
         btn.addEventListener("click", () => {
           activatePresetScenario(scenario);
+        });
+      });
+
+      pmvExampleButtons.forEach(({ btn, variant }) => {
+        if (!btn || !variant) return;
+        btn.addEventListener("click", () => {
+          setPmvVariant(variant);
         });
       });
 
@@ -15634,6 +18938,8 @@
         );
       }
 
+      // pmv-viz-dots handle tooltip events
+
       metSelect.addEventListener("change", () => {
         metCustomInput.style.display =
           metSelect.value === "custom" ? "block" : "none";
@@ -15658,7 +18964,16 @@
         updateLayout();
         resize3DBody();
         updateBody3DTimeLabelPosition();
+        positionPmvTooltip();
       });
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          positionPmvTooltip();
+        },
+        true
+      );
 
       if (twoNodeCopyBtn) {
         setCopyButtonState(twoNodeCopyBtn, "ready");
@@ -15771,10 +19086,13 @@
 
       // === 初始化 ===
       ensureInlineConditionsInitialized();
+      bindPmvPsychrometricPreviewInputs();
       applyI18n();
       updateScenarioUI();
       initBody3DHeightSync();
       updatePMVCard();
+      updatePMVView(NaN, NaN, NaN);
+      updatePPDView(NaN, NaN, NaN);
       initDraggableCharts();
       buildTwoNodeMindmap();
 
@@ -15866,6 +19184,11 @@
           }
 
           applyModelLayout();
+          if (stored === "pmv") {
+            setPmvVariant(currentPmvVariant);
+          }
+          refreshExampleButtonState();
+          updateConditionInlineStatus();
           return;
         }
 
