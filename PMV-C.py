@@ -11,6 +11,12 @@ from numba import float64, vectorize
 from typing import Union, Dict
 
 MET_TO_W_M2 = 58.15
+CHILD_ACTIVITY_COEFFICIENTS = {
+    "seated_rest": (1.994, 0.0549),
+    "reading_writing": (2.0245, 0.051),
+    "standing_rest": (2.029, 0.0495),
+    "walk_3kmh": (3.3829, 0.0313),
+}
 
 
 # =========================
@@ -214,7 +220,25 @@ def _is_child_mode(age: Union[float, int, None]) -> bool:
     if abs(a - np.floor(a)) > 1e-12:
         return False
     ia = int(np.floor(a))
-    return 6 <= ia <= 18
+    return 8 <= ia <= 18
+
+
+def _resolve_child_met(
+    age: Union[float, int],
+    child_activity: Union[str, None],
+    fallback_met: Union[float, int, None],
+) -> float:
+    if child_activity is None:
+        if fallback_met is None:
+            raise ValueError("儿童 PMV 需要提供 child_activity 或 met。")
+        return max(float(fallback_met), 0.0)
+    key = str(child_activity).strip().lower()
+    coeffs = CHILD_ACTIVITY_COEFFICIENTS.get(key)
+    if coeffs is None:
+        valid_keys = ", ".join(CHILD_ACTIVITY_COEFFICIENTS.keys())
+        raise ValueError(f"无效的儿童活动类型：{child_activity}。可选值：{valid_keys}")
+    intercept, slope = coeffs
+    return max(float(intercept - slope * float(age)), 0.0)
 
 
 def _thermal_sensation_level(pmv: float) -> int:
@@ -238,7 +262,8 @@ def pmv_with_components_auto(
     tdb, tr, vr, rh, met, clo, wme=0.0,
     age: Union[float, int, None] = None,
     height: Union[float, None] = None,
-    weight: Union[float, None] = None
+    weight: Union[float, None] = None,
+    child_activity: Union[str, None] = None,
 ) -> Dict[str, float]:
     """
     自动选择标准/儿童：
@@ -254,6 +279,7 @@ def pmv_with_components_auto(
         return res
 
     # ---------- 儿童分支 ----------
+    met = _resolve_child_met(age, child_activity, met)
     tdb, tr, vr, rh, met, clo, wme = _sanitize_children(tdb, tr, vr, rh, met, clo, wme)
     ia = int(float(age))
 
