@@ -115,6 +115,9 @@ class PMVInput(BaseModel):
     age: Optional[float] = None
     height: Optional[float] = None
     weight: Optional[float] = None
+    child_activity: Optional[
+        Literal["seated_rest", "reading_writing", "standing_rest", "walk_3kmh"]
+    ] = None
     variant: Literal["adult", "child"] = "adult"
 
 
@@ -185,6 +188,14 @@ def api_pmv_child(payload: PMVInput):
     """严格调用 PMV-C.py 进行儿童 PMV 计算。"""
     if pmv_c is None:
         raise HTTPException(status_code=500, detail="PMV-C 模块未加载，无法计算儿童模式")
+    if payload.age is None:
+        raise HTTPException(status_code=400, detail="儿童 PMV 需要提供年龄，且范围为 8-18 岁")
+    try:
+        age_value = float(payload.age)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="儿童年龄必须是有效数字，且范围为 8-18 岁")
+    if not age_value.is_integer() or age_value < 8 or age_value > 18:
+        raise HTTPException(status_code=400, detail="儿童年龄范围必须为 8-18 岁整数")
     if payload.height is None or payload.weight is None:
         raise HTTPException(status_code=400, detail="儿童 PMV 需要提供身高与体重")
     tr = payload.tr if payload.tr is not None else payload.ta
@@ -199,6 +210,7 @@ def api_pmv_child(payload: PMVInput):
         age=payload.age,
         height=payload.height,
         weight=payload.weight,
+        child_activity=payload.child_activity,
     )
     return _build_pmv_output(res)
 
