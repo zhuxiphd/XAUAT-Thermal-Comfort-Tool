@@ -4552,8 +4552,6 @@ body.pmv-mode-active .chart-card--pmv-table {
                 value="30"
               />
               <select id="pmv-child-age" style="display:none; margin-top:4px;">
-                <option value="6">6</option>
-                <option value="7">7</option>
                 <option value="8">8</option>
                 <option value="9">9</option>
                 <option value="10" selected>10</option>
@@ -5388,6 +5386,42 @@ body.pmv-mode-active .chart-card--pmv-table {
       let pmvPsychChartState = null;
       let pmvPsychHoverSample = null;
       let pmvPsychBaseSubtitle = "";
+      const PMV_ADULT_MET_OPTION_DEFS = Object.freeze([
+        { value: "1.0", zh: "安静坐着（1.0 met）", en: "Seated quiet (1.0 met)" },
+        { value: "1.2", zh: "轻度办公（1.2 met）", en: "Light office work (1.2 met)" },
+        { value: "1.7", zh: "缓慢行走（1.7 met）", en: "Slow walking (1.7 met)" },
+        { value: "2.0", zh: "快走 / 轻体力劳动（2.0 met）", en: "Brisk walking / light work (2.0 met)" },
+        { value: "custom", zh: "自定义 met …", en: "Custom met …" }
+      ]);
+      const PMV_CHILD_MET_ACTIVITY_DEFS = Object.freeze([
+        {
+          value: "seated_rest",
+          zh: "静坐休息",
+          en: "Seated rest",
+          calc: (age) => 1.994 - 0.0549 * age
+        },
+        {
+          value: "reading_writing",
+          zh: "看书写字",
+          en: "Reading / writing",
+          calc: (age) => 2.0245 - 0.051 * age
+        },
+        {
+          value: "standing_rest",
+          zh: "站立休息",
+          en: "Standing rest",
+          calc: (age) => 2.029 - 0.0495 * age
+        },
+        {
+          value: "walk_3kmh",
+          zh: "3 km/h",
+          en: "3 km/h",
+          calc: (age) => 3.3829 - 0.0313 * age
+        }
+      ]);
+      let lastAdultMetOptionValue = "1.0";
+      let lastAdultCustomMetValue = "";
+      let lastChildPmvActivityValue = "seated_rest";
 
       function ensureXlsxAvailable(actionZh, actionEn, onError) {
         if (typeof XLSX !== "undefined") return true;
@@ -5883,6 +5917,9 @@ body.pmv-mode-active .chart-card--pmv-table {
         ) {
           setTwoNodeBatchStatus(currentLang === "zh" ? "未导入文件" : "No file loaded", false);
         }
+        if (typeof refreshPmvMetOptions === "function") {
+          refreshPmvMetOptions();
+        }
       }
 
       // === DOM 绑定 ===
@@ -6009,6 +6046,111 @@ body.pmv-mode-active .chart-card--pmv-table {
       let activeConditionId = null;
       let nextConditionId = 1;
 
+      function getMetSuffixElement() {
+        const field = metSelect ? metSelect.closest(".field") : null;
+        return field ? field.querySelector(".field-suffix") : null;
+      }
+
+      function shouldUseChildPmvMetLogic() {
+        return currentModel === "pmv" && currentPmvVariant === "child";
+      }
+
+      function getChildPmvAgeValue() {
+        const rawValue = pmvChildAgeSelect
+          ? parseInt(pmvChildAgeSelect.value, 10)
+          : parseInt(ageInput && ageInput.value, 10);
+        if (!Number.isFinite(rawValue)) return 10;
+        return Math.min(Math.max(rawValue, 8), 18);
+      }
+
+      function getChildPmvActivityDef(activityKey) {
+        return (
+          PMV_CHILD_MET_ACTIVITY_DEFS.find((item) => item.value === activityKey) ||
+          PMV_CHILD_MET_ACTIVITY_DEFS[0]
+        );
+      }
+
+      function getSelectedChildPmvActivityKey() {
+        return getChildPmvActivityDef(metSelect ? metSelect.value : lastChildPmvActivityValue).value;
+      }
+
+      function computeChildPmvMet(ageValue, activityKey) {
+        const age = Number(ageValue);
+        const def = getChildPmvActivityDef(activityKey);
+        if (!Number.isFinite(age)) return Number(def.calc(10).toFixed(4));
+        return Number(Math.max(0, def.calc(age)).toFixed(4));
+      }
+
+      function rememberMetSelectionState() {
+        if (!metSelect) return;
+        const currentValue = metSelect.value || "";
+        const isChildOptions =
+          !!currentValue && PMV_CHILD_MET_ACTIVITY_DEFS.some((item) => item.value === currentValue);
+        if (isChildOptions) {
+          lastChildPmvActivityValue = getChildPmvActivityDef(currentValue).value;
+          return;
+        }
+        if (currentValue) {
+          lastAdultMetOptionValue = currentValue;
+        }
+        if (metCustomInput) {
+          lastAdultCustomMetValue = metCustomInput.value || "";
+        }
+      }
+
+      function refreshMetFieldSuffix() {
+        const suffixEl = getMetSuffixElement();
+        if (!suffixEl) return;
+        const metValue = getMetValue();
+        const heatFlux = Number.isFinite(metValue) ? metValue * 58.15 : NaN;
+        if (shouldUseChildPmvMetLogic()) {
+          const ageValue = getChildPmvAgeValue();
+          const activityDef = getChildPmvActivityDef(getSelectedChildPmvActivityKey());
+          suffixEl.textContent =
+            currentLang === "zh"
+              ? `按年龄自动换算：${activityDef.zh}，${ageValue} 岁 = ${formatNumber(metValue, 2)} met ≈ ${formatNumber(heatFlux, 2)} W/m²`
+              : `Age-linked value: ${activityDef.en}, age ${ageValue} = ${formatNumber(metValue, 2)} met ≈ ${formatNumber(heatFlux, 2)} W/m²`;
+          return;
+        }
+        suffixEl.textContent = `${formatNumber(metValue, 2)} met ≈ ${formatNumber(heatFlux, 2)} W/m²`;
+      }
+
+      function refreshPmvMetOptions() {
+        if (!metSelect) return;
+        rememberMetSelectionState();
+        const useChildOptions = shouldUseChildPmvMetLogic();
+        const optionDefs = useChildOptions ? PMV_CHILD_MET_ACTIVITY_DEFS : PMV_ADULT_MET_OPTION_DEFS;
+        const selectedValue = useChildOptions ? lastChildPmvActivityValue : lastAdultMetOptionValue;
+
+        metSelect.innerHTML = "";
+        optionDefs.forEach((def) => {
+          const option = document.createElement("option");
+          option.value = def.value;
+          if (useChildOptions) {
+            option.textContent = currentLang === "zh" ? def.zh : def.en;
+          } else {
+            option.textContent = currentLang === "zh" ? def.zh : def.en;
+          }
+          metSelect.appendChild(option);
+        });
+
+        const validSelected = optionDefs.some((def) => def.value === selectedValue)
+          ? selectedValue
+          : optionDefs[0].value;
+        metSelect.value = validSelected;
+
+        if (metCustomInput) {
+          metCustomInput.disabled = useChildOptions;
+          metCustomInput.style.display =
+            !useChildOptions && metSelect.value === "custom" ? "block" : "none";
+          if (!useChildOptions && lastAdultMetOptionValue === "custom") {
+            metCustomInput.value = lastAdultCustomMetValue;
+          }
+        }
+
+        refreshMetFieldSuffix();
+      }
+
       function setPmvVariant(variant) {
         const next = variant === "child" ? "child" : variant === "elder" ? "elder" : "adult";
         currentPmvVariant = next;
@@ -6016,10 +6158,14 @@ body.pmv-mode-active .chart-card--pmv-table {
         if (pmvChildAgeSelect) {
           pmvChildAgeSelect.style.display = showChild ? "" : "none";
           pmvChildAgeSelect.disabled = !showChild;
+          if (showChild) {
+            pmvChildAgeSelect.value = String(getChildPmvAgeValue());
+          }
         }
         if (ageInput) {
           ageInput.style.display = showChild ? "none" : "";
         }
+        refreshPmvMetOptions();
         refreshExampleButtonState();
         applyModelLayout();
         if (currentModel === "pmv") {
@@ -7245,6 +7391,8 @@ body.pmv-mode-active .chart-card--pmv-table {
               payload.age = Number.isFinite(row.age) ? row.age : parseInt(pmvChildAgeSelect ? pmvChildAgeSelect.value : ageInput.value, 10);
               payload.height = Number.isFinite(row.height) ? row.height : parseFloat(heightInput.value);
               payload.weight = Number.isFinite(row.weight) ? row.weight : parseFloat(weightInput.value);
+              payload.child_activity = getSelectedChildPmvActivityKey();
+              payload.met = computeChildPmvMet(payload.age, payload.child_activity);
             }
 
             try {
@@ -7274,6 +7422,7 @@ body.pmv-mode-active .chart-card--pmv-table {
                 met: payload.met,
                 clo: payload.clo,
                 wme: payload.wme,
+                child_activity: payload.child_activity,
                 mw: null,
                 q_total: null,
                 q_sens: null,
@@ -11969,6 +12118,9 @@ body.pmv-mode-active .chart-card--pmv-table {
 
       // === 通用工具函数 ===
       function getMetValue() {
+        if (shouldUseChildPmvMetLogic()) {
+          return computeChildPmvMet(getChildPmvAgeValue(), getSelectedChildPmvActivityKey());
+        }
         if (metSelect.value === "custom") {
           const v = parseFloat(metCustomInput.value);
           return Number.isFinite(v) ? v : 1.0;
@@ -12926,9 +13078,7 @@ body.pmv-mode-active .chart-card--pmv-table {
         if (Number.isFinite(cond.va)) vaInput.value = cond.va;
         if (Number.isFinite(cond.rh)) rhInput.value = cond.rh;
         if (Number.isFinite(cond.met)) {
-          metSelect.value = "custom";
-          metCustomInput.style.display = "block";
-          metCustomInput.value = cond.met;
+          setMetFromValue(cond.met);
         }
         if (Number.isFinite(cond.clo)) {
           cloSelect.value = "custom";
@@ -16160,6 +16310,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           clo: payload.clo,
           wme: payload.wme,
           age: payload.age,
+          child_activity: payload.child_activity,
           height: payload.height,
           weight: payload.weight,
           variant: payload.ui_variant || payload.variant || currentPmvVariant,
@@ -16193,6 +16344,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           clo: payload.clo,
           wme: payload.wme,
           age: payload.age,
+          child_activity: payload.child_activity,
           height: payload.height,
           weight: payload.weight,
           variant: payload.ui_variant || payload.variant || currentPmvVariant
@@ -16407,6 +16559,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           clo: getCloValue(),
           wme: getWmeValue(),
           age: variant === "child" ? childAgeValue : genericAgeValue,
+          child_activity: variant === "child" ? getSelectedChildPmvActivityKey() : null,
           height: parseFloat(heightInput && heightInput.value),
           weight: parseFloat(weightInput && weightInput.value)
         };
@@ -16434,6 +16587,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           pairs.push([liveData.age, columnData.age, 0.0001]);
           pairs.push([liveData.height, columnData.height, 0.0001]);
           pairs.push([liveData.weight, columnData.weight, 0.0001]);
+          pairs.push([liveData.child_activity === columnData.child_activity ? 1 : 0, 1, 0.0001]);
         }
         return pairs.every(([left, right, tolerance]) =>
           isPmvPsychValueClose(left, right, tolerance)
@@ -16851,7 +17005,7 @@ body.pmv-mode-active .chart-card--pmv-table {
 
         noteEl.textContent =
           currentLang === "zh"
-            ? "注：在本焓湿图中，横坐标为操作温度；对于每个点，干球温度等于平均辐射温度（DBT = MRT）。舒适区表示在 DBT 与 MRT 相同的条件组合下，依据标准 PMV 介于 -0.5 至 +0.5 之间的范围。\n\n适用性限制：本标准仅适用于健康个体。本标准不适用于以下人员：a) 服装热阻超过 1.5 clo；b) 服装具有高度不透湿性；c) 正在睡眠、斜躺并接触寝具，或能够调节毯子/寝具的人员。"
+            ? "注：在本焓湿图中，横坐标为操作温度，界面纵轴标签显示为焓；对于每个点，干球温度等于平均辐射温度（DBT = MRT）。舒适区表示在 DBT 与 MRT 相同的条件组合下，依据标准 PMV 介于 -0.5 至 +0.5 之间的范围。\n\n适用性限制：本标准仅适用于健康个体。本标准不适用于以下人员：a) 服装热阻超过 1.5 clo；b) 服装具有高度不透湿性；c) 正在睡眠、斜躺并接触寝具，或能够调节毯子/寝具的人员。"
             : "NOTE: In this psychrometric chart the abscissa is the operative temperature and for each point dry-bulb temperature equals mean radiant temperature (DBT = MRT). The comfort zone represents the combination of conditions with the same DBT and MRT for which the PMV is between -0.5 and +0.5, according to the standard.\n\nLimits of Applicability: This standard is only applicable to healthy individuals. This standard does not apply to occupants: a) whose clothing insulation exceed 1.5 clo; b) whose clothing is highly impermeable; or c) who are sleeping, reclining in contact with bedding, or able to adjust blankets or bedding.";
 
         if (!Number.isFinite(tdb) || !Number.isFinite(rh) || !Number.isFinite(humidityRatioGkg)) {
@@ -16966,7 +17120,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           `<circle id="pmvPsychHoverInner" cx="${pointX.toFixed(2)}" cy="${pointY.toFixed(2)}" r="3.8" fill="#2563eb" />`,
           `</g>`,
           `<text x="${((padding.left + width - padding.right) / 2).toFixed(2)}" y="${(height - 10).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600">${currentLang === "zh" ? "操作温度 [°C]" : "Operative Temperature [°C]"}</text>`,
-          `<text x="${(width - 13).toFixed(2)}" y="${((padding.top + axisY) / 2).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600" transform="rotate(90 ${(width - 13).toFixed(2)} ${((padding.top + axisY) / 2).toFixed(2)})">${currentLang === "zh" ? "含湿比 [g/kg_da]" : "Humidity Ratio [g/kg_da]"}</text>`
+          `<text x="${(width - 13).toFixed(2)}" y="${((padding.top + axisY) / 2).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600" transform="rotate(90 ${(width - 13).toFixed(2)} ${((padding.top + axisY) / 2).toFixed(2)})">${currentLang === "zh" ? "焓 [kJ/kg]" : "Enthalpy [kJ/kg]"}</text>`
         ].join("");
         pmvPsychBaseSubtitle = subtitleEl.textContent;
         pmvPsychHoverSample = null;
@@ -17229,9 +17383,14 @@ body.pmv-mode-active .chart-card--pmv-table {
           `<div class="floating-glass-tooltip__line">wme: <b>${formatPmvTooltipNumber(data.wme, 2)}</b> met</div>`
         );
         if (isChild) {
+          const activityLabel = currentLang === "zh" ? "活动" : "Activity";
           const ageLabel = currentLang === "zh" ? "年龄" : "Age";
           const heightLabel = currentLang === "zh" ? "身高" : "Height";
           const weightLabel = currentLang === "zh" ? "体重" : "Weight";
+          const activityDef = getChildPmvActivityDef(data.child_activity);
+          lines.push(
+            `<div class="floating-glass-tooltip__line">${activityLabel}: <b>${currentLang === "zh" ? activityDef.zh : activityDef.en}</b></div>`
+          );
           lines.push(
             `<div class="floating-glass-tooltip__line">${ageLabel}: <b>${formatPmvTooltipNumber(data.age, 0)}</b> y</div>`
           );
@@ -18031,6 +18190,24 @@ body.pmv-mode-active .chart-card--pmv-table {
       }
 
       function setMetFromValue(value) {
+        if (shouldUseChildPmvMetLogic()) {
+          const targetValue = Number(value);
+          const ageValue = getChildPmvAgeValue();
+          let bestValue = PMV_CHILD_MET_ACTIVITY_DEFS[0].value;
+          let bestDiff = Number.POSITIVE_INFINITY;
+          PMV_CHILD_MET_ACTIVITY_DEFS.forEach((def) => {
+            const diff = Math.abs(computeChildPmvMet(ageValue, def.value) - targetValue);
+            if (diff < bestDiff) {
+              bestDiff = diff;
+              bestValue = def.value;
+            }
+          });
+          lastChildPmvActivityValue = bestValue;
+          refreshPmvMetOptions();
+          metSelect.value = bestValue;
+          refreshMetFieldSuffix();
+          return;
+        }
         const numericOptions = Array.from(metSelect.options)
           .map((o) => ({ value: o.value, num: parseFloat(o.value) }))
           .filter((o) => Number.isFinite(o.num));
@@ -18038,11 +18215,15 @@ body.pmv-mode-active .chart-card--pmv-table {
         if (found) {
           metSelect.value = String(found.num);
           metCustomInput.style.display = "none";
+          lastAdultMetOptionValue = metSelect.value;
         } else {
           metSelect.value = "custom";
           metCustomInput.style.display = "block";
           metCustomInput.value = String(value);
+          lastAdultMetOptionValue = "custom";
+          lastAdultCustomMetValue = metCustomInput.value;
         }
+        refreshMetFieldSuffix();
       }
 
       function setCloFromValue(value) {
@@ -18077,9 +18258,6 @@ body.pmv-mode-active .chart-card--pmv-table {
         if (Number.isFinite(payload.relative_humidity)) {
           rhInput.value = String(payload.relative_humidity);
         }
-        if (Number.isFinite(payload.met)) {
-          setMetFromValue(payload.met);
-        }
         if (Number.isFinite(payload.clo)) {
           setCloFromValue(payload.clo);
         }
@@ -18101,6 +18279,12 @@ body.pmv-mode-active .chart-card--pmv-table {
         }
         if (Number.isFinite(payload.age)) {
           ageInput.value = String(payload.age);
+          if (pmvChildAgeSelect && payload.age >= 8 && payload.age <= 18) {
+            pmvChildAgeSelect.value = String(Math.round(payload.age));
+          }
+        }
+        if (Number.isFinite(payload.met)) {
+          setMetFromValue(payload.met);
         }
         if (payload.sex) {
           sexSelect.value = payload.sex;
@@ -18231,9 +18415,12 @@ body.pmv-mode-active .chart-card--pmv-table {
             : parseInt(ageInput.value, 10);
           const heightVal = parseFloat(heightInput.value);
           const weightVal = parseFloat(weightInput.value);
+          const activityKey = getSelectedChildPmvActivityKey();
           payload.age = ageVal;
           payload.height = heightVal;
           payload.weight = weightVal;
+          payload.child_activity = activityKey;
+          payload.met = computeChildPmvMet(ageVal, activityKey);
 
           const heightOk = Number.isFinite(heightVal) && heightVal > 0;
           const weightOk = Number.isFinite(weightVal) && weightVal > 0;
@@ -18685,6 +18872,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           currentModel = newModel;
           saveLastModel(currentModel);
 
+          refreshPmvMetOptions();
           applyModelLayout();
           if (newModel === "jos3") {
             ensureJos3RunIfEmpty();
@@ -18941,8 +19129,15 @@ body.pmv-mode-active .chart-card--pmv-table {
       // pmv-viz-dots handle tooltip events
 
       metSelect.addEventListener("change", () => {
-        metCustomInput.style.display =
-          metSelect.value === "custom" ? "block" : "none";
+        if (shouldUseChildPmvMetLogic()) {
+          lastChildPmvActivityValue = getSelectedChildPmvActivityKey();
+          metCustomInput.style.display = "none";
+        } else {
+          lastAdultMetOptionValue = metSelect.value || "1.0";
+          metCustomInput.style.display =
+            metSelect.value === "custom" ? "block" : "none";
+        }
+        refreshMetFieldSuffix();
         saveActiveConditionFromInputs();
       });
 
@@ -18956,8 +19151,27 @@ body.pmv-mode-active .chart-card--pmv-table {
         .filter(Boolean)
         .forEach((el) => {
           el.addEventListener("input", () => {
+            if (el === metCustomInput) {
+              lastAdultCustomMetValue = metCustomInput.value || "";
+              refreshMetFieldSuffix();
+            }
             saveActiveConditionFromInputs();
           });
+        });
+
+      [ageInput, pmvChildAgeSelect]
+        .filter(Boolean)
+        .forEach((el) => {
+          const handleAgeRelatedMetRefresh = () => {
+            if (shouldUseChildPmvMetLogic()) {
+              refreshPmvMetOptions();
+            } else {
+              refreshMetFieldSuffix();
+            }
+            saveActiveConditionFromInputs();
+          };
+          el.addEventListener("input", handleAgeRelatedMetRefresh);
+          el.addEventListener("change", handleAgeRelatedMetRefresh);
         });
 
       window.addEventListener("resize", () => {
@@ -19088,6 +19302,7 @@ body.pmv-mode-active .chart-card--pmv-table {
       ensureInlineConditionsInitialized();
       bindPmvPsychrometricPreviewInputs();
       applyI18n();
+      refreshPmvMetOptions();
       updateScenarioUI();
       initBody3DHeightSync();
       updatePMVCard();
