@@ -7,3 +7,4 @@ flask-cors
 gunicorn
 numba
 joblib>=1.4.2
+scikit-learn
