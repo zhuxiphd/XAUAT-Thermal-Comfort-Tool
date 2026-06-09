@@ -14,7 +14,7 @@ PMV-E: 老年人修正 PMV 模型（comfort-Tskin + comfort-Eskin + radiation-fe
    - hl5_E = 5.595 * f_eff,E * f_cl * [(Tcl/100)^4 - (Tr/100)^4]
    - 同步用于 Tcl 迭代中的辐射项，避免只改最终输出 R 而 Tcl 仍按原式求解。
 4) 皮肤温度与皮肤蒸发散热按“偏好温度舒适稳态”拟合公式替换：
-   - 舒适皮肤温度: Tsk,E = 33.46 - 0.003 * M_E；
+   - 舒适皮肤温度: Tsk,E = 33.46 - 0.005 * M_E  (R²=0.07)；
    - 皮肤净蒸发散热: Eskin,E = 0.552 * M_E - 14.54 (R²=0.70)；
    - measured / literature / mass_g 模式仍保留为敏感性分析或缺失值兜底入口。
 5) 以偏好温度状态作为老年人舒适锚点，拟合 TL0,E；
@@ -39,7 +39,6 @@ from __future__ import annotations
 
 import csv
 import math
-import warnings
 import re
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -61,26 +60,17 @@ LATENT_HEAT_J_PER_G = 2430.0  # 约 30°C 附近水汽化潜热，J/g
 # 1. 默认 PMV-E 系数
 #    这些系数来自当前上传的老年人偏好温度实验表，并使用：
 #    - Kang 2025 18–70 岁自然/强制对流公式；
-#    - 偏好温度实验末 10 min 稳态舒适皮温拟合 Tsk,E = 33.46 - 0.003*M_E；
+#    - 偏好温度实验末 10 min 稳态舒适皮温拟合 Tsk,E = 33.46 - 0.005*M_E；
 #    - 偏好温度实验末 10 min 净蒸发散热拟合 Eskin,E = 0.552*M_E - 14.54；
 #    - 偏好温度状态作为 TSV≈0 的舒适锚点。
 # =========================================================
 @dataclass
 class PMVEConfig:
-    # TL0,E = d0 + d_M*M_Wm2
-    # 已使用 metMET课题组代谢率数据2026.6.8(2).xlsx 中
-    # “偏好温度和热反应实验”子表 A列=“老年人偏好温度实验”的 120 行数据重新拟合。
-    # 拟合时使用主模型 comfort_model：
-    # Tsk,E = 33.46 - 0.003*M_E；Eskin,E = 0.552*M_E - 14.54。
-    # 按你的最新逻辑，TL0,E 只作为代谢率 M_E 的函数，不再单独加入工况哑变量。
-    # 使用 AW 列 M(W/m2) / AX 列 met 对应的 M_E，n=120，R²=0.7781474674。
-    tl0_d0: float = -15.3129604058
-    tl0_d_M: float = 0.2559914488
-    # 保留这两个字段仅为兼容旧接口；主模型 tl0_elderly() 不再使用工况项。
-    tl0_d_walk3: float = 0.0000000000
-    tl0_d_walk5: float = 0.0000000000
-    tl0_calibrated: bool = True
-    tl0_source: str = "calibrated from elderly preferred-temperature rows; comfort_model Tsk/Eskin; TL0_E=f(M_E) only; n=120; R2=0.7634876299"
+    # TL0,E = d0 + d_M*M_Wm2 + d_walk3*I_walk3 + d_walk5*I_walk5
+    tl0_d0: float = -47.99131770
+    tl0_d_M: float = 0.91325727
+    tl0_d_walk3: float = -11.79008682
+    tl0_d_walk5: float = -19.40895752
 
     # PMV_E = slope * (TL_E - TL0_E)
     # 该斜率保留文献 Top–TSV/TL 映射的默认值；后续若有完整老年人 TSV 实测，可重新拟合。
@@ -88,10 +78,10 @@ class PMVEConfig:
 
     # 主模型：本研究老年人偏好温度实验末 10 min 舒适稳态拟合
     # M_Wm2 为老年人代谢产热，单位 W/m²。
-    # Tsk,E = 33.46 - 0.003*M_Wm2
+    # Tsk,E = 33.46 - 0.005*M_Wm2, R²=0.07
     # Eskin,E = 0.552*M_Wm2 - 14.54, R²=0.70
     tsk_pref_intercept: float = 33.46
-    tsk_pref_slope_M: float = -0.003
+    tsk_pref_slope_M: float = -0.005
     tsk_pref_r2: float = 0.07
     eskin_pref_intercept: float = -14.54
     eskin_pref_slope_M: float = 0.552
@@ -231,7 +221,7 @@ def tskin_elderly(
 
     tskin_mode：
     - "comfort_model"：默认。使用本研究老年人偏好温度实验末 10 min 舒适稳态拟合式：
-      Tsk,E = 33.46 - 0.003*M_Wm2。
+      Tsk,E = 33.46 - 0.005*M_Wm2, R²=0.07。
       该式用于网页/论文主模型，使 PMV-E 具有可泛化的公式输入。
     - "measured"：逐行使用输入的实测皮温，适合复算实验原始行。
     - "top_relation" / "xiong"：使用 Xiong 2019 Top–Tsk 稳态关系：
@@ -425,14 +415,8 @@ def hc_kang_18_70(tcl: Number, tdb: Number, vr: Number, config: PMVEConfig = DEF
 
 
 def tl0_elderly(M_Wm2: Number, activity: Optional[str] = None, config: PMVEConfig = DEFAULT_CONFIG) -> float:
-    """
-    老年人舒适热负荷锚点 TL0,E。
-
-    最新定版逻辑：TL0,E 只作为老年人代谢产热 M_E 的函数，
-    不再单独加入静坐/3 km/h/5 km/h 工况哑变量。
-    activity 参数保留是为了兼容旧调用接口，但此处不参与计算。
-    """
-    return config.tl0_d0 + config.tl0_d_M * float(M_Wm2)
+    I3, I5 = activity_dummies(activity)
+    return config.tl0_d0 + config.tl0_d_M * float(M_Wm2) + config.tl0_d_walk3 * I3 + config.tl0_d_walk5 * I5
 
 
 # =========================================================
@@ -671,14 +655,6 @@ def pmv_e_with_components(
     )
 
     TL_e = elderly["TL"]
-    if not bool(config.tl0_calibrated):
-        warnings.warn(
-            "TL0,E is using legacy placeholder coefficients. For final PMV-E results, "
-            "run fit_tl0_from_preferred_excel(..., tskin_mode='comfort_model', eskin_mode='comfort_model') "
-            "and use the returned calibrated config.",
-            RuntimeWarning,
-            stacklevel=2,
-        )
     TL0_e = tl0_elderly(M_Wm2, activity, config=config)
     dTL_e = TL_e - TL0_e
 
@@ -701,8 +677,6 @@ def pmv_e_with_components(
         "ppd_e_fanger": float(ppd_fanger(pmv_e)),
         "TL_e": float(TL_e),
         "TL0_e": float(TL0_e),
-        "TL0_calibrated": bool(config.tl0_calibrated),
-        "TL0_source": str(config.tl0_source),
         "dTL_e": float(dTL_e),
         "tsk_e": float(tsk_e),
         "tskin_mode_used": tskin_mode,
@@ -835,141 +809,43 @@ def read_xlsx_named_sheets(xlsx_path: Union[str, Path]) -> Dict[str, List[Dict[s
     return out
 
 
-
-def _first_existing(row: Dict[str, object], keys, default=None):
-    """按候选列名顺序取第一个非空值，兼容不同版本 Excel 列名。"""
-    for key in keys:
-        if key in row and row.get(key) not in (None, ""):
-            return row.get(key)
-    return default
-
-
 def _num(row: Dict[str, object], key: str, default: Optional[float] = None) -> Optional[float]:
     v = finite_or_none(row.get(key))
     return default if v is None else v
-
-
-def _num_any(row: Dict[str, object], keys, default: Optional[float] = None) -> Optional[float]:
-    for key in keys:
-        v = finite_or_none(row.get(key))
-        if v is not None:
-            return v
-    return default
-
-
-def _height_m_from_row(row: Dict[str, object]) -> Optional[float]:
-    h_m = _num_any(row, ["Height（m）", "Height(m)", "height_m", "身高m", "身高（m）"])
-    if h_m is not None:
-        return normalize_height_m(h_m)
-    h_cm = _num_any(row, ["身高cm", "身高(cm)", "Height（cm）", "Height(cm)"])
-    if h_cm is not None:
-        return normalize_height_m(h_cm)
-    return None
-
-
-def _weight_kg_from_row(row: Dict[str, object]) -> Optional[float]:
-    return _num_any(row, ["Weight（kg）", "Weight(kg)", "weight_kg", "体重kg", "体重(kg)", "体重（kg）"])
-
-
-def _activity_from_row(row: Dict[str, object]) -> str:
-    return str(_first_existing(row, ["Activity", "活动", "测试方法"], "") or "")
-
-
-def _is_elderly_row(row: Dict[str, object]) -> bool:
-    group = str(_first_existing(row, ["Population groups", "分组", "年龄段"], "") or "")
-    return "老年" in group or ">60" in group or "elder" in group.lower()
-
-
-def _has_preferred_temperature(row: Dict[str, object]) -> bool:
-    return _num_any(row, ["偏好温度(℃)", "偏好空气温度Ta_pref(℃)tdb_used", "Ta_pref", "Tpref_C"]) is not None
-
-
-def _is_preferred_experiment_row(row: Dict[str, object]) -> bool:
-    """兼容两类 Excel：
-    1) 合并表：有“实验波次=老年人偏好温度实验”；
-    2) 全年龄段汇总表：无实验波次，但有“分组=老年人”和偏好温度列。
-    """
-    if not _is_elderly_row(row):
-        return False
-    wave = str(row.get("实验波次") or "")
-    if wave:
-        return "偏好温度" in wave and "老年" in wave
-    return _has_preferred_temperature(row)
-
-
-def _extract_preferred_row_values(row: Dict[str, object]) -> Optional[Dict[str, object]]:
-    """把不同 Excel 版本的列名统一为 PMV-E 计算需要的字段。"""
-    top = _num_any(row, ["偏好温度(℃)", "偏好空气温度Ta_pref(℃)tdb_used", "Ta_pref", "Tpref_C"])
-    met = _num_any(row, ["met", "MET"])
-    # 部分表只有代谢率 W/m²，没有 met，则反算 met。
-    M_wm2 = _num_any(row, ["M_Wm2", "M(W/m2)", "代谢率（W/m2）", "代谢率(W/m2)"])
-    if met is None and M_wm2 is not None:
-        met = M_wm2 / MET_TO_W_M2
-    if top is None or met is None:
-        return None
-    if not (10.0 <= top <= 40.0) or not (0.3 <= met <= 8.0):
-        return None
-
-    tr = _num_any(row, ["辐射温度", "平均辐射温度Tr_used", "tr_C"], top) or top
-    rh = _num_any(row, ["相对湿度RH_used", "rh_pct", "RH"], 50.0) or 50.0
-    vr = _num_any(row, ["相对风速vr", "vr_m_s", "相对风速", "Va"], 0.1) or 0.1
-    clo = _num_any(row, ["服装热阻(clo)", "服装热阻clo", "clo"], 0.6) or 0.6
-    wme = _num_any(row, ["外部做功wme", "wme"], 0.0) or 0.0
-    tsk = _num_any(row, ["皮肤温度(℃)", "Tskin_input_C", "Tskin_used_C"])
-    esk = _num_any(row, ["净蒸发散热", "Eskin_input", "Eskin_used_Wm2"])
-    age = _num_any(row, ["Age", "年龄"])
-    height = _height_m_from_row(row)
-    weight = _weight_kg_from_row(row)
-    activity = _activity_from_row(row)
-
-    return {
-        "top": float(top),
-        "tr": float(tr),
-        "rh": float(rh),
-        "vr": float(vr),
-        "clo": float(clo),
-        "wme": float(wme),
-        "met": float(met),
-        "M_Wm2_input": None if M_wm2 is None else float(M_wm2),
-        "tsk": tsk,
-        "esk": esk,
-        "age": age,
-        "height": height,
-        "weight": weight,
-        "activity": activity,
-    }
 
 
 # =========================================================
 # 6. 批量计算和 TL0 重新拟合
 # =========================================================
 def iter_elderly_preferred_records(xlsx_path: Union[str, Path]) -> List[Dict[str, object]]:
-    """读取老年人偏好温度记录，兼容当前课题组合并表和全龄段汇总表。"""
     sheets = read_xlsx_named_sheets(xlsx_path)
-    records: List[Dict[str, object]] = []
-    for sheet_name, rows in sheets.items():
-        if not ("偏好" in sheet_name or "热反应" in sheet_name or "数据汇总" in sheet_name):
+    sheet_name = None
+    for name in sheets:
+        if "偏好温度" in name or "热反应" in name:
+            sheet_name = name
+            break
+    if sheet_name is None:
+        raise ValueError("未找到包含“偏好温度/热反应”的工作表。")
+
+    records = []
+    for row in sheets[sheet_name]:
+        if row.get("Population groups") != "老年人>60岁":
             continue
-        for row in rows:
-            if not _is_preferred_experiment_row(row):
-                continue
-            vals = _extract_preferred_row_values(row)
-            if vals is None:
-                continue
-            row2 = dict(row)
-            row2["__sheet_name"] = sheet_name
-            records.append(row2)
-    if not records:
-        raise ValueError(
-            "未找到有效的老年人偏好温度记录。请确认表格包含老年人分组、偏好温度、met或M(W/m2)等列。"
-        )
+        # 只使用本研究老年人偏好温度实验，不混入文献图像数字化数据。
+        if row.get("实验波次") != "老年人偏好温度实验":
+            continue
+        top = _num(row, "偏好温度(℃)")
+        met = _num(row, "met")
+        if top is None or met is None or not (10 <= top <= 40) or not (0.3 <= met <= 7):
+            continue
+        records.append(row)
     return records
 
 
 def fit_tl0_from_preferred_excel(
     xlsx_path: Union[str, Path],
     base_config: PMVEConfig = DEFAULT_CONFIG,
-    trim_quantile: float = 0.0,
+    trim_quantile: float = 0.02,
     eskin_column: str = "净蒸发散热",
     eskin_unit: str = "W/m2",
     eskin_mode: str = "comfort_model",
@@ -977,47 +853,47 @@ def fit_tl0_from_preferred_excel(
 ) -> Tuple[PMVEConfig, Dict[str, float]]:
     """
     用老年人偏好温度实验重新拟合 TL0,E。
-
-    默认使用主模型：
-    - Tsk,E = 33.46 - 0.003*M_E；
-    - Eskin,E = 0.552*M_E - 14.54。
-
-    拟合目标：在偏好温度舒适状态下，使 TL0,E 拟合由新热平衡算出的 TL_E。
-    最新定版逻辑：TL0,E = d0 + d_M*M_E，只用代谢率作为自变量；
-    不再加入 walk3 / walk5 工况哑变量。
+    默认使用偏好温度实验拟合得到的舒适皮温/净蒸发公式。
+    若设 tskin_mode="measured" 或 eskin_mode="measured"，则逐行使用 Excel 实测值。
     """
     if np is None:
         raise ImportError("fit_tl0_from_preferred_excel 需要 numpy。")
 
     records = iter_elderly_preferred_records(xlsx_path)
     data = []
-    skipped = 0
     for row in records:
-        vals = _extract_preferred_row_values(row)
-        if vals is None:
-            skipped += 1
+        top = _num(row, "偏好温度(℃)")
+        tr = _num(row, "辐射温度", top) or top
+        rh = _num(row, "相对湿度RH_used", 50.0) or 50.0
+        vr = _num(row, "相对风速vr", 0.1) or 0.1
+        clo = _num(row, "服装热阻(clo)", 0.6) or 0.6
+        wme = _num(row, "外部做功wme", 0.0) or 0.0
+        met = _num(row, "met")
+        tsk = _num(row, "皮肤温度(℃)")
+        height = _num(row, "Height（m）")
+        weight = _num(row, "Weight（kg）")
+        esk = _num(row, eskin_column)
+        if top is None or met is None:
             continue
-        if str(tskin_mode).lower().strip() in {"measured", "row_measured"} and vals["tsk"] is None:
-            skipped += 1
+        if str(tskin_mode).lower().strip() in {"measured", "row_measured"} and tsk is None:
             continue
-        if str(eskin_mode).lower().strip() in {"measured", "row_measured", "mass_g", "g", "g_10min"} and vals["esk"] is None:
-            skipped += 1
+        if str(eskin_mode).lower().strip() in {"measured", "row_measured", "mass_g", "g", "g_10min"} and esk is None:
             continue
         res = pmv_e_with_components(
-            tdb=vals["top"],
-            tr=vals["tr"],
-            vr=vals["vr"],
-            rh=vals["rh"],
-            met=vals["met"],
-            clo=vals["clo"],
-            wme=vals["wme"],
-            activity=vals["activity"],
-            age=vals["age"],
-            height=vals["height"],
-            weight=vals["weight"],
-            tskin=vals["tsk"],
+            tdb=top,
+            tr=tr,
+            vr=vr,
+            rh=rh,
+            met=met,
+            clo=clo,
+            wme=wme,
+            activity=str(row.get("Activity") or ""),
+            age=_num(row, "Age"),
+            height=height,
+            weight=weight,
+            tskin=tsk,
             tskin_mode=tskin_mode,
-            eskin=vals["esk"],
+            eskin=esk,
             eskin_unit=eskin_unit,
             eskin_mode=eskin_mode,
             config=base_config,
@@ -1025,7 +901,7 @@ def fit_tl0_from_preferred_excel(
         data.append({
             "TL": res["TL_e"],
             "M": res["M_Wm2"],
-            "activity": vals["activity"],
+            "activity": str(row.get("Activity") or ""),
         })
 
     if not data:
@@ -1037,13 +913,13 @@ def fit_tl0_from_preferred_excel(
         lo, hi = np.quantile(TL, [trim_quantile, 1 - trim_quantile])
         use = (TL >= lo) & (TL <= hi)
 
-    # 最新定版：只用 M_E 作为 TL0,E 的自变量，不再加入工况项。
     X = []
     y = []
     for flag, d in zip(use, data):
         if not flag:
             continue
-        X.append([1.0, d["M"]])
+        I3, I5 = activity_dummies(d["activity"])
+        X.append([1.0, d["M"], I3, I5])
         y.append(d["TL"])
     X = np.asarray(X, dtype=float)
     y = np.asarray(y, dtype=float)
@@ -1055,38 +931,19 @@ def fit_tl0_from_preferred_excel(
         base_config,
         tl0_d0=float(coef[0]),
         tl0_d_M=float(coef[1]),
-        tl0_d_walk3=0.0,
-        tl0_d_walk5=0.0,
-        tl0_calibrated=True,
-        tl0_source=f"refit_tl0_from_preferred_excel_M_only(tskin_mode={tskin_mode}, eskin_mode={eskin_mode}, file={Path(xlsx_path).name})",
+        tl0_d_walk3=float(coef[2]),
+        tl0_d_walk5=float(coef[3]),
     )
     info = {
-        "n_total": float(len(data) + skipped),
+        "n_total": float(len(data)),
         "n_used": float(len(y)),
-        "n_skipped": float(skipped),
         "r2": float(r2),
         "tl0_d0": float(coef[0]),
         "tl0_d_M": float(coef[1]),
-        "tl0_d_walk3": 0.0,
-        "tl0_d_walk5": 0.0,
-        "tl0_formula": f"TL0_E = {coef[0]:.8f} + {coef[1]:.8f}*M_E",
-        "tskin_mode": str(tskin_mode),
-        "eskin_mode": str(eskin_mode),
-        "tl0_model": "M_only",
+        "tl0_d_walk3": float(coef[2]),
+        "tl0_d_walk5": float(coef[3]),
     }
     return new_config, info
-
-
-def format_pmve_config_block(config: PMVEConfig) -> str:
-    """输出可粘贴回 PMVEConfig 的 TL0 系数块。"""
-    return (
-        f"tl0_d0: float = {config.tl0_d0:.10f}\n"
-        f"tl0_d_M: float = {config.tl0_d_M:.10f}\n"
-        f"tl0_d_walk3: float = {config.tl0_d_walk3:.10f}\n"
-        f"tl0_d_walk5: float = {config.tl0_d_walk5:.10f}\n"
-        f"tl0_calibrated: bool = True\n"
-        f"tl0_source: str = {config.tl0_source!r}\n"
-    )
 
 
 def compute_elderly_preferred_rows(
@@ -1099,7 +956,10 @@ def compute_elderly_preferred_rows(
     eskin_mode: str = "comfort_model",
     tskin_mode: str = "comfort_model",
 ) -> List[Dict[str, object]]:
-    """批量读取老年人偏好温度实验并计算 PMV_original 和 PMV-E。"""
+    """批量读取老年人偏好温度实验并计算 PMV_original 和 PMV-E。
+    默认采用舒适皮温模型 Tsk,E = 33.46 - 0.005*M_E，
+    以及净蒸发模型 Eskin,E = 0.552*M_E - 14.54。
+    """
     if refit_tl0:
         config, info = fit_tl0_from_preferred_excel(
             input_xlsx,
@@ -1110,56 +970,64 @@ def compute_elderly_preferred_rows(
             tskin_mode=tskin_mode,
         )
         print("Refitted TL0,E:", info)
-        print("\nPaste this TL0 block back into PMVEConfig if you want fixed calibrated defaults:\n")
-        print(format_pmve_config_block(config))
 
     records = iter_elderly_preferred_records(input_xlsx)
     out_rows: List[Dict[str, object]] = []
     for row in records:
-        vals = _extract_preferred_row_values(row)
-        if vals is None:
+        top = _num(row, "偏好温度(℃)")
+        tr = _num(row, "辐射温度", top) or top
+        rh = _num(row, "相对湿度RH_used", 50.0) or 50.0
+        vr = _num(row, "相对风速vr", 0.1) or 0.1
+        clo = _num(row, "服装热阻(clo)", 0.6) or 0.6
+        wme = _num(row, "外部做功wme", 0.0) or 0.0
+        met = _num(row, "met")
+        tsk = _num(row, "皮肤温度(℃)")
+        age = _num(row, "Age")
+        height = _num(row, "Height（m）")
+        weight = _num(row, "Weight（kg）")
+        esk = _num(row, eskin_column)
+        if top is None or met is None:
             continue
         res = pmv_e_with_components(
-            tdb=vals["top"],
-            tr=vals["tr"],
-            vr=vals["vr"],
-            rh=vals["rh"],
-            met=vals["met"],
-            clo=vals["clo"],
-            wme=vals["wme"],
-            activity=vals["activity"],
-            age=vals["age"],
-            height=vals["height"],
-            weight=vals["weight"],
-            tskin=vals["tsk"],
+            tdb=top,
+            tr=tr,
+            vr=vr,
+            rh=rh,
+            met=met,
+            clo=clo,
+            wme=wme,
+            activity=str(row.get("Activity") or ""),
+            age=age,
+            height=height,
+            weight=weight,
+            tskin=tsk,
             tskin_mode=tskin_mode,
-            eskin=vals["esk"],
+            eskin=esk,
             eskin_unit=eskin_unit,
             eskin_mode=eskin_mode,
             config=config,
         )
         out_rows.append({
-            "sheet": row.get("__sheet_name"),
-            "ID": row.get("ID") or row.get("序号"),
+            "ID": row.get("ID"),
             "姓名": row.get("姓名"),
-            "Age": vals["age"],
-            "Gender_1M2F": row.get("Gender（1男2女）") or row.get("Gender（1男2女）_0") or row.get("性别"),
-            "Activity": vals["activity"],
+            "Age": age,
+            "Gender_1M2F": row.get("Gender（1男2女）") or row.get("Gender（1男2女）_0"),
+            "Activity": row.get("Activity"),
             "activity_group": res["activity_group"],
-            "Tpref_C": vals["top"],
-            "tr_C": vals["tr"],
-            "rh_pct": vals["rh"],
-            "vr_m_s": vals["vr"],
-            "clo": vals["clo"],
-            "met": vals["met"],
+            "Tpref_C": top,
+            "tr_C": tr,
+            "rh_pct": rh,
+            "vr_m_s": vr,
+            "clo": clo,
+            "met": met,
             "M_Wm2": res["M_Wm2"],
-            "height_m": vals["height"],
-            "weight_kg": vals["weight"],
-            "BSA_m2_calc": bsa_m2(vals["height"], vals["weight"]),
-            "Tskin_input_C": vals["tsk"],
+            "height_m": height,
+            "weight_kg": weight,
+            "BSA_m2_calc": bsa_m2(height, weight),
+            "Tskin_input_C": tsk,
             "Tskin_used_C": res["tsk_e"],
             "Tskin_mode": res["tskin_mode_used"],
-            "Eskin_input": vals["esk"],
+            "Eskin_input": esk,
             "Eskin_unit": eskin_unit,
             "Eskin_mode": eskin_mode,
             "Eskin_used_Wm2": res["eskin_e"],
@@ -1170,8 +1038,6 @@ def compute_elderly_preferred_rows(
             "TL_original": res["TL_original"],
             "TL_E": res["TL_e"],
             "TL0_E": res["TL0_e"],
-            "TL0_calibrated": res["TL0_calibrated"],
-            "TL0_source": res["TL0_source"],
             "dTL_E": res["dTL_e"],
             "hc_original": res["hc_original"],
             "hcn_original": res["hcn_original"],
@@ -1197,7 +1063,7 @@ def compute_elderly_preferred_rows(
 
 
 if __name__ == "__main__":
-    # 单点示例：默认使用舒适皮温/净蒸发散热拟合公式，并使用已校准 TL0,E
+    # 单点示例：eskin 直接使用“净蒸发散热”W/m²
     sample = pmv_e_with_components(
         tdb=26.0,
         tr=26.0,
@@ -1219,16 +1085,15 @@ if __name__ == "__main__":
         print(f"{k}: {sample[k]:.4f}")
 
     # 批量示例：读取当前目录下的课题组 Excel，重新拟合 TL0,E 并输出 CSV
-    default_xlsx = Path("/mnt/data/metMET课题组代谢率数据2026.6.8(2).xlsx")
+    default_xlsx = Path("/mnt/data/metMET课题组代谢率数据2026.6.8(1).xlsx")
     if default_xlsx.exists():
-        out_csv = Path("/mnt/data/PMV_E_elderly_results_Monly_TL0.csv")
+        out_csv = Path("/mnt/data/PMV_E_elderly_results_latest.csv")
         rows = compute_elderly_preferred_rows(
             default_xlsx,
             output_csv=out_csv,
             refit_tl0=True,
             eskin_column="净蒸发散热",
             eskin_unit="W/m2",
-            tskin_mode="comfort_model",
-            eskin_mode="comfort_model",
+            eskin_mode="literature",
         )
         print(f"\nSaved {len(rows)} rows to {out_csv}")
