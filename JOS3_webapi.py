@@ -20,13 +20,37 @@ except ImportError as err:
     ) from err
 
 from PMV import pmv_ppd, pmv_with_components
+from met_prediction_function import (
+    list_available_activities,
+    load_model_bundle,
+    predict_met,
+)
 
 PMV_C_PATH = BASE_DIR / "PMV-C.py"
 _pmv_c_spec = importlib.util.spec_from_file_location("pmv_c", str(PMV_C_PATH))
 pmv_c = None
 if _pmv_c_spec and _pmv_c_spec.loader:
     pmv_c = importlib.util.module_from_spec(_pmv_c_spec)
+    sys.modules[_pmv_c_spec.name] = pmv_c
     _pmv_c_spec.loader.exec_module(pmv_c)
+
+PMV_E_PATH = BASE_DIR / "PMV-E.py"
+_pmv_e_spec = importlib.util.spec_from_file_location("pmv_e", str(PMV_E_PATH))
+pmv_e = None
+if _pmv_e_spec and _pmv_e_spec.loader:
+    pmv_e = importlib.util.module_from_spec(_pmv_e_spec)
+    sys.modules[_pmv_e_spec.name] = pmv_e
+    _pmv_e_spec.loader.exec_module(pmv_e)
+
+MET_MODEL_PATH = BASE_DIR / "all_final_m5_gam_models.joblib"
+_met_model_bundle = None
+
+
+def _get_met_model_bundle():
+    global _met_model_bundle
+    if _met_model_bundle is None:
+        _met_model_bundle = load_model_bundle(MET_MODEL_PATH)
+    return _met_model_bundle
 from SET import set_tmp  # SET 计算函数
 from two_node_excel import calculate_comfort_parameters
 import numpy as np
@@ -109,16 +133,20 @@ class PMVInput(BaseModel):
     tr: Optional[float] = None  # 平均辐射温度，可不填
     vel: float              # 风速
     rh: float               # 相对湿度
-    met: float              # 代谢率
+    met: Optional[float] = None  # 代谢率；PMV 模式可由 activity_type 自动预测
     clo: float              # 服装
     wme: float = 0.0        # 外部功（met），默认 0
     age: Optional[float] = None
     height: Optional[float] = None
     weight: Optional[float] = None
+    sex: Optional[Union[int, float, str]] = None
+    activity_type: Optional[str] = None
     child_activity: Optional[
         Literal["seated_rest", "reading_writing", "standing_rest", "walk_3kmh"]
     ] = None
-    variant: Literal["adult", "child"] = "adult"
+    elder_activity: Optional[str] = None
+    eskin_mode: Optional[Literal["literature", "measured", "mass_g", "excel_model", "model", "fanger"]] = None
+    variant: Literal["adult", "child", "elder"] = "adult"
 
 
 class PMVOutput(BaseModel):
@@ -141,6 +169,83 @@ class PMVOutput(BaseModel):
     e_res: Optional[float] = None
     e_rsw: Optional[float] = None
     e_diff: Optional[float] = None
+
+
+class MetPredictInput(BaseModel):
+    activity_type: str
+    age: float
+    sex: Union[int, float, str] = "male"
+    height: float = Field(..., description="Body height [m]; values > 3 are treated as cm")
+    weight: float = Field(..., description="Body weight [kg]")
+
+
+class MetPredictOutput(BaseModel):
+    ok: bool
+    activity_type: str
+    predicted_met: float
+    predicted_W_m2: float
+    age: float
+    sex: int
+    sex_label: str
+    height_m: Optional[float] = None
+    weight_kg: Optional[float] = None
+    bmi: float
+    ffm_alsallami: float
+    bsa_m2_dubois: Optional[float] = None
+    approx_PI95_lower_met: float
+    approx_PI95_upper_met: float
+    cv_rmse_used_for_PI: float
+
+
+@app.get("/api/met_activities")
+def api_met_activities():
+    """返回代谢率预测模型支持的活动状态。"""
+    bundle = _get_met_model_bundle()
+    return {"ok": True, "activities": list_available_activities(bundle)}
+
+
+@app.post("/api/met_predict", response_model=MetPredictOutput)
+def api_met_predict(payload: MetPredictInput):
+    """根据活动状态、年龄、性别、身高、体重预测代谢率。"""
+    height = float(payload.height)
+    if height > 3.0:
+        height = height / 100.0
+    if height <= 0 or payload.weight <= 0:
+        raise HTTPException(status_code=400, detail="身高和体重必须为正数")
+    try:
+        result = predict_met(
+            bundle=_get_met_model_bundle(),
+            activity_type=payload.activity_type,
+            age=payload.age,
+            sex=payload.sex,
+            height_m=height,
+            weight_kg=payload.weight,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return MetPredictOutput(ok=True, **result)
+
+
+def _resolve_pmv_met(payload: PMVInput) -> float:
+    if payload.activity_type:
+        if payload.age is None or payload.height is None or payload.weight is None or payload.sex is None:
+            raise HTTPException(
+                status_code=400,
+                detail="使用活动状态预测代谢率时必须提供 age、sex、height、weight",
+            )
+        result = api_met_predict(
+            MetPredictInput(
+                activity_type=payload.activity_type,
+                age=payload.age,
+                sex=payload.sex,
+                height=payload.height,
+                weight=payload.weight,
+            )
+        )
+        return float(result.predicted_met)
+    if payload.met is None:
+        raise HTTPException(status_code=400, detail="必须提供 met 或 activity_type")
+    return float(payload.met)
 
 
 def _build_pmv_output(res: Dict[str, float]) -> PMVOutput:
@@ -171,12 +276,13 @@ def _build_pmv_output(res: Dict[str, float]) -> PMVOutput:
 def api_pmv_adult(payload: PMVInput):
     """严格调用 PMV.py 进行成人 PMV 计算。"""
     tr = payload.tr if payload.tr is not None else payload.ta
+    met = _resolve_pmv_met(payload)
     res = pmv_with_components(
         payload.ta,   # tdb
         tr,           # tr
         payload.vel,  # vr
         payload.rh,   # rh
-        payload.met,  # met
+        met,          # met
         payload.clo,  # clo
         payload.wme,  # wme
     )
@@ -199,27 +305,91 @@ def api_pmv_child(payload: PMVInput):
     if payload.height is None or payload.weight is None:
         raise HTTPException(status_code=400, detail="儿童 PMV 需要提供身高与体重")
     tr = payload.tr if payload.tr is not None else payload.ta
+    met = _resolve_pmv_met(payload)
     res = pmv_c.pmv_with_components_auto(
         payload.ta,   # tdb
         tr,           # tr
         payload.vel,  # vr
         payload.rh,   # rh
-        payload.met,  # met
+        met,          # met
         payload.clo,  # clo
         payload.wme,  # wme
         age=payload.age,
         height=payload.height,
         weight=payload.weight,
-        child_activity=payload.child_activity,
+        child_activity=None if payload.activity_type else payload.child_activity,
     )
     return _build_pmv_output(res)
 
 
+def _build_pmv_elder_output(res: Dict[str, float]) -> PMVOutput:
+    hl1 = float(res["hl1_e"])
+    hl2 = float(res["hl2_e"])
+    hl3 = float(res["hl3_e"])
+    hl4 = float(res["hl4_e"])
+    hl5 = float(res["hl5_e"])
+    hl6 = float(res["hl6_e"])
+    q_sensible = hl5 + hl6
+    c_res = hl4
+    e_skin = hl1 + hl2
+    e_res = hl3
+    return PMVOutput(
+        ok=bool(res.get("ok", True)),
+        pmv=res["pmv_e"],
+        ppd=res["ppd_e_fanger"],
+        hl1=hl1,
+        hl2=hl2,
+        hl3=hl3,
+        hl4=hl4,
+        hl5=hl5,
+        hl6=hl6,
+        mw=res.get("mw", res.get("M_Wm2")),
+        q_total=hl1 + hl2 + hl3 + hl4 + hl5 + hl6,
+        q_sens=q_sensible + c_res,
+        q_sensible=q_sensible,
+        c_res=c_res,
+        q_lat=e_skin + e_res,
+        e_skin=e_skin,
+        e_res=e_res,
+        e_rsw=hl2,
+        e_diff=hl1,
+    )
+
+
+@app.post("/api/pmv_elder", response_model=PMVOutput)
+def api_pmv_elder(payload: PMVInput):
+    """严格调用 PMV-E.py 进行老年人 PMV 修正计算。"""
+    if pmv_e is None:
+        raise HTTPException(status_code=500, detail="PMV-E 模块未加载，无法计算老人模式")
+    elder_age = 70.0 if payload.age is None else float(payload.age)
+    if elder_age < 60.0:
+        raise HTTPException(status_code=400, detail="PMV-E 老年人模型要求年龄 age >= 60")
+    tr = payload.tr if payload.tr is not None else payload.ta
+    met = _resolve_pmv_met(payload)
+    res = pmv_e.pmv_e_with_components(
+        tdb=payload.ta,
+        tr=tr,
+        vr=payload.vel,
+        rh=payload.rh,
+        met=met,
+        clo=payload.clo,
+        wme=payload.wme,
+        activity=payload.elder_activity or "静坐",
+        age=elder_age,
+        height=payload.height if payload.height is not None else 1.65,
+        weight=payload.weight if payload.weight is not None else 65.0,
+        eskin_mode=payload.eskin_mode or "literature",
+    )
+    return _build_pmv_elder_output(res)
+
+
 @app.post("/api/pmv", response_model=PMVOutput)
 def api_pmv(payload: PMVInput):
-    """兼容旧接口：根据 variant 路由到成人/儿童计算。"""
+    """兼容旧接口：根据 variant 路由到成人/儿童/老人计算。"""
     if payload.variant == "child":
         return api_pmv_child(payload)
+    if payload.variant == "elder":
+        return api_pmv_elder(payload)
     return api_pmv_adult(payload)
 
 
