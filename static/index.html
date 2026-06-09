@@ -1204,7 +1204,7 @@ body.pmv-mode-active .chart-card--pmv-table {
     /* 让下拉框宽度刚好容纳最长文本，而不是占满整行 */
     #model-select {
       width: auto;
-      min-width: 220px;   /* 能完整容纳“JOS-3 体温调节模型” */
+      min-width: 220px;   /* 能完整容纳“多节点模型” */
       max-width: 260px;
       flex: 0 0 auto;
     }
@@ -1644,6 +1644,20 @@ body.pmv-mode-active .chart-card--pmv-table {
 
     .two-node-table tbody tr.two-node-row-selected {
       background-color: rgba(250, 204, 21, 0.25); /* 柔和的黄色高亮 */
+    }
+
+    .two-node-table th.pmv-column-selected,
+    .two-node-table td.pmv-column-selected {
+      background-color: rgba(37, 99, 235, 0.13);
+      box-shadow: inset 0 0 0 9999px rgba(37, 99, 235, 0.04);
+    }
+
+    .two-node-table th.pmv-column-selected {
+      color: #1d4ed8;
+      font-weight: 700;
+      box-shadow:
+        inset 0 -2px 0 rgba(37, 99, 235, 0.72),
+        inset 0 0 0 9999px rgba(37, 99, 235, 0.04);
     }
 
     /* 数值列统一居中，便于纵向比较 */
@@ -3070,10 +3084,12 @@ body.pmv-mode-active .chart-card--pmv-table {
     }
 
     .pmv-viz-dot.is-selected {
+      z-index: 3;
       box-shadow:
         0 0 0 3px rgba(255, 255, 255, 0.96),
-        0 0 0 6px rgba(255, 255, 255, 0.34),
-        0 8px 18px rgba(15, 23, 42, 0.3);
+        0 0 0 7px rgba(37, 99, 235, 0.72),
+        0 0 0 11px rgba(37, 99, 235, 0.18),
+        0 10px 22px rgba(15, 23, 42, 0.34);
     }
 
     .pmv-viz-dot--child {
@@ -4315,6 +4331,105 @@ body.pmv-mode-active .chart-card--pmv-table {
       text-align: left;
     }
 
+    body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+      font-size: 0.66rem;
+      line-height: 1.04;
+    }
+
+    body.pmv-mode-active .pmv-table-condensed thead th,
+    body.pmv-mode-active .pmv-table-condensed tbody td {
+      padding: 1px 4px;
+      line-height: 1.04;
+    }
+
+    body.pmv-mode-active .pmv-table-condensed tbody tr:first-child td,
+    body.pmv-mode-active .pmv-table-condensed tbody tr:last-child td {
+      height: 1px !important;
+      padding: 0 !important;
+      line-height: 1 !important;
+    }
+
+    body.pmv-mode-active .pmv-table-condensed .pmv-group-cell {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      line-height: 1.02;
+      font-size: 0.66rem;
+    }
+
+    body.pmv-mode-active .pmv-col-header-label {
+      font-size: 0.66rem;
+      line-height: 1;
+    }
+
+    body.pmv-mode-active .pmv-col-header-actions {
+      margin-top: 0;
+    }
+
+    body.pmv-mode-active .pmv-col-btn {
+      width: 16px;
+      height: 16px;
+      font-size: 0.62rem;
+      line-height: 1;
+    }
+
+    body.pmv-mode-active .pmv-split {
+      gap: 8px;
+    }
+
+    body.pmv-mode-active .pmv-split-right-column {
+      gap: 6px;
+    }
+
+    body.pmv-mode-active .pmv-split-right {
+      padding: 8px 10px;
+    }
+
+    body.pmv-mode-active .pmv-psych-card {
+      margin-top: 0;
+      padding: 8px 10px 7px;
+      min-height: 0 !important;
+    }
+
+    body.pmv-mode-active .pmv-psych-header {
+      margin-bottom: 4px;
+      gap: 4px;
+    }
+
+    body.pmv-mode-active .pmv-psych-body {
+      padding: 6px 7px 4px;
+    }
+
+    body.pmv-mode-active .pmv-psych-note {
+      margin-top: 2px;
+      white-space: normal;
+      line-height: 1.18;
+      font-size: 0.62rem;
+    }
+
+    body.pmv-mode-active #pmvPsychChartSvg {
+      height: 100% !important;
+      min-height: 390px;
+    }
+
+    @media (min-width: 1800px) {
+      body.pmv-mode-active .pmv-table-condensed table.two-node-table {
+        font-size: 0.72rem;
+        line-height: 1;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed thead th,
+      body.pmv-mode-active .pmv-table-condensed tbody td {
+        padding: 0 4px;
+        line-height: 1;
+      }
+
+      body.pmv-mode-active .pmv-table-condensed .pmv-group-cell,
+      body.pmv-mode-active .pmv-col-header-label {
+        font-size: 0.7rem;
+        line-height: 1;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -4339,8 +4454,8 @@ body.pmv-mode-active .chart-card--pmv-table {
             <label for="model-select" data-i18n-key="field.model.label">热舒适模型</label>
           <div class="model-select-row">
             <select id="model-select">
-              <option value="jos3" selected data-i18n-key="model.jos3">JOS-3 体温调节模型</option>
-              <option value="pmv" data-i18n-key="model.pmv">Fanger PMV 模型</option>
+              <option value="jos3" selected data-i18n-key="model.jos3">多节点模型</option>
+              <option value="pmv" data-i18n-key="model.pmv">PMV模型</option>
               <option value="two-node" data-i18n-key="model.twoNode">两节点模型</option>
               <!-- 如果你以后还想做 SET，可以再加一项，但目前不调用 SET.py -->
               <!-- <option value="set">SET 模型</option> -->
@@ -4398,7 +4513,7 @@ body.pmv-mode-active .chart-card--pmv-table {
                 <span class="pmv-example-card-media">
                   <img src="/static/elder-svg.svg?v=2" alt="elder" />
                 </span>
-                <span class="quick-example-btn-label pmv-example-card-label" data-i18n-key="button.pmvElder"><span class="pmv-label-main">PMV 老人</span><small class="pmv-coming-soon">（即将上线）</small></span>
+                <span class="quick-example-btn-label pmv-example-card-label" data-i18n-key="button.pmvElder">PMV 老人</span>
               </button>
             </div>
           </div>
@@ -4476,7 +4591,7 @@ body.pmv-mode-active .chart-card--pmv-table {
 
           <!-- met + 自定义 -->
           <div class="field" id="field-met">
-            <label for="met-select" data-i18n-key="field.met.label">代谢率（met）</label>
+            <label for="met-select" data-i18n-key="field.met.label">代谢率 (met)</label>
           <select id="met-select">
               <option value="1.0" data-i18n-key="met.option.resting">安静坐着（1.0 met）</option>
               <option value="1.2" data-i18n-key="met.option.lightOffice">轻度办公（1.2 met）</option>
@@ -4492,6 +4607,18 @@ body.pmv-mode-active .chart-card--pmv-table {
               style="margin-top:4px; display:none;"
             />
             <div class="field-suffix" data-i18n-key="field.met.suffix">1.0 met ≈ 58.15 W/m²</div>
+          </div>
+
+          <div class="field" id="field-elder-activity" style="display:none;">
+            <label for="elder-activity-select" data-i18n-key="field.elderActivity.label">老年人活动状态</label>
+            <select id="elder-activity-select">
+              <option value="seated" selected data-i18n-key="elderActivity.option.seated">静坐</option>
+              <option value="walk3" data-i18n-key="elderActivity.option.walk3">3 km/h 步行</option>
+              <option value="walk5" data-i18n-key="elderActivity.option.walk5">5 km/h 步行</option>
+            </select>
+            <div class="field-suffix" data-i18n-key="field.elderActivity.suffix">
+              PMV-E 的 TL0,E 标定按活动状态区分。
+            </div>
           </div>
 
           <!-- clo + 自定义 -->
@@ -5370,7 +5497,7 @@ body.pmv-mode-active .chart-card--pmv-table {
       let currentLang = "zh";
       let currentModel = "jos3"; // 默认 JOS-3
       let currentPmvVariant = "adult"; // PMV adult | child | elder
-      const PMV_ELDER_COMING_SOON = true;
+      const PMV_ELDER_COMING_SOON = false;
       let lastChildPMV = null;
       let lastAdultPMV = null;
       let lastElderPMV = null;
@@ -5379,6 +5506,7 @@ body.pmv-mode-active .chart-card--pmv-table {
       let lastElderPPD = null;
       let lastChildPmvPayload = null;
       let lastAdultPmvPayload = null;
+      let lastElderPmvPayload = null;
       let lastChildPmvLabelName = null;
       let lastAdultPmvLabelName = null;
       let pmvPsychInputPreviewBound = false;
@@ -5386,6 +5514,26 @@ body.pmv-mode-active .chart-card--pmv-table {
       let pmvPsychChartState = null;
       let pmvPsychHoverSample = null;
       let pmvPsychBaseSubtitle = "";
+      const PMV_MET_ACTIVITY_DEFS = Object.freeze([
+        { value: "Seated, quiet", zh: "安静坐着", en: "Seated, quiet" },
+        { value: "Typing, sitting", zh: "坐姿打字", en: "Typing, sitting" },
+        { value: "Reading", zh: "阅读", en: "Reading" },
+        { value: "Writing", zh: "写字", en: "Writing" },
+        { value: "Watching TV", zh: "看电视", en: "Watching TV" },
+        { value: "Playing phone", zh: "玩手机", en: "Playing phone" },
+        { value: "Reclining", zh: "斜倚/躺靠", en: "Reclining" },
+        { value: "Standing, relaxed", zh: "放松站立", en: "Standing, relaxed" },
+        { value: "Typing, standing", zh: "站姿打字", en: "Typing, standing" },
+        { value: "Filing, standing", zh: "站立整理文件", en: "Filing, standing" },
+        { value: "Folding clothes", zh: "叠衣服", en: "Folding clothes" },
+        { value: "Cleaning windows", zh: "擦窗", en: "Cleaning windows" },
+        { value: "Vacuum cleaner", zh: "吸尘", en: "Vacuum cleaner" },
+        { value: "Walking 2km/h", zh: "2 km/h 步行", en: "Walking 2km/h" },
+        { value: "Walking 3km/h", zh: "3 km/h 步行", en: "Walking 3km/h" },
+        { value: "Walking 4km/h", zh: "4 km/h 步行", en: "Walking 4km/h" },
+        { value: "Walking 5km/h", zh: "5 km/h 步行", en: "Walking 5km/h" },
+        { value: "Walking 6km/h", zh: "6 km/h 步行", en: "Walking 6km/h" }
+      ]);
       const PMV_ADULT_MET_OPTION_DEFS = Object.freeze([
         { value: "1.0", zh: "安静坐着（1.0 met）", en: "Seated quiet (1.0 met)" },
         { value: "1.2", zh: "轻度办公（1.2 met）", en: "Light office work (1.2 met)" },
@@ -5422,6 +5570,13 @@ body.pmv-mode-active .chart-card--pmv-table {
       let lastAdultMetOptionValue = "1.0";
       let lastAdultCustomMetValue = "";
       let lastChildPmvActivityValue = "seated_rest";
+      let lastPmvActivityType = "Seated, quiet";
+      let lastPredictedPmvMet = null;
+      let lastPredictedPmvMetWm2 = null;
+      let pmvMetPreviewTimer = null;
+      let pmvMetPreviewRequestId = 0;
+      let pmvMetPreviewPending = false;
+      let pmvMetPreviewError = "";
 
       function ensureXlsxAvailable(actionZh, actionEn, onError) {
         if (typeof XLSX !== "undefined") return true;
@@ -5526,17 +5681,22 @@ body.pmv-mode-active .chart-card--pmv-table {
           "step.table.note": "在全局行填写数值会自动填满整列；如修改任意单元格，该列的全局输入会被锁定。",
           "step.table.global": "全局设置",
           "field.model.label": "热舒适模型",
-          "model.jos3": "JOS-3 体温调节模型",
-          "model.pmv": "Fanger PMV 模型",
+          "model.jos3": "多节点模型",
+          "model.pmv": "PMV模型",
           "model.twoNode": "两节点模型",
           "field.model.hint": "先选择模型，再填写左侧参数并点击「模拟」。",
+          "field.elderActivity.label": "老年人活动状态",
+          "field.elderActivity.suffix": "PMV-E 的 TL0,E 标定按活动状态区分。",
+          "elderActivity.option.seated": "静坐",
+          "elderActivity.option.walk3": "3 km/h 步行",
+          "elderActivity.option.walk5": "5 km/h 步行",
           "meta.dt.label": "时间步长（全局）：",
           "button.simulate": "模拟",
           "button.quickExample1": "示例工况 1<br/>（To 28→20 °C）",
           "button.quickExample2": "示例工况 2<br/>（暖→风扇→更暖）",
           "button.pmvAdult": "PMV 成人",
           "button.pmvChild": "PMV 小孩",
-          "button.pmvElder": "<span class=\"pmv-label-main\">PMV 老人</span><small class=\"pmv-coming-soon\">（即将上线）</small>",
+          "button.pmvElder": "PMV 老人",
           "local.open": "展开局部设置",
           "local.modal.title": "局部设置",
           "local.modal.close": "保存并关闭",
@@ -5645,7 +5805,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           "import.scene": "导入场景 (JSON)",
           "batch.upload.choose": "选择文件",
           "batch.upload.dragPrefix": "将文件拖拽到此处，或",
-          "batch.upload.dragSuffix": "。支持列：tdb tr v rh met clo wme weight height（CSV/Excel）",
+          "batch.upload.dragSuffix": "。PMV 支持列：tdb tr v rh activity_type age sex height weight clo wme（CSV/Excel）",
           "batch.upload.run": "批量模拟",
           "table.scrollHint": "← 左右滑动查看未显示列 →",
           "summary.description":
@@ -5710,17 +5870,22 @@ body.pmv-mode-active .chart-card--pmv-table {
           "step.table.note": "Values in the global row fill the entire column; editing any cell locks that column's global input.",
           "step.table.global": "Global",
           "field.model.label": "Thermal comfort model",
-          "model.jos3": "JOS-3 thermoregulation model",
-          "model.pmv": "Fanger PMV model",
+          "model.jos3": "Multi-node model",
+          "model.pmv": "PMV model",
           "model.twoNode": "Two-node model",
           "field.model.hint": "Select a model first, then fill the inputs and click \"Simulate\".",
+          "field.elderActivity.label": "Older-adult activity",
+          "field.elderActivity.suffix": "PMV-E TL0,E calibration depends on activity state.",
+          "elderActivity.option.seated": "Seated",
+          "elderActivity.option.walk3": "3 km/h walking",
+          "elderActivity.option.walk5": "5 km/h walking",
           "meta.dt.label": "Global time step:",
           "button.simulate": "Simulate",
           "button.quickExample1": "Demo 1<br/>(To 28→20 °C)",
           "button.quickExample2": "Demo 2<br/>(Warm → Fan → Warmer)",
           "button.pmvAdult": "PMV Adult",
           "button.pmvChild": "PMV Child",
-          "button.pmvElder": "<span class=\"pmv-label-main\">PMV Elder</span><small class=\"pmv-coming-soon\">(Coming soon)</small>",
+          "button.pmvElder": "PMV Elder",
           "local.open": "Open local settings",
           "local.modal.title": "Local settings",
           "local.modal.close": "Save & Close",
@@ -5830,7 +5995,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           "import.scene": "Import scene (JSON)",
           "batch.upload.choose": "Choose file",
           "batch.upload.dragPrefix": "Drag a file here, or",
-          "batch.upload.dragSuffix": ". Supported columns: tdb tr v rh met clo wme weight height (CSV/Excel)",
+          "batch.upload.dragSuffix": ". PMV columns: tdb tr v rh activity_type age sex height weight clo wme (CSV/Excel)",
           "batch.upload.run": "Batch simulation",
           "table.scrollHint": "← Drag horizontally to view hidden columns →",
           "summary.description":
@@ -5920,6 +6085,9 @@ body.pmv-mode-active .chart-card--pmv-table {
         if (typeof refreshPmvMetOptions === "function") {
           refreshPmvMetOptions();
         }
+        if (typeof refreshMetFieldLabel === "function") {
+          refreshMetFieldLabel();
+        }
       }
 
       // === DOM 绑定 ===
@@ -5929,6 +6097,7 @@ body.pmv-mode-active .chart-card--pmv-table {
       const vaInput = $("va");
       const rhInput = $("rh");
       const metSelect = $("met-select");
+      const elderActivitySelect = $("elder-activity-select");
       const cloSelect = $("clo-select");
       const postureSelect = $("posture");
       const heightInput = $("height");
@@ -6051,8 +6220,24 @@ body.pmv-mode-active .chart-card--pmv-table {
         return field ? field.querySelector(".field-suffix") : null;
       }
 
+      function refreshMetFieldLabel() {
+        const labelEl = document.querySelector("label[for=\"met-select\"]");
+        if (!labelEl) return;
+        if (shouldUsePmvPredictedMetLogic()) {
+          labelEl.textContent =
+            currentLang === "zh" ? "活动状态 / 代谢率" : "Activity / metabolic rate";
+        } else {
+          labelEl.textContent =
+            currentLang === "zh" ? "代谢率 (met)" : "Metabolic rate (met)";
+        }
+      }
+
       function shouldUseChildPmvMetLogic() {
-        return currentModel === "pmv" && currentPmvVariant === "child";
+        return false;
+      }
+
+      function shouldUsePmvPredictedMetLogic() {
+        return currentModel === "pmv";
       }
 
       function getChildPmvAgeValue() {
@@ -6084,6 +6269,12 @@ body.pmv-mode-active .chart-card--pmv-table {
       function rememberMetSelectionState() {
         if (!metSelect) return;
         const currentValue = metSelect.value || "";
+        if (shouldUsePmvPredictedMetLogic()) {
+          if (PMV_MET_ACTIVITY_DEFS.some((item) => item.value === currentValue)) {
+            lastPmvActivityType = currentValue;
+          }
+          return;
+        }
         const isChildOptions =
           !!currentValue && PMV_CHILD_MET_ACTIVITY_DEFS.some((item) => item.value === currentValue);
         if (isChildOptions) {
@@ -6101,6 +6292,35 @@ body.pmv-mode-active .chart-card--pmv-table {
       function refreshMetFieldSuffix() {
         const suffixEl = getMetSuffixElement();
         if (!suffixEl) return;
+        if (shouldUsePmvPredictedMetLogic()) {
+          const activity = getSelectedPmvActivityType();
+          const metValue = Number(lastPredictedPmvMet);
+          const wm2Value = Number(lastPredictedPmvMetWm2);
+          if (pmvMetPreviewPending) {
+            suffixEl.textContent =
+              currentLang === "zh"
+                ? `预测代谢率：${getPmvActivityLabel(activity)} = 计算中...`
+                : `Predicted metabolic rate: ${getPmvActivityLabel(activity)} = calculating...`;
+            return;
+          }
+          if (Number.isFinite(metValue)) {
+            suffixEl.textContent =
+              currentLang === "zh"
+                ? `预测代谢率：${getPmvActivityLabel(activity)} = ${formatNumber(metValue, 2)} met ≈ ${formatNumber(Number.isFinite(wm2Value) ? wm2Value : metValue * 58.2, 2)} W/m²`
+                : `Predicted metabolic rate: ${getPmvActivityLabel(activity)} = ${formatNumber(metValue, 2)} met ≈ ${formatNumber(Number.isFinite(wm2Value) ? wm2Value : metValue * 58.2, 2)} W/m²`;
+          } else if (pmvMetPreviewError) {
+            suffixEl.textContent =
+              currentLang === "zh"
+                ? `预测代谢率：${getPmvActivityLabel(activity)} = 暂无法计算（${pmvMetPreviewError}）`
+                : `Predicted metabolic rate: ${getPmvActivityLabel(activity)} = unavailable (${pmvMetPreviewError})`;
+          } else {
+            suffixEl.textContent =
+              currentLang === "zh"
+                ? "将根据活动状态、年龄、性别、身高和体重预测 met。"
+                : "Met will be predicted from activity, age, sex, height, and weight.";
+          }
+          return;
+        }
         const metValue = getMetValue();
         const heatFlux = Number.isFinite(metValue) ? metValue * 58.15 : NaN;
         if (shouldUseChildPmvMetLogic()) {
@@ -6117,10 +6337,20 @@ body.pmv-mode-active .chart-card--pmv-table {
 
       function refreshPmvMetOptions() {
         if (!metSelect) return;
+        refreshMetFieldLabel();
         rememberMetSelectionState();
+        const usePmvActivityOptions = shouldUsePmvPredictedMetLogic();
         const useChildOptions = shouldUseChildPmvMetLogic();
-        const optionDefs = useChildOptions ? PMV_CHILD_MET_ACTIVITY_DEFS : PMV_ADULT_MET_OPTION_DEFS;
-        const selectedValue = useChildOptions ? lastChildPmvActivityValue : lastAdultMetOptionValue;
+        const optionDefs = usePmvActivityOptions
+          ? PMV_MET_ACTIVITY_DEFS
+          : useChildOptions
+          ? PMV_CHILD_MET_ACTIVITY_DEFS
+          : PMV_ADULT_MET_OPTION_DEFS;
+        const selectedValue = usePmvActivityOptions
+          ? lastPmvActivityType
+          : useChildOptions
+          ? lastChildPmvActivityValue
+          : lastAdultMetOptionValue;
 
         metSelect.innerHTML = "";
         optionDefs.forEach((def) => {
@@ -6140,10 +6370,10 @@ body.pmv-mode-active .chart-card--pmv-table {
         metSelect.value = validSelected;
 
         if (metCustomInput) {
-          metCustomInput.disabled = useChildOptions;
+          metCustomInput.disabled = useChildOptions || usePmvActivityOptions;
           metCustomInput.style.display =
-            !useChildOptions && metSelect.value === "custom" ? "block" : "none";
-          if (!useChildOptions && lastAdultMetOptionValue === "custom") {
+            !useChildOptions && !usePmvActivityOptions && metSelect.value === "custom" ? "block" : "none";
+          if (!useChildOptions && !usePmvActivityOptions && lastAdultMetOptionValue === "custom") {
             metCustomInput.value = lastAdultCustomMetValue;
           }
         }
@@ -6151,21 +6381,76 @@ body.pmv-mode-active .chart-card--pmv-table {
         refreshMetFieldSuffix();
       }
 
+      function getSelectedPmvActivityType() {
+        const value = metSelect ? metSelect.value : lastPmvActivityType;
+        return PMV_MET_ACTIVITY_DEFS.some((item) => item.value === value)
+          ? value
+          : lastPmvActivityType || PMV_MET_ACTIVITY_DEFS[0].value;
+      }
+
+      function getPmvActivityLabel(activityType) {
+        const def =
+          PMV_MET_ACTIVITY_DEFS.find((item) => item.value === activityType) ||
+          PMV_MET_ACTIVITY_DEFS[0];
+        return currentLang === "zh" ? def.zh : def.en;
+      }
+
+      function applyPmvVariantDefaults(variant) {
+        const defaults =
+          variant === "child"
+            ? { age: 10, height: 1.4, weight: 33 }
+            : variant === "elder"
+            ? { age: 70, height: 1.6, weight: 60 }
+            : { age: 30, height: 1.7, weight: 70 };
+
+        if (ageInput) {
+          ageInput.value = String(defaults.age);
+        }
+        if (pmvChildAgeSelect) {
+          pmvChildAgeSelect.value = String(defaults.age);
+        }
+        if (heightInput) {
+          heightInput.value = String(defaults.height);
+        }
+        if (weightInput) {
+          weightInput.value = String(defaults.weight);
+        }
+        if (taInput) {
+          taInput.value = "26";
+        }
+        if (trInput) {
+          trInput.value = "26";
+        }
+        if (cloSelect) {
+          cloSelect.value = "custom";
+        }
+        if (cloCustomInput) {
+          cloCustomInput.value = "0.6";
+          cloCustomInput.style.display = "block";
+        }
+
+        lastPmvActivityType = "Seated, quiet";
+        resetLivePmvMetPredictionState();
+      }
+
       function setPmvVariant(variant) {
         const next = variant === "child" ? "child" : variant === "elder" ? "elder" : "adult";
         currentPmvVariant = next;
         const showChild = next === "child";
+        const showElder = next === "elder";
+        applyPmvVariantDefaults(next);
         if (pmvChildAgeSelect) {
           pmvChildAgeSelect.style.display = showChild ? "" : "none";
           pmvChildAgeSelect.disabled = !showChild;
-          if (showChild) {
-            pmvChildAgeSelect.value = String(getChildPmvAgeValue());
-          }
         }
         if (ageInput) {
           ageInput.style.display = showChild ? "none" : "";
         }
+        if (showElder && elderActivitySelect) {
+          elderActivitySelect.value = getSelectedElderPmvActivityKey();
+        }
         refreshPmvMetOptions();
+        scheduleLivePmvMetPrediction(0);
         refreshExampleButtonState();
         applyModelLayout();
         if (currentModel === "pmv") {
@@ -6175,6 +6460,25 @@ body.pmv-mode-active .chart-card--pmv-table {
 
       function isPmvElderComingSoon() {
         return PMV_ELDER_COMING_SOON;
+      }
+
+      function getPmvEndpointForVariant(variant) {
+        if (variant === "child") return "/api/pmv_child";
+        if (variant === "elder") return "/api/pmv_elder";
+        return "/api/pmv_adult";
+      }
+
+      function getSelectedElderPmvActivityKey() {
+        if (shouldUsePmvPredictedMetLogic()) {
+          return getSelectedPmvActivityType();
+        }
+        if (elderActivitySelect && elderActivitySelect.value) {
+          return elderActivitySelect.value;
+        }
+        const value = metSelect ? metSelect.value : lastAdultMetOptionValue;
+        if (value === "1.7") return "walk3";
+        if (value === "2.0") return "walk5";
+        return "seated";
       }
 
       function getPmvElderComingSoonStatus() {
@@ -6201,7 +6505,8 @@ body.pmv-mode-active .chart-card--pmv-table {
           ageInput,
           heightInput,
           weightInput,
-          pmvChildAgeSelect
+          pmvChildAgeSelect,
+          elderActivitySelect
         ]
           .filter(Boolean)
           .forEach((el) => {
@@ -6863,12 +7168,14 @@ body.pmv-mode-active .chart-card--pmv-table {
           { key: "tr", aliases: ["tr", "mrt", "meanradiant", "mean_radiant_temperature"], label: { zh: "平均辐射温度", en: "Mean radiant temp" }, type: "number", required: true },
           { key: "vel", aliases: ["vel", "v", "va", "air_speed"], label: { zh: "空气速度", en: "Air speed" }, type: "number", required: true },
           { key: "rh", aliases: ["rh", "relativehumidity", "relative_humidity"], label: { zh: "相对湿度", en: "Relative humidity" }, type: "number", required: true },
-          { key: "met", aliases: ["met"], label: { zh: "代谢率", en: "Metabolic rate" }, type: "number", required: true },
+          { key: "activity_type", aliases: ["activitytype", "activity", "act", "activity_state", "activitystate"], label: { zh: "活动状态", en: "Activity" }, type: "string", required: false },
+          { key: "age", aliases: ["age"], label: { zh: "年龄", en: "Age" }, type: "number", required: false },
+          { key: "sex", aliases: ["sex", "gender"], label: { zh: "性别", en: "Sex" }, type: "string", required: false },
+          { key: "height", aliases: ["height", "heightm", "heightcm"], label: { zh: "身高", en: "Height" }, type: "number", required: false },
+          { key: "weight", aliases: ["weight", "weightkg"], label: { zh: "体重", en: "Weight" }, type: "number", required: false },
+          { key: "met", aliases: ["met"], label: { zh: "预测代谢率", en: "Predicted metabolic rate" }, type: "number", required: false },
           { key: "clo", aliases: ["clo", "icl"], label: { zh: "服装热阻", en: "Clothing insulation" }, type: "number", required: true },
           { key: "wme", aliases: ["wme", "work"], label: { zh: "外部功率 wme", en: "External work wme" }, type: "number", required: false },
-          { key: "age", aliases: ["age"], label: { zh: "年龄", en: "Age" }, type: "number", required: false },
-          { key: "height", aliases: ["height"], label: { zh: "身高", en: "Height" }, type: "number", required: false },
-          { key: "weight", aliases: ["weight"], label: { zh: "体重", en: "Weight" }, type: "number", required: false },
           { key: "variant", aliases: ["variant", "mode"], label: { zh: "PMV 模式", en: "PMV mode" }, type: "string", required: false }
         ],
         jos3: [
@@ -7070,7 +7377,9 @@ body.pmv-mode-active .chart-card--pmv-table {
         const normFirst = firstRow.map(normalizeHeaderName);
         const hasHeader =
           normFirst.some((c) => isNaN(parseFloat(c))) ||
-          fields.some((f) => f.aliases && f.aliases.some((a) => normFirst.includes(a)));
+          fields.some((f) =>
+            f.aliases && f.aliases.some((a) => normFirst.includes(normalizeHeaderName(a)))
+          );
 
         const headerMap = {};
         let startIndex = 0;
@@ -7078,7 +7387,7 @@ body.pmv-mode-active .chart-card--pmv-table {
         if (hasHeader) {
           fields.forEach((field) => {
             (field.aliases || []).forEach((alias) => {
-              const idx = normFirst.indexOf(alias);
+              const idx = normFirst.indexOf(normalizeHeaderName(alias));
               if (idx >= 0 && headerMap[field.key] == null) {
                 headerMap[field.key] = idx;
               }
@@ -7350,7 +7659,12 @@ body.pmv-mode-active .chart-card--pmv-table {
 
       async function runPmvBatch() {
         if (!batchRows.length) {
-          setBatchStatus(currentLang === "zh" ? "请先导入包含 ta tr vel rh met clo 的表格" : "Load a table with ta tr vel rh met clo first.", true);
+          setBatchStatus(
+            currentLang === "zh"
+              ? "请先导入包含 ta tr vel rh activity_type age sex height weight clo 的表格"
+              : "Load a table with ta tr vel rh activity_type age sex height weight clo first.",
+            true
+          );
           return;
         }
         if (batchParsedModel && batchParsedModel !== "pmv") {
@@ -7380,27 +7694,45 @@ body.pmv-mode-active .chart-card--pmv-table {
               tr: Number.isFinite(row.tr) ? row.tr : parseFloat(trInput.value),
               vel: Number.isFinite(row.vel) ? row.vel : Number.isFinite(row.va) ? row.va : parseFloat(vaInput.value),
               rh: Number.isFinite(row.rh) ? row.rh : parseFloat(rhInput.value),
-              met: Number.isFinite(row.met) ? row.met : getMetValue(),
+              met: null,
+              activity_type: row.activity_type || row.activity || getSelectedPmvActivityType(),
               clo: Number.isFinite(row.clo) ? row.clo : getCloValue(),
               wme: Number.isFinite(row.wme)
                 ? row.wme
                 : getWmeValue(),
+              age: Number.isFinite(row.age)
+                ? row.age
+                : currentPmvVariant === "child"
+                ? parseInt(pmvChildAgeSelect ? pmvChildAgeSelect.value : ageInput.value, 10)
+                : parseFloat(ageInput.value),
+              sex: row.sex || (sexSelect ? sexSelect.value : "male"),
+              height: Number.isFinite(row.height) ? row.height : parseFloat(heightInput.value),
+              weight: Number.isFinite(row.weight) ? row.weight : parseFloat(weightInput.value),
               variant: currentPmvVariant
             };
             if (currentPmvVariant === "child") {
-              payload.age = Number.isFinite(row.age) ? row.age : parseInt(pmvChildAgeSelect ? pmvChildAgeSelect.value : ageInput.value, 10);
-              payload.height = Number.isFinite(row.height) ? row.height : parseFloat(heightInput.value);
-              payload.weight = Number.isFinite(row.weight) ? row.weight : parseFloat(weightInput.value);
               payload.child_activity = getSelectedChildPmvActivityKey();
-              payload.met = computeChildPmvMet(payload.age, payload.child_activity);
+            } else if (currentPmvVariant === "elder") {
+              payload.elder_activity = getSelectedElderPmvActivityKey();
+              payload.eskin_mode = "literature";
             }
 
             try {
+              const metPrediction = await predictMetForPmvInputs(payload);
+              payload.met = metPrediction.predicted_met;
+              payload.activity_type = metPrediction.activity_type;
+              payload.age = metPrediction.age;
+              payload.height = metPrediction.height_m;
+              payload.weight = metPrediction.weight_kg;
               if (currentPmvVariant === "child" && (!Number.isFinite(payload.height) || !Number.isFinite(payload.weight))) {
                 updatePmvColumns(payload, { placeholder: true, message: currentLang === "zh" ? "缺少身高/体重" : "Height/weight missing" }, { forceNew: true, placeholder: true });
                 continue;
               }
-              const pmvEndpoint = currentPmvVariant === "child" ? "/api/pmv_child" : "/api/pmv_adult";
+              if (currentPmvVariant === "elder" && (!Number.isFinite(payload.age) || payload.age < 60)) {
+                updatePmvColumns(payload, { placeholder: true, message: currentLang === "zh" ? "年龄需至少 60 岁" : "Age must be >= 60" }, { forceNew: true, placeholder: true });
+                continue;
+              }
+              const pmvEndpoint = getPmvEndpointForVariant(currentPmvVariant);
               const res = await fetch(pmvEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -7420,9 +7752,17 @@ body.pmv-mode-active .chart-card--pmv-table {
                 vel: payload.vel,
                 rh: payload.rh,
                 met: payload.met,
+                activity_type: payload.activity_type,
                 clo: payload.clo,
                 wme: payload.wme,
+                age: payload.age,
+                sex: payload.sex,
+                height: payload.height,
+                weight: payload.weight,
+                variant: payload.ui_variant || payload.variant || currentPmvVariant,
                 child_activity: payload.child_activity,
+                elder_activity: payload.elder_activity,
+                eskin_mode: payload.eskin_mode,
                 mw: null,
                 q_total: null,
                 q_sens: null,
@@ -9372,6 +9712,9 @@ body.pmv-mode-active .chart-card--pmv-table {
       function removePmvColumn(columnId) {
         if (!columnId) return;
         pmvColumns = pmvColumns.filter((col) => col.id !== columnId);
+        if (pmvSelectedOutputColumnId === columnId) {
+          pmvSelectedOutputColumnId = null;
+        }
         if (pmvPsychSelectedColumnId === columnId) {
           pmvPsychSelectedColumnId = null;
         }
@@ -9381,6 +9724,20 @@ body.pmv-mode-active .chart-card--pmv-table {
           }
         });
         renderPmvOutputTable();
+      }
+
+      function refreshPmvSelectedTableColumn() {
+        if (!pmvPanel) return;
+        const selectedId = pmvSelectedOutputColumnId || "";
+        pmvPanel.querySelectorAll(".pmv-column-selected").forEach((el) => {
+          el.classList.remove("pmv-column-selected");
+        });
+        if (!selectedId) return;
+        pmvPanel.querySelectorAll("[data-column-id]").forEach((el) => {
+          if (el.getAttribute("data-column-id") === selectedId) {
+            el.classList.add("pmv-column-selected");
+          }
+        });
       }
 
       if (pmvHeaderRow) {
@@ -9780,6 +10137,7 @@ body.pmv-mode-active .chart-card--pmv-table {
         adult: null,
         elder: null
       };
+      let pmvSelectedOutputColumnId = null;
       let pmvPsychSelectedColumnId = null;
 
       function getChartTooltipState(chart) {
@@ -12118,6 +12476,10 @@ body.pmv-mode-active .chart-card--pmv-table {
 
       // === 通用工具函数 ===
       function getMetValue() {
+        if (shouldUsePmvPredictedMetLogic()) {
+          const predicted = Number(lastPredictedPmvMet);
+          return Number.isFinite(predicted) ? predicted : 1.0;
+        }
         if (shouldUseChildPmvMetLogic()) {
           return computeChildPmvMet(getChildPmvAgeValue(), getSelectedChildPmvActivityKey());
         }
@@ -15580,9 +15942,11 @@ body.pmv-mode-active .chart-card--pmv-table {
         { key: "vel",     label: { zh: "空气速度",           en: "Air speed" },            symbol: "Va",  unit: "m/s", group: "inputs" },
         { key: "rh",      label: { zh: "相对湿度",           en: "Relative humidity" },    symbol: "RH",  unit: "%",   group: "inputs" },
         { key: "met",     label: { zh: "代谢率",             en: "Metabolic rate" },       symbol: "met", unit: "met", group: "inputs" },
+        { key: "activity_type", label: { zh: "活动状态", en: "Activity" }, symbol: "Act", unit: "", group: "inputs" },
         { key: "clo",     label: { zh: "服装热阻",           en: "Clothing" },             symbol: "clo", unit: "clo", group: "inputs" },
         { key: "wme",     label: { zh: "外部功率",           en: "External work" },        symbol: "wme", unit: "met", group: "inputs" },
         { key: "age",     label: { zh: "年龄",               en: "Age" },                  symbol: "Y",   unit: "y",   group: "inputs" },
+        { key: "sex",     label: { zh: "性别",               en: "Sex" },                  symbol: "Sex", unit: "",    group: "inputs" },
         { key: "height",  label: { zh: "身高",               en: "Height" },               symbol: "H",   unit: "m",   group: "inputs" },
         { key: "weight",  label: { zh: "体重",               en: "Weight" },               symbol: "W",   unit: "kg",  group: "inputs" },
         // 当前输出
@@ -15703,8 +16067,8 @@ body.pmv-mode-active .chart-card--pmv-table {
             formatI18n("twoNode.tableHeader.name", "量名称", "Quantity"),
             formatI18n("twoNode.tableHeader.symbol", "符号", "Symbol")
           ];
-        pmvColumns.forEach((_, idx) => {
-          header.push(getPmvColumnLabel(idx + 1));
+        pmvColumns.forEach((col, idx) => {
+          header.push(getPmvColumnLabel(idx + 1, col));
         });
         header.push(formatI18n("twoNode.tableHeader.unit", "单位", "Unit"));
         lines.push(header.join("\t"));
@@ -15808,8 +16172,8 @@ body.pmv-mode-active .chart-card--pmv-table {
           formatI18n("twoNode.tableHeader.name", "量名称", "Quantity"),
           formatI18n("twoNode.tableHeader.symbol", "符号", "Symbol")
         ];
-        pmvColumns.forEach((_, idx) => {
-          header.push(getPmvColumnLabel(idx + 1));
+        pmvColumns.forEach((col, idx) => {
+          header.push(getPmvColumnLabel(idx + 1, col));
         });
         header.push(formatI18n("twoNode.tableHeader.unit", "单位", "Unit"));
         aoa.push(header);
@@ -16184,7 +16548,7 @@ body.pmv-mode-active .chart-card--pmv-table {
 
         (columns || pmvColumns).forEach((col, idx) => {
           const index = idx + 1;
-          const label = getPmvColumnLabel(index);
+          const label = getPmvColumnLabel(index, col);
           const th = document.createElement("th");
           th.className = "two-node-col two-node-value-col";
           th.dataset.columnId = col.id;
@@ -16242,7 +16606,7 @@ body.pmv-mode-active .chart-card--pmv-table {
 
           if (isNewGroup) {
             const spacer = document.createElement("tr");
-            spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:3px;"></td>`;
+            spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:1px;padding:0;line-height:1;"></td>`;
             pmvOutputTbody.appendChild(spacer);
 
             const titleTr = document.createElement("tr");
@@ -16284,9 +16648,10 @@ body.pmv-mode-active .chart-card--pmv-table {
         });
 
         const spacer = document.createElement("tr");
-        spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:3px;"></td>`;
+        spacer.innerHTML = `<td colspan="${colSpanCount}" style="height:1px;padding:0;line-height:1;"></td>`;
         pmvOutputTbody.appendChild(spacer);
 
+        refreshPmvSelectedTableColumn();
         renderPmvVizPoints();
         syncPMVViewFromColumns();
       }
@@ -16307,9 +16672,11 @@ body.pmv-mode-active .chart-card--pmv-table {
           vel: payload.vel,
           rh: payload.rh,
           met: payload.met,
+          activity_type: payload.activity_type,
           clo: payload.clo,
           wme: payload.wme,
           age: payload.age,
+          sex: payload.sex,
           child_activity: payload.child_activity,
           height: payload.height,
           weight: payload.weight,
@@ -16341,9 +16708,11 @@ body.pmv-mode-active .chart-card--pmv-table {
           vel: payload.vel,
           rh: payload.rh,
           met: payload.met,
+          activity_type: payload.activity_type,
           clo: payload.clo,
           wme: payload.wme,
           age: payload.age,
+          sex: payload.sex,
           child_activity: payload.child_activity,
           height: payload.height,
           weight: payload.weight,
@@ -16423,10 +16792,20 @@ body.pmv-mode-active .chart-card--pmv-table {
         return "很热 (+3)";
       }
 
-      function getPmvColumnLabel(index) {
+      function getPmvColumnLabel(index, col) {
         const baseValueLabel = formatI18n("twoNode.column.valueLabel", "数值", "Value");
         const idx = Number.isFinite(index) ? index : 1;
-        return currentLang === "zh" ? `${baseValueLabel}${idx}` : `${baseValueLabel} ${idx}`;
+        const sourceCol =
+          col ||
+          (Array.isArray(pmvColumns) && idx >= 1 ? pmvColumns[idx - 1] : null);
+        const variantLabel =
+          sourceCol && sourceCol.data
+            ? getPmvVariantTitle(getPmvColumnVariant(sourceCol))
+            : "";
+        if (currentLang === "zh") {
+          return `${variantLabel || ""}${baseValueLabel}${idx}`;
+        }
+        return `${variantLabel ? variantLabel + " " : ""}${baseValueLabel} ${idx}`;
       }
 
       function getLatestPmvColumnLabel() {
@@ -17005,8 +17384,8 @@ body.pmv-mode-active .chart-card--pmv-table {
 
         noteEl.textContent =
           currentLang === "zh"
-            ? "注：在本焓湿图中，横坐标为操作温度，界面纵轴标签显示为焓；对于每个点，干球温度等于平均辐射温度（DBT = MRT）。舒适区表示在 DBT 与 MRT 相同的条件组合下，依据标准 PMV 介于 -0.5 至 +0.5 之间的范围。\n\n适用性限制：本标准仅适用于健康个体。本标准不适用于以下人员：a) 服装热阻超过 1.5 clo；b) 服装具有高度不透湿性；c) 正在睡眠、斜躺并接触寝具，或能够调节毯子/寝具的人员。"
-            : "NOTE: In this psychrometric chart the abscissa is the operative temperature and for each point dry-bulb temperature equals mean radiant temperature (DBT = MRT). The comfort zone represents the combination of conditions with the same DBT and MRT for which the PMV is between -0.5 and +0.5, according to the standard.\n\nLimits of Applicability: This standard is only applicable to healthy individuals. This standard does not apply to occupants: a) whose clothing insulation exceed 1.5 clo; b) whose clothing is highly impermeable; or c) who are sleeping, reclining in contact with bedding, or able to adjust blankets or bedding.";
+            ? "注：在本焓湿图中，横坐标为操作温度，界面纵轴标签显示为焓；对于每个点，干球温度等于平均辐射温度（DBT = MRT）。舒适区表示在 DBT 与 MRT 相同的条件组合下，依据标准 PMV 介于 -0.5 至 +0.5 之间的范围。适用性限制：本标准仅适用于健康个体，不适用于以下人员：a) 服装热阻超过 1.5 clo；b) 服装具有高度不透湿性；c) 正在睡眠、斜躺并接触寝具，或能够调节毯子/寝具的人员。"
+            : "NOTE: In this psychrometric chart the abscissa is the operative temperature and dry-bulb temperature equals mean radiant temperature (DBT = MRT) for each point. The comfort zone represents conditions with the same DBT and MRT for which PMV is between -0.5 and +0.5. Limits of applicability: this standard is only applicable to healthy individuals and does not apply to occupants whose clothing insulation exceeds 1.5 clo, whose clothing is highly impermeable, or who are sleeping, reclining in contact with bedding, or able to adjust blankets or bedding.";
 
         if (!Number.isFinite(tdb) || !Number.isFinite(rh) || !Number.isFinite(humidityRatioGkg)) {
           renderPmvPsychrometricPlaceholder(
@@ -17017,7 +17396,7 @@ body.pmv-mode-active .chart-card--pmv-table {
 
         const width = 640;
         const height = 470;
-        const padding = { top: 14, right: 52, bottom: 58, left: 36 };
+        const padding = { top: 14, right: 52, bottom: 44, left: 36 };
         const axisTickFontSize = 14;
         const axisLabelFontSize = 17;
         const innerWidth = width - padding.left - padding.right;
@@ -17071,7 +17450,7 @@ body.pmv-mode-active .chart-card--pmv-table {
             `<line x1="${x.toFixed(2)}" y1="${padding.top}" x2="${x.toFixed(2)}" y2="${(height - padding.bottom).toFixed(2)}" stroke="rgba(148,163,184,0.12)" stroke-width="1" />`
           );
           verticalGrid.push(
-            `<text x="${x.toFixed(2)}" y="${(height - padding.bottom + 25).toFixed(2)}" text-anchor="middle" fill="#64748b" font-size="${axisTickFontSize}">${tick}</text>`
+            `<text x="${x.toFixed(2)}" y="${(height - padding.bottom + 20).toFixed(2)}" text-anchor="middle" fill="#64748b" font-size="${axisTickFontSize}">${tick}</text>`
           );
         }
 
@@ -17119,7 +17498,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           `<circle id="pmvPsychHoverOuter" cx="${pointX.toFixed(2)}" cy="${pointY.toFixed(2)}" r="10" fill="rgba(255,255,255,0.88)" stroke="#2563eb" stroke-width="2.6" />`,
           `<circle id="pmvPsychHoverInner" cx="${pointX.toFixed(2)}" cy="${pointY.toFixed(2)}" r="3.8" fill="#2563eb" />`,
           `</g>`,
-          `<text x="${((padding.left + width - padding.right) / 2).toFixed(2)}" y="${(height - 10).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600">${currentLang === "zh" ? "操作温度 [°C]" : "Operative Temperature [°C]"}</text>`,
+          `<text x="${((padding.left + width - padding.right) / 2).toFixed(2)}" y="${(height - 7).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600">${currentLang === "zh" ? "操作温度 [°C]" : "Operative Temperature [°C]"}</text>`,
           `<text x="${(width - 13).toFixed(2)}" y="${((padding.top + axisY) / 2).toFixed(2)}" text-anchor="middle" fill="#334155" font-size="${axisLabelFontSize}" font-weight="600" transform="rotate(90 ${(width - 13).toFixed(2)} ${((padding.top + axisY) / 2).toFixed(2)})">${currentLang === "zh" ? "焓 [kJ/kg]" : "Enthalpy [kJ/kg]"}</text>`
         ].join("");
         pmvPsychBaseSubtitle = subtitleEl.textContent;
@@ -17199,11 +17578,10 @@ body.pmv-mode-active .chart-card--pmv-table {
         if (!layer) return;
         const dots = layer.querySelectorAll(".pmv-viz-dot");
         dots.forEach((dot) => {
-          const variant = dot.dataset.variant || "adult";
           const columnId = dot.dataset.columnId || "";
           dot.classList.toggle(
             "is-selected",
-            !!columnId && pmvSelectedColumnIds[variant] === columnId
+            !!columnId && pmvSelectedOutputColumnId === columnId
           );
         });
       }
@@ -17223,8 +17601,16 @@ body.pmv-mode-active .chart-card--pmv-table {
       function setSelectedPmvColumn(variant, columnId) {
         const normalized =
           variant === "child" ? "child" : variant === "elder" ? "elder" : "adult";
+        Object.keys(pmvSelectedColumnIds).forEach((key) => {
+          pmvSelectedColumnIds[key] = null;
+        });
         pmvSelectedColumnIds[normalized] = columnId || null;
+        pmvSelectedOutputColumnId = columnId || null;
+        if (columnId) {
+          pmvPsychSelectedColumnId = columnId;
+        }
         syncPMVViewFromColumns();
+        refreshPmvSelectedTableColumn();
         refreshPmvSelectedDots();
       }
 
@@ -17566,6 +17952,17 @@ body.pmv-mode-active .chart-card--pmv-table {
                 keepIdsPMV.add("field-age");
                 keepIdsPMV.add("field-height");
                 keepIdsPMV.add("field-weight");
+                keepIdsPMV.add("field-sex");
+              } else if (currentPmvVariant === "elder") {
+                keepIdsPMV.add("field-age");
+                keepIdsPMV.add("field-height");
+                keepIdsPMV.add("field-weight");
+                keepIdsPMV.add("field-sex");
+              } else {
+                keepIdsPMV.add("field-age");
+                keepIdsPMV.add("field-height");
+                keepIdsPMV.add("field-weight");
+                keepIdsPMV.add("field-sex");
               }
               fields.forEach((field) => {
                 if (keepIdsPMV.has(field.id)) {
@@ -17604,7 +18001,7 @@ body.pmv-mode-active .chart-card--pmv-table {
             } else {
               // JOS-3：保留基础工况字段在主网格，个体信息移动到左侧高级调参区域
               fields.forEach((field) => {
-                field.style.display = "";
+                field.style.display = field.id === "field-elder-activity" ? "none" : "";
               });
               if (advancedTwoNodeSection) {
                 advancedTwoNodeSection.style.display = "none";
@@ -18190,6 +18587,16 @@ body.pmv-mode-active .chart-card--pmv-table {
       }
 
       function setMetFromValue(value) {
+        if (shouldUsePmvPredictedMetLogic()) {
+          lastPredictedPmvMet = Number(value);
+          lastPredictedPmvMetWm2 = Number.isFinite(lastPredictedPmvMet)
+            ? lastPredictedPmvMet * 58.2
+            : null;
+          pmvMetPreviewError = "";
+          refreshPmvMetOptions();
+          refreshMetFieldSuffix();
+          return;
+        }
         if (shouldUseChildPmvMetLogic()) {
           const targetValue = Number(value);
           const ageValue = getChildPmvAgeValue();
@@ -18285,6 +18692,13 @@ body.pmv-mode-active .chart-card--pmv-table {
         }
         if (Number.isFinite(payload.met)) {
           setMetFromValue(payload.met);
+        }
+        if (payload.activity_type && PMV_MET_ACTIVITY_DEFS.some((item) => item.value === payload.activity_type)) {
+          lastPmvActivityType = payload.activity_type;
+          refreshPmvMetOptions();
+          if (metSelect) metSelect.value = payload.activity_type;
+          lastPredictedPmvMet = Number.isFinite(payload.met) ? payload.met : null;
+          refreshMetFieldSuffix();
         }
         if (payload.sex) {
           sexSelect.value = payload.sex;
@@ -18386,6 +18800,120 @@ body.pmv-mode-active .chart-card--pmv-table {
         }
       }
 
+      function getCurrentPmvAgeValue() {
+        if (currentPmvVariant === "child") {
+          return pmvChildAgeSelect
+            ? parseInt(pmvChildAgeSelect.value, 10)
+            : parseInt(ageInput.value, 10);
+        }
+        return parseFloat(ageInput.value);
+      }
+
+      function buildMetPredictionPayload(overrides) {
+        const source = overrides || {};
+        return {
+          activity_type: source.activity_type || getSelectedPmvActivityType(),
+          age: Number.isFinite(source.age) ? source.age : getCurrentPmvAgeValue(),
+          sex: source.sex || (sexSelect ? sexSelect.value : "male"),
+          height: Number.isFinite(source.height) ? source.height : parseFloat(heightInput.value),
+          weight: Number.isFinite(source.weight) ? source.weight : parseFloat(weightInput.value)
+        };
+      }
+
+      function getMetPredictionMissingInputs(payload) {
+        const missing = [];
+        if (!payload.activity_type) missing.push("activity");
+        if (!Number.isFinite(payload.age)) missing.push("age");
+        if (!payload.sex) missing.push("sex");
+        if (!Number.isFinite(payload.height) || payload.height <= 0) missing.push("height");
+        if (!Number.isFinite(payload.weight) || payload.weight <= 0) missing.push("weight");
+        return missing;
+      }
+
+      function resetLivePmvMetPredictionState() {
+        lastPredictedPmvMet = null;
+        lastPredictedPmvMetWm2 = null;
+        pmvMetPreviewError = "";
+      }
+
+      async function predictMetForPmvInputs(overrides, options) {
+        const opts = options || {};
+        const payload = buildMetPredictionPayload(overrides);
+        const missing = getMetPredictionMissingInputs(payload);
+        if (missing.length) {
+          throw new Error(
+            currentLang === "zh"
+              ? `代谢率预测缺少输入：${missing.join(", ")}`
+              : `Met prediction missing inputs: ${missing.join(", ")}`
+          );
+        }
+        const res = await fetch("/api/met_predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error("代谢率预测失败：" + res.status + "，详细：" + text);
+        }
+        const data = await res.json();
+        if (opts.deferUpdate) {
+          return data;
+        }
+        lastPredictedPmvMet = Number(data.predicted_met);
+        lastPredictedPmvMetWm2 = Number(data.predicted_W_m2);
+        pmvMetPreviewError = "";
+        if (!opts.keepPending) {
+          pmvMetPreviewPending = false;
+        }
+        refreshMetFieldSuffix();
+        return data;
+      }
+
+      function scheduleLivePmvMetPrediction(delayMs) {
+        if (pmvMetPreviewTimer) {
+          clearTimeout(pmvMetPreviewTimer);
+          pmvMetPreviewTimer = null;
+        }
+        if (!shouldUsePmvPredictedMetLogic()) return;
+
+        const requestId = ++pmvMetPreviewRequestId;
+        const payload = buildMetPredictionPayload();
+        const missing = getMetPredictionMissingInputs(payload);
+        resetLivePmvMetPredictionState();
+        if (missing.length) {
+          pmvMetPreviewPending = false;
+          refreshMetFieldSuffix();
+          return;
+        }
+
+        pmvMetPreviewPending = true;
+        refreshMetFieldSuffix();
+
+        pmvMetPreviewTimer = setTimeout(async () => {
+          try {
+            const data = await predictMetForPmvInputs(payload, { deferUpdate: true });
+            if (requestId !== pmvMetPreviewRequestId) return;
+            lastPredictedPmvMet = Number(data.predicted_met);
+            lastPredictedPmvMetWm2 = Number(data.predicted_W_m2);
+            pmvMetPreviewError = "";
+          } catch (err) {
+            if (requestId !== pmvMetPreviewRequestId) return;
+            lastPredictedPmvMet = null;
+            lastPredictedPmvMetWm2 = null;
+            pmvMetPreviewError =
+              err && err.message
+                ? err.message.replace(/^代谢率预测失败：/, "").slice(0, 80)
+                : String(err || "error").slice(0, 80);
+          } finally {
+            if (requestId === pmvMetPreviewRequestId) {
+              pmvMetPreviewPending = false;
+              refreshMetFieldSuffix();
+            }
+          }
+        }, Number.isFinite(delayMs) ? delayMs : 250);
+      }
+
       // === 模拟主流程 ===
       async function runPmvSimulation() {
         if (currentPmvVariant === "elder" && isPmvElderComingSoon()) {
@@ -18394,64 +18922,74 @@ body.pmv-mode-active .chart-card--pmv-table {
           return;
         }
 
-        const payload = {
-          ta: parseFloat(taInput.value),
-          tr: parseFloat(trInput.value),
-          vel: parseFloat(vaInput.value),
-          rh: parseFloat(rhInput.value),
-          met: getMetValue(),
-          clo: getCloValue(),
-          wme: getWmeValue(),
-          variant: currentPmvVariant === "child" ? "child" : "adult"
-        };
-
-        if (currentPmvVariant === "elder") {
-          payload.ui_variant = "elder";
-        }
-
-        if (currentPmvVariant === "child") {
-          const ageVal = pmvChildAgeSelect
-            ? parseInt(pmvChildAgeSelect.value, 10)
-            : parseInt(ageInput.value, 10);
-          const heightVal = parseFloat(heightInput.value);
-          const weightVal = parseFloat(weightInput.value);
-          const activityKey = getSelectedChildPmvActivityKey();
-          payload.age = ageVal;
-          payload.height = heightVal;
-          payload.weight = weightVal;
-          payload.child_activity = activityKey;
-          payload.met = computeChildPmvMet(ageVal, activityKey);
-
-          const heightOk = Number.isFinite(heightVal) && heightVal > 0;
-          const weightOk = Number.isFinite(weightVal) && weightVal > 0;
-          if (!heightOk || !weightOk) {
-            // 缺少身高/体重：直接生成占位列，值全部为“/”
-            updatePmvColumns(payload, {
-              placeholder: true,
-              message:
-                currentLang === "zh"
-                  ? "缺少身高或体重"
-                  : "Height & weight required"
-            }, { forceNew: true, placeholder: true });
-            setPmvStatus(
-              currentLang === "zh"
-                ? "状态：缺少身高或体重，结果为空"
-                : "Status: height/weight missing; filled with blanks"
-            );
-            return;
-          }
-        }
-
-        lastPayload = payload;
-        lastScenario = "pmv";
-        lastStepsForSummary = [];
-
         try {
           simulateBtn.disabled = true;
           simulateBtnLabel.textContent = currentLang === "zh" ? "计算中…" : "Running…";
+          setPmvStatus(currentLang === "zh" ? "状态：正在预测代谢率…" : "Status: predicting metabolic rate…");
+
+          const metPrediction = await predictMetForPmvInputs();
+
+          const payload = {
+            ta: parseFloat(taInput.value),
+            tr: parseFloat(trInput.value),
+            vel: parseFloat(vaInput.value),
+            rh: parseFloat(rhInput.value),
+            met: metPrediction.predicted_met,
+            activity_type: metPrediction.activity_type,
+            clo: getCloValue(),
+            wme: getWmeValue(),
+            age: metPrediction.age,
+            sex: sexSelect ? sexSelect.value : "male",
+            height: metPrediction.height_m,
+            weight: metPrediction.weight_kg,
+            variant:
+              currentPmvVariant === "child"
+                ? "child"
+                : currentPmvVariant === "elder"
+                ? "elder"
+                : "adult"
+          };
+
+          if (currentPmvVariant === "elder") {
+            payload.ui_variant = "elder";
+            payload.elder_activity = getSelectedElderPmvActivityKey();
+            payload.eskin_mode = "literature";
+            if (!Number.isFinite(payload.age) || payload.age < 60) {
+              throw new Error(
+                currentLang === "zh"
+                  ? "PMV-E 老年人模型要求年龄至少 60 岁。"
+                  : "PMV-E older-adult model requires age >= 60."
+              );
+            }
+          }
+
+          if (currentPmvVariant === "child") {
+            const heightOk = Number.isFinite(payload.height) && payload.height > 0;
+            const weightOk = Number.isFinite(payload.weight) && payload.weight > 0;
+            payload.child_activity = getSelectedChildPmvActivityKey();
+            if (!heightOk || !weightOk) {
+              updatePmvColumns(payload, {
+                placeholder: true,
+                message:
+                  currentLang === "zh"
+                    ? "缺少身高或体重"
+                    : "Height & weight required"
+              }, { forceNew: true, placeholder: true });
+              setPmvStatus(
+                currentLang === "zh"
+                  ? "状态：缺少身高或体重，结果为空"
+                  : "Status: height/weight missing; filled with blanks"
+              );
+              return;
+            }
+          }
+
+          lastPayload = payload;
+          lastScenario = "pmv";
+          lastStepsForSummary = [];
           setPmvStatus("状态：PMV 计算中…");
 
-          const pmvEndpoint = currentPmvVariant === "child" ? "/api/pmv_child" : "/api/pmv_adult";
+          const pmvEndpoint = getPmvEndpointForVariant(currentPmvVariant);
           const res = await fetch(pmvEndpoint, {
             method: "POST",
             headers: {
@@ -18471,6 +19009,8 @@ body.pmv-mode-active .chart-card--pmv-table {
           updatePMVCard();
           if (currentPmvVariant === "child") {
             lastChildPmvPayload = { ...payload };
+          } else if (currentPmvVariant === "elder") {
+            lastElderPmvPayload = { ...payload };
           } else {
             lastAdultPmvPayload = { ...payload };
           }
@@ -18879,6 +19419,7 @@ body.pmv-mode-active .chart-card--pmv-table {
           }
           if (newModel === "pmv") {
             setPmvVariant(currentPmvVariant);
+            scheduleLivePmvMetPrediction(0);
           }
           refreshExampleButtonState();
           updateConditionInlineStatus();
@@ -19129,7 +19670,14 @@ body.pmv-mode-active .chart-card--pmv-table {
       // pmv-viz-dots handle tooltip events
 
       metSelect.addEventListener("change", () => {
-        if (shouldUseChildPmvMetLogic()) {
+        if (shouldUsePmvPredictedMetLogic()) {
+          lastPmvActivityType = getSelectedPmvActivityType();
+          resetLivePmvMetPredictionState();
+          if (metCustomInput) {
+            metCustomInput.style.display = "none";
+          }
+          scheduleLivePmvMetPrediction(120);
+        } else if (shouldUseChildPmvMetLogic()) {
           lastChildPmvActivityValue = getSelectedChildPmvActivityKey();
           metCustomInput.style.display = "none";
         } else {
@@ -19147,6 +19695,13 @@ body.pmv-mode-active .chart-card--pmv-table {
         saveActiveConditionFromInputs();
       });
 
+      if (elderActivitySelect) {
+        elderActivitySelect.addEventListener("change", () => {
+          renderPmvPsychrometricCard();
+          saveActiveConditionFromInputs();
+        });
+      }
+
       [taInput, trInput, vaInput, rhInput, exposureInput, metCustomInput, cloCustomInput]
         .filter(Boolean)
         .forEach((el) => {
@@ -19163,6 +19718,10 @@ body.pmv-mode-active .chart-card--pmv-table {
         .filter(Boolean)
         .forEach((el) => {
           const handleAgeRelatedMetRefresh = () => {
+            if (shouldUsePmvPredictedMetLogic()) {
+              resetLivePmvMetPredictionState();
+              scheduleLivePmvMetPrediction(250);
+            }
             if (shouldUseChildPmvMetLogic()) {
               refreshPmvMetOptions();
             } else {
@@ -19172,6 +19731,21 @@ body.pmv-mode-active .chart-card--pmv-table {
           };
           el.addEventListener("input", handleAgeRelatedMetRefresh);
           el.addEventListener("change", handleAgeRelatedMetRefresh);
+        });
+
+      [heightInput, weightInput, sexSelect]
+        .filter(Boolean)
+        .forEach((el) => {
+          const handleMetPredictorInputChange = () => {
+            if (shouldUsePmvPredictedMetLogic()) {
+              resetLivePmvMetPredictionState();
+              scheduleLivePmvMetPrediction(250);
+              refreshMetFieldSuffix();
+            }
+            saveActiveConditionFromInputs();
+          };
+          el.addEventListener("input", handleMetPredictorInputChange);
+          el.addEventListener("change", handleMetPredictorInputChange);
         });
 
       window.addEventListener("resize", () => {
@@ -19303,6 +19877,7 @@ body.pmv-mode-active .chart-card--pmv-table {
       bindPmvPsychrometricPreviewInputs();
       applyI18n();
       refreshPmvMetOptions();
+      scheduleLivePmvMetPrediction(0);
       updateScenarioUI();
       initBody3DHeightSync();
       updatePMVCard();
